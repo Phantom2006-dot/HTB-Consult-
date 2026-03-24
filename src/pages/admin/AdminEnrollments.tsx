@@ -5,19 +5,12 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fadeUp } from "@/lib/animations";
 import AdminLayout from "@/components/AdminLayout";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 const AdminEnrollments = () => {
   const { data: enrollments, isLoading } = useQuery({
     queryKey: ["admin-enrollments"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("enrollments")
-        .select("*, courses(title, category)")
-        .order("enrolled_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => api.get<any[]>("/api/admin/enrollments"),
   });
 
   return (

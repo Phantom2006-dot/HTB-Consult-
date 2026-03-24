@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { fadeUp } from "@/lib/animations";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import Layout from "@/components/Layout";
 
 interface Conversation {
@@ -23,23 +23,12 @@ const Messages = () => {
 
   useEffect(() => {
     if (!user) return;
-    supabase
-      .from("chat_conversations")
-      .select("id, title, type, created_at")
-      .eq("user_id", user.id)
-      .order("updated_at", { ascending: false })
-      .then(({ data }) => {
-        if (data) setConversations(data);
-      });
+    api.get<Conversation[]>("/api/chat/conversations").then(setConversations).catch(() => {});
   }, [user]);
 
   const startNewUserChat = async () => {
     if (!user) return;
-    const { data } = await supabase
-      .from("chat_conversations")
-      .insert({ user_id: user.id, title: "New Conversation", type: "user" })
-      .select("id")
-      .single();
+    const data = await api.post<{ id: string }>("/api/chat/conversations", { title: "New Conversation", type: "user" });
     if (data) navigate(`/chat?conv=${data.id}`);
   };
 

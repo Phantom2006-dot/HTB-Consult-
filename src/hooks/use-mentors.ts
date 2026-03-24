@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 export interface Mentor {
   id: string;
@@ -26,15 +26,7 @@ export interface AvailabilitySlot {
 export function useMentors() {
   return useQuery({
     queryKey: ["mentors"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("mentors")
-        .select("*")
-        .eq("published", true)
-        .order("rating", { ascending: false });
-      if (error) throw error;
-      return data as Mentor[];
-    },
+    queryFn: () => api.get<Mentor[]>("/api/mentors"),
   });
 }
 
@@ -42,22 +34,6 @@ export function useMentorDetail(id: string | undefined) {
   return useQuery({
     queryKey: ["mentor", id],
     enabled: !!id,
-    queryFn: async () => {
-      const { data: mentor, error } = await supabase
-        .from("mentors")
-        .select("*")
-        .eq("id", id!)
-        .single();
-      if (error) throw error;
-
-      const { data: slots } = await supabase
-        .from("availability_slots")
-        .select("*")
-        .eq("mentor_id", id!)
-        .eq("is_active", true)
-        .order("day_of_week");
-
-      return { mentor: mentor as Mentor, slots: (slots || []) as AvailabilitySlot[] };
-    },
+    queryFn: () => api.get<{ mentor: Mentor; slots: AvailabilitySlot[] }>(`/api/mentors/${id}`),
   });
 }

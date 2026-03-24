@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
 export function useIsAdmin() {
@@ -7,16 +7,7 @@ export function useIsAdmin() {
   return useQuery({
     queryKey: ["is-admin", user?.id],
     enabled: !!user,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user!.id)
-        .eq("role", "admin")
-        .maybeSingle();
-      if (error) throw error;
-      return !!data;
-    },
+    queryFn: () => Promise.resolve(user?.role === "admin"),
     staleTime: 5 * 60 * 1000,
   });
 }
@@ -24,19 +15,6 @@ export function useIsAdmin() {
 export function useAdminStats() {
   return useQuery({
     queryKey: ["admin-stats"],
-    queryFn: async () => {
-      const [courses, mentors, enrollments, profiles] = await Promise.all([
-        supabase.from("courses").select("id", { count: "exact", head: true }),
-        supabase.from("mentors").select("id", { count: "exact", head: true }),
-        supabase.from("enrollments").select("id", { count: "exact", head: true }),
-        supabase.from("profiles").select("id", { count: "exact", head: true }),
-      ]);
-      return {
-        courses: courses.count || 0,
-        mentors: mentors.count || 0,
-        enrollments: enrollments.count || 0,
-        users: profiles.count || 0,
-      };
-    },
+    queryFn: () => api.get<{ courses: number; mentors: number; enrollments: number; users: number }>("/api/admin/stats"),
   });
 }

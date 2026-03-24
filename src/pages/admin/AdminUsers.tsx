@@ -5,33 +5,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fadeUp } from "@/lib/animations";
 import AdminLayout from "@/components/AdminLayout";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 const AdminUsers = () => {
   const { data: profiles, isLoading } = useQuery({
     queryKey: ["admin-profiles"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => api.get<any[]>("/api/admin/users"),
   });
-
-  const { data: roles } = useQuery({
-    queryKey: ["admin-all-roles"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("user_roles").select("*");
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const getUserRoles = (userId: string) => {
-    return (roles || []).filter((r: any) => r.user_id === userId).map((r: any) => r.role);
-  };
 
   const getInitials = (name: string | null) => {
     if (!name) return "?";
@@ -52,9 +32,7 @@ const AdminUsers = () => {
           ) : (profiles || []).length === 0 ? (
             <Card className="border-border bg-card"><CardContent className="p-8 text-center text-muted-foreground">No users yet.</CardContent></Card>
           ) : (
-            (profiles || []).map((profile: any) => {
-              const userRoles = getUserRoles(profile.user_id);
-              return (
+            (profiles || []).map((profile: any) => (
                 <Card key={profile.id} className="border-border bg-card">
                   <CardContent className="p-4 flex items-center gap-4">
                     <div className="w-10 h-10 rounded-full bg-primary/15 text-primary flex items-center justify-center text-sm font-bold shrink-0">
@@ -65,12 +43,9 @@ const AdminUsers = () => {
                       <p className="text-xs text-muted-foreground">ID: {profile.user_id.slice(0, 8)}…</p>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      {userRoles.map((role: string) => (
-                        <Badge key={role} variant={role === "admin" ? "default" : "secondary"} className="text-[10px]">
-                          {role}
-                        </Badge>
-                      ))}
-                      {userRoles.length === 0 && <Badge variant="outline" className="text-[10px]">no role</Badge>}
+                      <Badge variant={profile.role === "admin" ? "default" : "secondary"} className="text-[10px]">
+                        {profile.role || "student"}
+                      </Badge>
                     </div>
                     <p className="text-xs text-muted-foreground shrink-0">{new Date(profile.created_at).toLocaleDateString()}</p>
                   </CardContent>

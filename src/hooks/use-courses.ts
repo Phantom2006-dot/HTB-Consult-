@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 export interface Course {
   id: string;
@@ -42,15 +42,7 @@ export interface Lesson {
 export function useCourses() {
   return useQuery({
     queryKey: ["courses"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("courses")
-        .select("*")
-        .eq("published", true)
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return data as Course[];
-    },
+    queryFn: () => api.get<Course[]>("/api/courses"),
   });
 }
 
@@ -58,37 +50,6 @@ export function useCourseDetail(id: string | undefined) {
   return useQuery({
     queryKey: ["course", id],
     enabled: !!id,
-    queryFn: async () => {
-      const { data: course, error } = await supabase
-        .from("courses")
-        .select("*")
-        .eq("id", id!)
-        .single();
-      if (error) throw error;
-
-      const { data: modules } = await supabase
-        .from("modules")
-        .select("*")
-        .eq("course_id", id!)
-        .order("sort_order");
-
-      const moduleIds = (modules || []).map((m: any) => m.id);
-      let lessons: Lesson[] = [];
-      if (moduleIds.length > 0) {
-        const { data: lessonData } = await supabase
-          .from("lessons")
-          .select("*")
-          .in("module_id", moduleIds)
-          .order("sort_order");
-        lessons = (lessonData || []) as Lesson[];
-      }
-
-      const modulesWithLessons = (modules || []).map((m: any) => ({
-        ...m,
-        lessons: lessons.filter((l) => l.module_id === m.id),
-      })) as Module[];
-
-      return { course: course as Course, modules: modulesWithLessons };
-    },
+    queryFn: () => api.get<{ course: Course; modules: Module[] }>(`/api/courses/${id}`),
   });
 }

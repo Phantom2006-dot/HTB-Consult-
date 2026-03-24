@@ -6,7 +6,7 @@ import { fadeUp } from "@/lib/animations";
 import AdminLayout from "@/components/AdminLayout";
 import { useAdminStats } from "@/hooks/use-admin";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -15,14 +15,7 @@ const AdminDashboard = () => {
 
   const { data: recentEnrollments } = useQuery({
     queryKey: ["admin-recent-enrollments"],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("enrollments")
-        .select("*, courses(title)")
-        .order("enrolled_at", { ascending: false })
-        .limit(5);
-      return data || [];
-    },
+    queryFn: () => api.get<any[]>("/api/admin/recent-enrollments"),
   });
 
   const statCards = [

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
 export interface Booking {
@@ -26,15 +26,7 @@ export function useCreateBooking() {
       start_time: string;
       end_time: string;
       notes?: string;
-    }) => {
-      const { data, error } = await supabase
-        .from("bookings")
-        .insert(booking)
-        .select()
-        .single();
-      if (error) throw error;
-      return data;
-    },
+    }) => api.post<Booking>("/api/bookings", booking),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
       queryClient.invalidateQueries({ queryKey: ["mentor-bookings"] });
@@ -47,15 +39,7 @@ export function useMyBookings() {
   return useQuery({
     queryKey: ["bookings", user?.id],
     enabled: !!user,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("bookings")
-        .select("*")
-        .eq("student_id", user!.id)
-        .order("session_date", { ascending: true });
-      if (error) throw error;
-      return data as Booking[];
-    },
+    queryFn: () => api.get<Booking[]>("/api/bookings"),
   });
 }
 
@@ -63,31 +47,15 @@ export function useMentorBookings(mentorId: string | undefined) {
   return useQuery({
     queryKey: ["mentor-bookings", mentorId],
     enabled: !!mentorId,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("bookings")
-        .select("*")
-        .eq("mentor_id", mentorId!)
-        .order("session_date", { ascending: true });
-      if (error) throw error;
-      return data as Booking[];
-    },
+    queryFn: () => api.get<Booking[]>(`/api/bookings/mentor/${mentorId}`),
   });
 }
 
 export function useUpdateBookingStatus() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: string }) => {
-      const { data, error } = await supabase
-        .from("bookings")
-        .update({ status })
-        .eq("id", id)
-        .select()
-        .single();
-      if (error) throw error;
-      return data;
-    },
+    mutationFn: async ({ id, status }: { id: string; status: string }) =>
+      api.patch<Booking>(`/api/bookings/${id}/status`, { status }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["bookings"] });
       queryClient.invalidateQueries({ queryKey: ["mentor-bookings"] });

@@ -12,7 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { fadeUp } from "@/lib/animations";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 
 interface Email {
@@ -48,34 +48,19 @@ const Emails = () => {
   const fetchEmails = useCallback(async () => {
     if (!user) return;
     setLoading(true);
-    const { data, error } = await supabase
-      .from("emails")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-    if (error) {
+    try {
+      const data = await api.get<Email[]>("/api/emails");
+      setEmails(data || []);
+    } catch {
       toast({ title: "Error", description: "Failed to load emails", variant: "destructive" });
-    } else {
-      setEmails((data as Email[]) || []);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [user]);
 
   useEffect(() => {
     fetchEmails();
   }, [fetchEmails]);
-
-  // Realtime subscription
-  useEffect(() => {
-    if (!user) return;
-    const channel = supabase
-      .channel("emails-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "emails" }, () => {
-        fetchEmails();
-      })
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
-  }, [user, fetchEmails]);
 
   const filteredEmails = emails.filter((e) => {
     const matchesTab =
@@ -94,60 +79,56 @@ const Emails = () => {
   const handleSend = async () => {
     if (!user || !composeSubject.trim()) return;
     setSending(true);
-    const { error } = await supabase.from("emails").insert({
-      user_id: user.id,
-      sender_id: user.id,
-      recipient_id: user.id,
-      subject: composeSubject,
-      body: composeBody,
-      folder: "sent",
-      is_read: true,
-    });
-    if (error) {
-      toast({ title: "Error", description: "Failed to send email", variant: "destructive" });
-    } else {
+    try {
+      await api.post("/api/emails", {
+        subject: composeSubject,
+        body: composeBody,
+        folder: "sent",
+        is_read: true,
+      });
       toast({ title: "Sent", description: "Email sent successfully" });
       setComposeOpen(false);
       setComposeTo("");
       setComposeSubject("");
       setComposeBody("");
       fetchEmails();
+    } catch {
+      toast({ title: "Error", description: "Failed to send email", variant: "destructive" });
+    } finally {
+      setSending(false);
     }
-    setSending(false);
   };
 
   const handleSaveDraft = async () => {
     if (!user) return;
     setSending(true);
-    const { error } = await supabase.from("emails").insert({
-      user_id: user.id,
-      sender_id: user.id,
-      recipient_id: user.id,
-      subject: composeSubject || "(No subject)",
-      body: composeBody,
-      is_draft: true,
-      folder: "inbox",
-    });
-    if (error) {
-      toast({ title: "Error", description: "Failed to save draft", variant: "destructive" });
-    } else {
+    try {
+      await api.post("/api/emails", {
+        subject: composeSubject || "(No subject)",
+        body: composeBody,
+        is_draft: true,
+        folder: "inbox",
+      });
       toast({ title: "Saved", description: "Draft saved" });
       setComposeOpen(false);
       setComposeTo("");
       setComposeSubject("");
       setComposeBody("");
       fetchEmails();
+    } catch {
+      toast({ title: "Error", description: "Failed to save draft", variant: "destructive" });
+    } finally {
+      setSending(false);
     }
-    setSending(false);
   };
 
   const toggleRead = async (email: Email) => {
-    await supabase.from("emails").update({ is_read: !email.is_read }).eq("id", email.id);
+    await api.patch(`/api/emails/${email.id}`, { is_read: !email.is_read });
     fetchEmails();
   };
 
   const deleteEmail = async (id: string) => {
-    await supabase.from("emails").delete().eq("id", id);
+    await api.delete(`/api/emails/${id}`);
     if (selectedEmail?.id === id) setSelectedEmail(null);
     fetchEmails();
     toast({ title: "Deleted", description: "Email removed" });

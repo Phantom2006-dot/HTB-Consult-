@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
 export function useEnrollments() {
@@ -7,15 +7,7 @@ export function useEnrollments() {
   return useQuery({
     queryKey: ["enrollments", user?.id],
     enabled: !!user,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("enrollments")
-        .select("*, courses(*)")
-        .eq("user_id", user!.id)
-        .order("enrolled_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => api.get<any[]>("/api/enrollments"),
   });
 }
 
@@ -26,10 +18,7 @@ export function useEnroll() {
   return useMutation({
     mutationFn: async (courseId: string) => {
       if (!user) throw new Error("Not authenticated");
-      const { error } = await supabase
-        .from("enrollments")
-        .insert({ user_id: user.id, course_id: courseId });
-      if (error) throw error;
+      return api.post("/api/enrollments", { course_id: courseId });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["enrollments"] });

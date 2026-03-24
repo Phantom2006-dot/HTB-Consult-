@@ -1,13 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 export function useCategories() {
   return useQuery({
     queryKey: ["categories"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("categories").select("*").order("name");
-      if (error) throw error;
-      return data as { id: string; name: string; created_at: string }[];
-    },
+    queryFn: () => api.get<{ id: string; name: string; created_at: string }[]>("/api/categories"),
   });
 }

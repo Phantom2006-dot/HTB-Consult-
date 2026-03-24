@@ -1,6 +1,6 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Pencil, Trash2, Eye, EyeOff, Upload, X, Image } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { fadeUp } from "@/lib/animations";
 import AdminLayout from "@/components/AdminLayout";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useCategories } from "@/hooks/use-categories";
 
 interface CourseForm {
@@ -42,36 +42,10 @@ const AdminCourses = () => {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [form, setForm] = useState<CourseForm>(emptyCourse);
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    try {
-      const ext = file.name.split(".").pop();
-      const fileName = `${crypto.randomUUID()}.${ext}`;
-      const { error } = await supabase.storage.from("course-thumbnails").upload(fileName, file);
-      if (error) throw error;
-      const { data: { publicUrl } } = supabase.storage.from("course-thumbnails").getPublicUrl(fileName);
-      setForm((prev) => ({ ...prev, thumbnail_url: publicUrl }));
-      toast({ title: "Image uploaded" });
-    } catch {
-      toast({ title: "Upload failed", variant: "destructive" });
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-    }
-  };
 
   const { data: courses, isLoading } = useQuery({
     queryKey: ["admin-courses"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("courses").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => api.get<any[]>("/api/admin/courses"),
   });
 
   const saveMutation = useMutation({
@@ -90,11 +64,9 @@ const AdminCourses = () => {
         published: form.published,
       };
       if (editing) {
-        const { error } = await supabase.from("courses").update(payload).eq("id", editing);
-        if (error) throw error;
+        await api.patch(`/api/admin/courses/${editing}`, payload);
       } else {
-        const { error } = await supabase.from("courses").insert(payload);
-        if (error) throw error;
+        await api.post("/api/admin/courses", payload);
       }
     },
     onSuccess: () => {
@@ -111,10 +83,7 @@ const AdminCourses = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("courses").delete().eq("id", id);
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => api.delete(`/api/admin/courses/${id}`),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-courses"] });
       qc.invalidateQueries({ queryKey: ["courses"] });
@@ -123,10 +92,8 @@ const AdminCourses = () => {
   });
 
   const togglePublish = useMutation({
-    mutationFn: async ({ id, published }: { id: string; published: boolean }) => {
-      const { error } = await supabase.from("courses").update({ published }).eq("id", id);
-      if (error) throw error;
-    },
+    mutationFn: ({ id, published }: { id: string; published: boolean }) =>
+      api.patch(`/api/admin/courses/${id}`, { published }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-courses"] });
       qc.invalidateQueries({ queryKey: ["courses"] });

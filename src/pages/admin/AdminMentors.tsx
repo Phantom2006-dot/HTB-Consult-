@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { fadeUp } from "@/lib/animations";
 import AdminLayout from "@/components/AdminLayout";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 interface MentorForm {
   name: string;
@@ -37,11 +37,7 @@ const AdminMentors = () => {
 
   const { data: mentors, isLoading } = useQuery({
     queryKey: ["admin-mentors"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("mentors").select("*").order("created_at", { ascending: false });
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => api.get<any[]>("/api/admin/mentors"),
   });
 
   const saveMutation = useMutation({
@@ -56,11 +52,9 @@ const AdminMentors = () => {
         published: form.published,
       };
       if (editing) {
-        const { error } = await supabase.from("mentors").update(payload).eq("id", editing);
-        if (error) throw error;
+        await api.patch(`/api/admin/mentors/${editing}`, payload);
       } else {
-        const { error } = await supabase.from("mentors").insert(payload);
-        if (error) throw error;
+        await api.post("/api/admin/mentors", payload);
       }
     },
     onSuccess: () => {
@@ -77,10 +71,7 @@ const AdminMentors = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("mentors").delete().eq("id", id);
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => api.delete(`/api/admin/mentors/${id}`),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-mentors"] });
       qc.invalidateQueries({ queryKey: ["mentors"] });
@@ -89,10 +80,8 @@ const AdminMentors = () => {
   });
 
   const togglePublish = useMutation({
-    mutationFn: async ({ id, published }: { id: string; published: boolean }) => {
-      const { error } = await supabase.from("mentors").update({ published }).eq("id", id);
-      if (error) throw error;
-    },
+    mutationFn: ({ id, published }: { id: string; published: boolean }) =>
+      api.patch(`/api/admin/mentors/${id}`, { published }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-mentors"] });
     },

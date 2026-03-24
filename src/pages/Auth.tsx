@@ -7,15 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { fadeUp } from "@/lib/animations";
-import { supabase } from "@/integrations/supabase/client";
 import htbLogo from "@/assets/htb-logo.png";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth, setToken } from "@/contexts/AuthContext";
+import { api } from "@/lib/api";
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, setUser } = useAuth();
   const initialTab = searchParams.get("tab") === "signup" ? "signup" : searchParams.get("tab") === "forgot" ? "forgot" : "login";
   const [tab, setTab] = useState<"login" | "signup" | "forgot">(initialTab);
   const [loginMode, setLoginMode] = useState<"student" | "mentor">("student");
@@ -39,16 +39,19 @@ const Auth = () => {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: loginData.email,
-      password: loginData.password,
-    });
-    setLoading(false);
-    if (error) {
-      toast({ title: "Login failed", description: error.message, variant: "destructive" });
-    } else {
+    try {
+      const result = await api.post<{ token: string; user: any }>("/api/auth/login", {
+        email: loginData.email,
+        password: loginData.password,
+      });
+      setToken(result.token);
+      setUser(result.user);
       toast({ title: "Welcome back!" });
       navigate(loginMode === "mentor" ? "/mentor-dashboard" : "/dashboard");
+    } catch (err: any) {
+      toast({ title: "Login failed", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -67,19 +70,20 @@ const Auth = () => {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
-      email: signupData.email,
-      password: signupData.password,
-      options: {
-        data: { full_name: signupData.name },
-        emailRedirectTo: window.location.origin,
-      },
-    });
-    setLoading(false);
-    if (error) {
-      toast({ title: "Sign up failed", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Check your email", description: "We've sent you a confirmation link to verify your account." });
+    try {
+      const result = await api.post<{ token: string; user: any }>("/api/auth/register", {
+        email: signupData.email,
+        password: signupData.password,
+        full_name: signupData.name,
+      });
+      setToken(result.token);
+      setUser(result.user);
+      toast({ title: "Account created!", description: "Welcome to HTB Consult Academy." });
+      navigate("/dashboard");
+    } catch (err: any) {
+      toast({ title: "Sign up failed", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -89,16 +93,7 @@ const Auth = () => {
       toast({ title: "Please enter your email", variant: "destructive" });
       return;
     }
-    setLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
-      redirectTo: `${window.location.origin}/auth`,
-    });
-    setLoading(false);
-    if (error) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Reset link sent", description: "Check your email for the password reset link." });
-    }
+    toast({ title: "Password reset", description: "Please contact support to reset your password." });
   };
 
   if (authLoading) return null;

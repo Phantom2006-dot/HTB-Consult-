@@ -8,7 +8,7 @@ import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { fadeUp } from "@/lib/animations";
 import Layout from "@/components/Layout";
@@ -102,69 +102,26 @@ const Chat = () => {
   // Load conversations
   useEffect(() => {
     if (!user) return;
-    supabase
-      .from("chat_conversations")
-      .select("id, title, type, participant_id, created_at")
-      .eq("user_id", user.id)
-      .order("updated_at", { ascending: false })
-      .then(({ data }) => {
-        if (data) {
-          setConversations(data);
-          // Auto-open conversation from URL param
-          const convParam = searchParams.get("conv");
-          if (convParam && data.find((c) => c.id === convParam)) {
-            setActiveConv(convParam);
-            const conv = data.find((c) => c.id === convParam);
-            if (conv) setActiveType(conv.type);
-          }
+    api.get<Conversation[]>("/api/chat/conversations").then((data) => {
+      if (data) {
+        setConversations(data);
+        const convParam = searchParams.get("conv");
+        if (convParam && data.find((c) => c.id === convParam)) {
+          setActiveConv(convParam);
+          const conv = data.find((c) => c.id === convParam);
+          if (conv) setActiveType(conv.type);
         }
-      });
+      }
+    }).catch(() => {});
   }, [user, searchParams]);
 
   // Load messages for active conversation
   useEffect(() => {
     if (!activeConv) { setMessages([]); return; }
-    supabase
-      .from("chat_messages")
-      .select("role, content")
-      .eq("conversation_id", activeConv)
-      .order("created_at", { ascending: true })
-      .then(({ data }) => {
-        if (data) setMessages(data as Msg[]);
-      });
+    api.get<Msg[]>(`/api/chat/conversations/${activeConv}/messages`).then((data) => {
+      if (data) setMessages(data);
+    }).catch(() => {});
   }, [activeConv]);
-
-  // Realtime subscription for user-to-user messages
-  useEffect(() => {
-    if (!activeConv || activeType !== "user") return;
-
-    const channel = supabase
-      .channel(`chat-${activeConv}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "chat_messages",
-          filter: `conversation_id=eq.${activeConv}`,
-        },
-        (payload) => {
-          const newMsg = payload.new as { role: string; content: string };
-          // Only add if it's from the other participant (assistant = other user's message)
-          setMessages((prev) => {
-            const last = prev[prev.length - 1];
-            // Avoid duplicates
-            if (last?.content === newMsg.content && last?.role === newMsg.role) return prev;
-            return [...prev, { role: newMsg.role as "user" | "assistant", content: newMsg.content }];
-          });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [activeConv, activeType]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -177,11 +134,10 @@ const Chat = () => {
 
   const createConversation = async (type: "ai" | "user" = "ai", title?: string) => {
     if (!user) return;
-    const { data } = await supabase
-      .from("chat_conversations")
-      .insert({ user_id: user.id, title: title || (type === "ai" ? "New AI Chat" : "New Conversation"), type })
-      .select("id, title, type, participant_id, created_at")
-      .single();
+    const data = await api.post<Conversation>("/api/chat/conversations", {
+      title: title || (type === "ai" ? "New AI Chat" : "New Conversation"),
+      type,
+    }).catch(() => null);
     if (data) {
       setConversations((prev) => [data, ...prev]);
       setActiveConv(data.id);
@@ -192,7 +148,7 @@ const Chat = () => {
   };
 
   const deleteConversation = async (id: string) => {
-    await supabase.from("chat_conversations").delete().eq("id", id);
+    await api.delete(`/api/chat/conversations/${id}`).catch(() => {});
     setConversations((prev) => prev.filter((c) => c.id !== id));
     if (activeConv === id) { setActiveConv(null); setMessages([]); }
   };
@@ -216,18 +172,11 @@ const Chat = () => {
     setInput("");
 
     // Save user message
-    await supabase.from("chat_messages").insert({
-      conversation_id: convId,
-      role: "user",
-      content: input,
-    });
+    await api.post(`/api/chat/conversations/${convId}/messages`, { role: "user", content: input }).catch(() => {});
 
     // Update conversation title if first message
     if (messages.length === 0) {
-      await supabase
-        .from("chat_conversations")
-        .update({ title: input.slice(0, 50), updated_at: new Date().toISOString() })
-        .eq("id", convId);
+      await api.patch(`/api/chat/conversations/${convId}`, { title: input.slice(0, 50) }).catch(() => {});
       setConversations((prev) =>
         prev.map((c) => (c.id === convId ? { ...c, title: input.slice(0, 50) } : c))
       );
@@ -254,11 +203,7 @@ const Chat = () => {
         onDone: async () => {
           setIsStreaming(false);
           if (assistantText && convId) {
-            await supabase.from("chat_messages").insert({
-              conversation_id: convId,
-              role: "assistant",
-              content: assistantText,
-            });
+            await api.post(`/api/chat/conversations/${convId}/messages`, { role: "assistant", content: assistantText }).catch(() => {});
           }
         },
         onError: (err) => {

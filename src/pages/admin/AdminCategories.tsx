@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { fadeUp } from "@/lib/animations";
 import AdminLayout from "@/components/AdminLayout";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 
 const AdminCategories = () => {
   const { toast } = useToast();
@@ -21,21 +21,15 @@ const AdminCategories = () => {
 
   const { data: categories, isLoading } = useQuery({
     queryKey: ["categories"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("categories").select("*").order("name");
-      if (error) throw error;
-      return data;
-    },
+    queryFn: () => api.get<any[]>("/api/categories"),
   });
 
   const saveMutation = useMutation({
     mutationFn: async () => {
       if (editing) {
-        const { error } = await supabase.from("categories").update({ name }).eq("id", editing);
-        if (error) throw error;
+        await api.patch(`/api/categories/${editing}`, { name });
       } else {
-        const { error } = await supabase.from("categories").insert({ name });
-        if (error) throw error;
+        await api.post("/api/categories", { name });
       }
     },
     onSuccess: () => {
@@ -51,10 +45,7 @@ const AdminCategories = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const { error } = await supabase.from("categories").delete().eq("id", id);
-      if (error) throw error;
-    },
+    mutationFn: (id: string) => api.delete(`/api/categories/${id}`),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["categories"] });
       toast({ title: "Category deleted" });

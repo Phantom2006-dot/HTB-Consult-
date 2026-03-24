@@ -10,7 +10,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { fadeUp } from "@/lib/animations";
 import Layout from "@/components/Layout";
 import { useCourses } from "@/hooks/use-courses";
@@ -32,14 +31,7 @@ const Dashboard = () => {
 
   const { data: profile } = useQuery({
     queryKey: ["profile", user?.id],
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("full_name, avatar_url, bio")
-        .eq("user_id", user!.id)
-        .maybeSingle();
-      return data;
-    },
+    queryFn: async () => ({ full_name: user?.full_name, avatar_url: user?.avatar_url, bio: user?.bio }),
     enabled: !!user,
   });
 

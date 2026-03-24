@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { fadeUp } from "@/lib/animations";
 import Layout from "@/components/Layout";
@@ -29,41 +29,28 @@ const Profile = () => {
 
   useEffect(() => {
     if (user) {
-      supabase
-        .from("profiles")
-        .select("full_name, bio, avatar_url")
-        .eq("user_id", user.id)
-        .maybeSingle()
-        .then(({ data }) => {
-          if (data) {
-            setForm({
-              full_name: data.full_name || "",
-              bio: data.bio || "",
-              avatar_url: data.avatar_url || "",
-            });
-          }
-        });
+      setForm({
+        full_name: user.full_name || "",
+        bio: user.bio || "",
+        avatar_url: user.avatar_url || "",
+      });
     }
   }, [user]);
 
   const handleSave = async () => {
     if (!user) return;
     setSaving(true);
-    const { error } = await supabase
-      .from("profiles")
-      .upsert({
-        user_id: user.id,
+    try {
+      await api.patch("/api/auth/profile", {
         full_name: form.full_name,
         bio: form.bio,
         avatar_url: form.avatar_url,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: "user_id" });
-
-    setSaving(false);
-    if (error) {
-      toast({ title: "Error", description: "Failed to save profile.", variant: "destructive" });
-    } else {
+      });
       toast({ title: "Saved", description: "Your profile has been updated." });
+    } catch {
+      toast({ title: "Error", description: "Failed to save profile.", variant: "destructive" });
+    } finally {
+      setSaving(false);
     }
   };
 

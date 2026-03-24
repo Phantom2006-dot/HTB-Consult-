@@ -12,7 +12,7 @@ import SidebarLayout from "@/components/SidebarLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useMentorBookings, useUpdateBookingStatus } from "@/hooks/use-bookings";
-import { supabase } from "@/integrations/supabase/client";
+import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 
@@ -33,15 +33,7 @@ const MentorDashboard = () => {
   const { data: mentorRecord, isLoading: mentorLoading } = useQuery({
     queryKey: ["my-mentor-record", user?.id],
     enabled: !!user,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("mentors")
-        .select("*")
-        .eq("user_id", user!.id)
-        .single();
-      if (error) return null;
-      return data;
-    },
+    queryFn: () => api.get<any>("/api/mentors/me").catch(() => null),
   });
 
   const { data: bookings, isLoading: bookingsLoading } = useMentorBookings(mentorRecord?.id);
@@ -51,13 +43,7 @@ const MentorDashboard = () => {
   const { data: studentProfiles } = useQuery({
     queryKey: ["student-profiles", studentIds],
     enabled: studentIds.length > 0,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("user_id, full_name, avatar_url")
-        .in("user_id", studentIds);
-      return data || [];
-    },
+    queryFn: () => api.post<any[]>("/api/admin/users/batch", { ids: studentIds }),
   });
 
   const getStudentName = (studentId: string) => {
