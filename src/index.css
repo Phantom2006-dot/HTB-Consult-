@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 163 36% 16%;
+    --foreground: 0 0% 100%;
+
+    --card: 163 34% 18%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 163 34% 18%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 30 100% 46%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 160 5% 95%;
+    --secondary-foreground: 163 36% 16%;
+
+    --muted: 163 25% 20%;
+    --muted-foreground: 0 0% 100%;
+
+    --accent: 36 70% 48%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 163 25% 24%;
+    --input: 163 25% 24%;
+    --ring: 30 100% 46%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 163 36% 14%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 30 100% 46%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 163 30% 22%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 163 25% 24%;
+    --sidebar-ring: 30 100% 46%;
+
+    --orange: 30 100% 46%;
+    --orange-light: 30 90% 56%;
+    --gold: 36 70% 48%;
+    --gold-light: 36 60% 58%;
+    --green-dark: 163 36% 16%;
+    --green-darker: 163 36% 14%;
+    --green-light: 163 30% 22%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+  }
+}
+
+@layer utilities {
+  .text-gradient-gold {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, hsl(30, 100%, 46%), hsl(36, 70%, 48%));
+  }
+
+  .bg-gradient-gold {
+    background-image: linear-gradient(135deg, hsl(30, 100%, 46%), hsl(36, 70%, 48%));
+  }
+
+  .bg-gradient-green {
+    background-image: linear-gradient(180deg, hsl(163, 36%, 16%), hsl(163, 36%, 14%));
+  }
+
+  .shadow-orange {
+    box-shadow: 0 10px 30px -10px hsla(30, 100%, 46%, 0.3);
+  }
+}

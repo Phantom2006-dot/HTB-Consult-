@@ -1,0 +1,1 @@
+ALTER TABLE public.courses ADD COLUMN live_class_url text DEFAULT NULL;
