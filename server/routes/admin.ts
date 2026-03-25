@@ -56,7 +56,8 @@ router.patch("/users/:id/role", requireAdmin, async (req, res) => {
 router.get("/enrollments", requireAdmin, async (_req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT e.*, u.email, u.full_name, c.title AS course_title
+      `SELECT e.*, u.email, u.full_name,
+              json_build_object('title', c.title, 'category', c.category) AS courses
        FROM enrollments e
        JOIN users u ON u.id = e.user_id
        JOIN courses c ON c.id = e.course_id
@@ -71,7 +72,8 @@ router.get("/enrollments", requireAdmin, async (_req, res) => {
 router.get("/recent-enrollments", requireAdmin, async (_req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT e.*, u.email, u.full_name, c.title AS course_title
+      `SELECT e.*, u.email, u.full_name,
+              json_build_object('title', c.title, 'category', c.category) AS courses
        FROM enrollments e
        JOIN users u ON u.id = e.user_id
        JOIN courses c ON c.id = e.course_id
@@ -179,17 +181,29 @@ router.post("/mentors", requireAdmin, async (req, res) => {
 });
 
 router.patch("/mentors/:id", requireAdmin, async (req, res) => {
-  const { name, title, bio, specializations, years_experience, hourly_rate, published } = req.body;
   try {
-    const specs = Array.isArray(specializations)
-      ? specializations
-      : (specializations || "").split(",").map((s: string) => s.trim()).filter(Boolean);
+    const { rows: current } = await pool.query("SELECT * FROM mentors WHERE id = $1", [req.params.id]);
+    if (current.length === 0) return res.status(404).json({ error: "Mentor not found" });
+    const m = current[0];
+    const b = req.body;
+    const specs = b.specializations !== undefined
+      ? (Array.isArray(b.specializations) ? b.specializations : b.specializations.split(",").map((s: string) => s.trim()).filter(Boolean))
+      : m.specializations;
     const { rows } = await pool.query(
       `UPDATE mentors SET name=$1, title=$2, bio=$3, specializations=$4, years_experience=$5,
-       hourly_rate=$6, published=$7, updated_at=now() WHERE id=$8 RETURNING *`,
-      [name, title || "", bio || "", specs, parseInt(years_experience) || 0, parseFloat(hourly_rate) || 0, !!published, req.params.id]
+       hourly_rate=$6, published=$7, avatar_url=$8, updated_at=now() WHERE id=$9 RETURNING *`,
+      [
+        b.name ?? m.name,
+        b.title ?? m.title,
+        b.bio ?? m.bio,
+        specs,
+        b.years_experience !== undefined ? parseInt(b.years_experience) : m.years_experience,
+        b.hourly_rate !== undefined ? parseFloat(b.hourly_rate) : m.hourly_rate,
+        b.published !== undefined ? !!b.published : m.published,
+        b.avatar_url !== undefined ? (b.avatar_url || null) : m.avatar_url,
+        req.params.id,
+      ]
     );
-    if (rows.length === 0) return res.status(404).json({ error: "Mentor not found" });
     return res.json(rows[0]);
   } catch (err: any) {
     return res.status(500).json({ error: err.message || "Failed to update mentor" });
