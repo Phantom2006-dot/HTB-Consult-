@@ -68,4 +68,141 @@ router.get("/enrollments", requireAdmin, async (_req, res) => {
   }
 });
 
+router.get("/recent-enrollments", requireAdmin, async (_req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT e.*, u.email, u.full_name, c.title AS course_title
+       FROM enrollments e
+       JOIN users u ON u.id = e.user_id
+       JOIN courses c ON c.id = e.course_id
+       ORDER BY e.enrolled_at DESC
+       LIMIT 10`
+    );
+    return res.json(rows);
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to fetch recent enrollments" });
+  }
+});
+
+router.get("/courses", requireAdmin, async (_req, res) => {
+  try {
+    const { rows } = await pool.query("SELECT * FROM courses ORDER BY created_at DESC");
+    return res.json(rows);
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to fetch courses" });
+  }
+});
+
+router.post("/courses", requireAdmin, async (req, res) => {
+  const { title, description, category, skill_level, course_type, price, total_duration, tags, thumbnail_url, live_class_url, published } = req.body;
+  try {
+    const tagsArr = Array.isArray(tags) ? tags : (tags || "").split(",").map((t: string) => t.trim()).filter(Boolean);
+    const { rows } = await pool.query(
+      `INSERT INTO courses (title, description, category, skill_level, course_type, price, total_duration, tags, thumbnail_url, live_class_url, published)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
+      [title, description || "", category || "General", skill_level || "Beginner", course_type || "video",
+       parseFloat(price) || 0, total_duration || "", tagsArr, thumbnail_url || null, live_class_url || null, !!published]
+    );
+    return res.json(rows[0]);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || "Failed to create course" });
+  }
+});
+
+router.patch("/courses/:id", requireAdmin, async (req, res) => {
+  try {
+    const { rows: current } = await pool.query("SELECT * FROM courses WHERE id = $1", [req.params.id]);
+    if (current.length === 0) return res.status(404).json({ error: "Course not found" });
+    const c = current[0];
+    const b = req.body;
+    const tagsArr = b.tags !== undefined
+      ? (Array.isArray(b.tags) ? b.tags : b.tags.split(",").map((t: string) => t.trim()).filter(Boolean))
+      : c.tags;
+    const { rows } = await pool.query(
+      `UPDATE courses SET title=$1, description=$2, category=$3, skill_level=$4, course_type=$5,
+       price=$6, total_duration=$7, tags=$8, thumbnail_url=$9, live_class_url=$10,
+       published=$11, updated_at=now() WHERE id=$12 RETURNING *`,
+      [
+        b.title ?? c.title,
+        b.description ?? c.description,
+        b.category ?? c.category,
+        b.skill_level ?? c.skill_level,
+        b.course_type ?? c.course_type,
+        b.price !== undefined ? parseFloat(b.price) : c.price,
+        b.total_duration ?? c.total_duration,
+        tagsArr,
+        b.thumbnail_url !== undefined ? (b.thumbnail_url || null) : c.thumbnail_url,
+        b.live_class_url !== undefined ? (b.live_class_url || null) : c.live_class_url,
+        b.published !== undefined ? !!b.published : c.published,
+        req.params.id,
+      ]
+    );
+    return res.json(rows[0]);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || "Failed to update course" });
+  }
+});
+
+router.delete("/courses/:id", requireAdmin, async (req, res) => {
+  try {
+    await pool.query("DELETE FROM courses WHERE id = $1", [req.params.id]);
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to delete course" });
+  }
+});
+
+router.get("/mentors", requireAdmin, async (_req, res) => {
+  try {
+    const { rows } = await pool.query("SELECT * FROM mentors ORDER BY created_at DESC");
+    return res.json(rows);
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to fetch mentors" });
+  }
+});
+
+router.post("/mentors", requireAdmin, async (req, res) => {
+  const { name, title, bio, specializations, years_experience, hourly_rate, published } = req.body;
+  try {
+    const specs = Array.isArray(specializations)
+      ? specializations
+      : (specializations || "").split(",").map((s: string) => s.trim()).filter(Boolean);
+    const { rows } = await pool.query(
+      `INSERT INTO mentors (name, title, bio, specializations, years_experience, hourly_rate, published)
+       VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+      [name, title || "", bio || "", specs, parseInt(years_experience) || 0, parseFloat(hourly_rate) || 0, !!published]
+    );
+    return res.json(rows[0]);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || "Failed to create mentor" });
+  }
+});
+
+router.patch("/mentors/:id", requireAdmin, async (req, res) => {
+  const { name, title, bio, specializations, years_experience, hourly_rate, published } = req.body;
+  try {
+    const specs = Array.isArray(specializations)
+      ? specializations
+      : (specializations || "").split(",").map((s: string) => s.trim()).filter(Boolean);
+    const { rows } = await pool.query(
+      `UPDATE mentors SET name=$1, title=$2, bio=$3, specializations=$4, years_experience=$5,
+       hourly_rate=$6, published=$7, updated_at=now() WHERE id=$8 RETURNING *`,
+      [name, title || "", bio || "", specs, parseInt(years_experience) || 0, parseFloat(hourly_rate) || 0, !!published, req.params.id]
+    );
+    if (rows.length === 0) return res.status(404).json({ error: "Mentor not found" });
+    return res.json(rows[0]);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || "Failed to update mentor" });
+  }
+});
+
+router.delete("/mentors/:id", requireAdmin, async (req, res) => {
+  try {
+    await pool.query("DELETE FROM mentors WHERE id = $1", [req.params.id]);
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to delete mentor" });
+  }
+});
+
 export default router;
