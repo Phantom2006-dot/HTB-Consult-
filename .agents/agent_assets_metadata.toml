@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "doodRtVUtQpWmql-03Noc"
+uri = "file://DEPLOY.md"
+type = "text"
+title = "Deployment Guide — Neon + Fly.io + Vercel"

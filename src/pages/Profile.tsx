@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, Mail, Save } from "lucide-react";
+import { CloudinaryUpload } from "@/components/CloudinaryUpload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -105,6 +106,12 @@ const Profile = () => {
                   rows={4}
                 />
               </div>
+              <CloudinaryUpload
+                value={form.avatar_url}
+                onChange={(url) => setForm({ ...form, avatar_url: url })}
+                folder="htb-avatars"
+                label="Profile Picture"
+              />
               <Button onClick={handleSave} disabled={saving} className="bg-gradient-gold hover:opacity-90">
                 <Save size={16} className="mr-1" /> {saving ? "Saving..." : "Save Changes"}
               </Button>

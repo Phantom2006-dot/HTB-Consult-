@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Pencil, Trash2, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import AdminLayout from "@/components/AdminLayout";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useCategories } from "@/hooks/use-categories";
+import { CloudinaryUpload } from "@/components/CloudinaryUpload";
 
 interface CourseForm {
   title: string;
@@ -214,34 +215,12 @@ const AdminCourses = () => {
                     {form.course_type === "live" ? "Google Meet, Zoom, or any external class link" : form.course_type === "book" ? "Link to the book, PDF, or reading resource" : "External video platform link (optional)"}
                   </p>
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-foreground block mb-1">Thumbnail</label>
-                  {form.thumbnail_url && (
-                    <div className="relative mb-2 rounded-lg overflow-hidden border border-border">
-                      <img src={form.thumbnail_url} alt="Thumbnail preview" className="w-full h-32 object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => setForm({ ...form, thumbnail_url: "" })}
-                        className="absolute top-1.5 right-1.5 bg-background/80 backdrop-blur-sm rounded-full p-1 hover:bg-destructive hover:text-destructive-foreground transition-colors"
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-                  )}
-                  <div className="flex gap-2">
-                    <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                    <Button type="button" variant="outline" size="sm" className="gap-1.5" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
-                      {uploading ? "Uploading..." : <><Upload size={14} /> Upload Image</>}
-                    </Button>
-                    <span className="text-xs text-muted-foreground self-center">or</span>
-                    <Input
-                      value={form.thumbnail_url}
-                      onChange={(e) => setForm({ ...form, thumbnail_url: e.target.value })}
-                      placeholder="Paste image URL"
-                      className="flex-1 h-9 text-xs"
-                    />
-                  </div>
-                </div>
+                <CloudinaryUpload
+                  value={form.thumbnail_url}
+                  onChange={(url) => setForm({ ...form, thumbnail_url: url })}
+                  folder="htb-courses"
+                  label="Thumbnail"
+                />
                 <div className="flex items-center gap-2">
                   <input type="checkbox" id="published" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} className="rounded" />
                   <label htmlFor="published" className="text-sm text-foreground">Published (visible to students)</label>

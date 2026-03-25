@@ -39,10 +39,6 @@ router.post("/login", async (req, res) => {
   if (!email || !password) return res.status(400).json({ error: "Email and password required" });
 
   try {
-    const { rows } = await pool.query(
-      "SELECT u.*, ur.role FROM users u LEFT JOIN user_roles ur ON ur.user_id = u.id ORDER BY CASE ur.role WHEN 'admin' THEN 0 WHEN 'instructor' THEN 1 ELSE 2 END LIMIT 1",
-      []
-    );
     const { rows: userRows } = await pool.query("SELECT * FROM users WHERE email = $1", [email.toLowerCase()]);
     if (userRows.length === 0) return res.status(401).json({ error: "Invalid email or password" });
 

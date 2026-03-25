@@ -40,18 +40,20 @@ const AdminUsers = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">{profile.full_name || "Unnamed"}</p>
-                      <p className="text-xs text-muted-foreground">ID: {profile.user_id.slice(0, 8)}…</p>
+                      <p className="text-xs text-muted-foreground">{profile.email}</p>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <Badge variant={profile.role === "admin" ? "default" : "secondary"} className="text-[10px]">
-                        {profile.role || "student"}
-                      </Badge>
+                      {(profile.roles || []).map((r: string) => (
+                        <Badge key={r} variant={r === "admin" ? "default" : "secondary"} className="text-[10px]">{r}</Badge>
+                      ))}
+                      {(!profile.roles || profile.roles.length === 0) && (
+                        <Badge variant="outline" className="text-[10px]">student</Badge>
+                      )}
                     </div>
                     <p className="text-xs text-muted-foreground shrink-0">{new Date(profile.created_at).toLocaleDateString()}</p>
                   </CardContent>
                 </Card>
-              );
-            })
+            ))
           )}
         </motion.div>
       </div>

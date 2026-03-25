@@ -13,11 +13,13 @@ import { fadeUp } from "@/lib/animations";
 import AdminLayout from "@/components/AdminLayout";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { CloudinaryUpload } from "@/components/CloudinaryUpload";
 
 interface MentorForm {
   name: string;
   title: string;
   bio: string;
+  avatar_url: string;
   specializations: string;
   years_experience: string;
   hourly_rate: string;
@@ -25,7 +27,7 @@ interface MentorForm {
 }
 
 const emptyMentor: MentorForm = {
-  name: "", title: "", bio: "", specializations: "", years_experience: "0", hourly_rate: "0", published: false,
+  name: "", title: "", bio: "", avatar_url: "", specializations: "", years_experience: "0", hourly_rate: "0", published: false,
 };
 
 const AdminMentors = () => {
@@ -46,6 +48,7 @@ const AdminMentors = () => {
         name: form.name,
         title: form.title,
         bio: form.bio,
+        avatar_url: form.avatar_url || null,
         specializations: form.specializations.split(",").map((t) => t.trim()).filter(Boolean),
         years_experience: parseInt(form.years_experience) || 0,
         hourly_rate: parseFloat(form.hourly_rate) || 0,
@@ -93,6 +96,7 @@ const AdminMentors = () => {
       name: mentor.name,
       title: mentor.title,
       bio: mentor.bio || "",
+      avatar_url: mentor.avatar_url || "",
       specializations: (mentor.specializations || []).join(", "),
       years_experience: String(mentor.years_experience),
       hourly_rate: String(mentor.hourly_rate),
@@ -138,6 +142,12 @@ const AdminMentors = () => {
                   <label className="text-sm font-medium text-foreground block mb-1">Bio</label>
                   <Textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} placeholder="Brief bio" />
                 </div>
+                <CloudinaryUpload
+                  value={form.avatar_url}
+                  onChange={(url) => setForm({ ...form, avatar_url: url })}
+                  folder="htb-mentors"
+                  label="Profile Photo"
+                />
                 <div>
                   <label className="text-sm font-medium text-foreground block mb-1">Specializations (comma separated)</label>
                   <Input value={form.specializations} onChange={(e) => setForm({ ...form, specializations: e.target.value })} placeholder="BA, PRINCE2, Agile" />
