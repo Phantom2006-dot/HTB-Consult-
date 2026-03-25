@@ -42,3 +42,10 @@ externalPort = 3001
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[userenv]
+
+[userenv.shared]
+JWT_SECRET = "htb-consults-jwt-secret-2025-replit"
+SERVER_PORT = "3001"
+NODE_ENV = "development"
