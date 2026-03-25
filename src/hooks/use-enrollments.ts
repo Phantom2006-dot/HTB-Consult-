@@ -25,3 +25,15 @@ export function useEnroll() {
     },
   });
 }
+
+export function useUpdateProgress() {
+  const qc = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ courseId, progress }: { courseId: string; progress: number }) =>
+      api.patch(`/api/enrollments/${courseId}/progress`, { progress }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["enrollments"] });
+    },
+  });
+}

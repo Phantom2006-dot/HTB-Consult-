@@ -35,4 +35,28 @@ router.post("/", requireAuth, async (req: AuthRequest, res) => {
   }
 });
 
+router.patch("/:course_id/progress", requireAuth, async (req: AuthRequest, res) => {
+  const { progress } = req.body;
+  if (progress === undefined) return res.status(400).json({ error: "progress required" });
+  const pct = Number(progress);
+  if (isNaN(pct) || pct < 0 || pct > 100) return res.status(400).json({ error: "progress must be 0–100" });
+
+  const completed = pct === 100;
+  const completed_at = completed ? "now()" : "NULL";
+
+  try {
+    const { rows } = await pool.query(
+      `UPDATE enrollments
+       SET progress = $1, completed = $2, completed_at = ${completed ? "now()" : "NULL"}
+       WHERE user_id = $3 AND course_id = $4
+       RETURNING *`,
+      [pct, completed, req.user!.id, req.params.course_id]
+    );
+    if (rows.length === 0) return res.status(404).json({ error: "Enrollment not found" });
+    return res.json(rows[0]);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || "Failed to update progress" });
+  }
+});
+
 export default router;

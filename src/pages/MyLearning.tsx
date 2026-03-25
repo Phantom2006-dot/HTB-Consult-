@@ -12,12 +12,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { fadeUp } from "@/lib/animations";
 import SidebarLayout from "@/components/SidebarLayout";
-import { useEnrollments } from "@/hooks/use-enrollments";
+import { useEnrollments, useUpdateProgress } from "@/hooks/use-enrollments";
+import { toast } from "sonner";
 
 const MyLearning = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const { data: enrollments, isLoading } = useEnrollments();
+  const { mutate: updateProgress, isPending: isUpdating } = useUpdateProgress();
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth");
@@ -45,6 +47,16 @@ const MyLearning = () => {
     { icon: Clock, label: "In Progress", value: String(inProgress.length) },
     { icon: Trophy, label: "Certificates", value: String(completed.length) },
   ];
+
+  const handleProgress = (courseId: string, progress: number, label: string) => {
+    updateProgress(
+      { courseId, progress },
+      {
+        onSuccess: () => toast.success(`Progress updated to ${label}`),
+        onError: () => toast.error("Failed to update progress"),
+      }
+    );
+  };
 
   return (
     <SidebarLayout>
@@ -113,6 +125,27 @@ const MyLearning = () => {
                             </div>
                             <Progress value={enrollment.progress} className="h-1.5" />
                           </div>
+                          {/* Manual progress update */}
+                          <div className="flex items-center gap-2 pt-1">
+                            <span className="text-[11px] text-muted-foreground">Update progress:</span>
+                            <button
+                              onClick={() => handleProgress(course.id, 50, "50% (Halfway)")}
+                              disabled={isUpdating || enrollment.progress === 50}
+                              className={`px-2.5 py-1 rounded text-[11px] font-medium border transition-colors
+                                ${enrollment.progress === 50
+                                  ? "bg-primary/10 border-primary/30 text-primary cursor-default"
+                                  : "border-border text-muted-foreground hover:border-primary hover:text-primary"}`}
+                            >
+                              50% Halfway
+                            </button>
+                            <button
+                              onClick={() => handleProgress(course.id, 100, "100% (Complete!)")}
+                              disabled={isUpdating}
+                              className="px-2.5 py-1 rounded text-[11px] font-medium border border-border text-muted-foreground hover:border-green-500 hover:text-green-600 transition-colors"
+                            >
+                              100% Done
+                            </button>
+                          </div>
                         </div>
                         <div className="shrink-0 flex sm:flex-col items-center gap-2">
                           <Button size="sm" className="gap-1.5 text-xs" asChild>
@@ -146,9 +179,18 @@ const MyLearning = () => {
                           <h3 className="font-semibold text-sm text-foreground">{course.title}</h3>
                           <p className="text-[11px] text-muted-foreground">Completed {new Date(enrollment.completed_at).toLocaleDateString()}</p>
                         </div>
-                        <Button size="sm" variant="outline" className="gap-1.5 text-xs shrink-0">
-                          <Award size={12} /> View Certificate
-                        </Button>
+                        <div className="flex flex-col gap-2 shrink-0">
+                          <Button size="sm" variant="outline" className="gap-1.5 text-xs">
+                            <Award size={12} /> View Certificate
+                          </Button>
+                          <button
+                            onClick={() => handleProgress(course.id, 50, "50% (Halfway)")}
+                            disabled={isUpdating}
+                            className="px-2.5 py-1 rounded text-[11px] font-medium border border-border text-muted-foreground hover:border-primary hover:text-primary transition-colors"
+                          >
+                            Mark as In Progress
+                          </button>
+                        </div>
                       </CardContent>
                     </Card>
                   );
