@@ -1,10 +1,11 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, BookOpen, Target, CheckCircle, Star, Lightbulb, UserCheck, Briefcase, Brain, BarChart3, Quote } from "lucide-react";
+import { ArrowRight, BookOpen, Target, CheckCircle, Star, Lightbulb, UserCheck, Briefcase, Brain, BarChart3, Quote, LogIn, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/components/Layout";
 import { fadeUp } from "@/lib/animations";
+import { useAuth } from "@/contexts/AuthContext";
 
 const learningAreas = [
   {
@@ -69,6 +70,8 @@ const stats = [
 ];
 
 const Index = () => {
+  const { user } = useAuth();
+
   return (
     <Layout>
       {/* ── Hero ── */}
@@ -122,6 +125,15 @@ const Index = () => {
               <Button size="lg" variant="outline" asChild className="text-sm font-semibold px-8 h-12 border-white/20 hover:bg-white/10 text-white">
                 <Link to="/about">Our Story</Link>
               </Button>
+              {user ? (
+                <Button size="lg" asChild className="text-sm font-semibold px-8 h-12 bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm">
+                  <Link to="/dashboard"><LayoutDashboard className="mr-2" size={16} />My Dashboard</Link>
+                </Button>
+              ) : (
+                <Button size="lg" asChild className="text-sm font-semibold px-8 h-12 bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-sm">
+                  <Link to="/auth"><LogIn className="mr-2" size={16} />Sign In / Register</Link>
+                </Button>
+              )}
             </motion.div>
           </div>
         </div>

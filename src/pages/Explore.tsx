@@ -2,13 +2,12 @@ import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import {
-  Search, Filter, Star, Clock, Bookmark, ChevronRight, ChevronLeft,
-  Briefcase, BarChart3, Award, Users, Wrench, FileText, Globe, CalendarDays, FolderOpen,
-  Play, Sparkles
+  Filter, Star, Clock, Bookmark, ChevronRight, ChevronLeft,
+  Briefcase, BarChart3, Award, Users, FileText, Globe, FolderOpen,
+  Play, Sparkles, Layers, Target, TrendingUp, Cpu, GraduationCap, CalendarDays
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
@@ -19,19 +18,25 @@ import { useCourses } from "@/hooks/use-courses";
 import { useMentors } from "@/hooks/use-mentors";
 import { useBookmarks, useToggleBookmark } from "@/hooks/use-bookmarks";
 import { useEnrollments } from "@/hooks/use-enrollments";
+import { useCategories } from "@/hooks/use-categories";
 import { useAuth } from "@/contexts/AuthContext";
 
-const categories = [
-  { label: "Project Management", icon: Briefcase },
-  { label: "Business Analysis", icon: BarChart3 },
-  { label: "Certifications", icon: Award },
-  { label: "Mentorship", icon: Users },
-  { label: "Career Tools", icon: Wrench },
-  { label: "Templates", icon: FileText },
-  { label: "Networking", icon: Globe },
-  { label: "Workshops", icon: CalendarDays },
-  { label: "Resources", icon: FolderOpen },
-];
+const CATEGORY_ICONS: Record<string, React.ElementType> = {
+  "Business Analysis": BarChart3,
+  "Project Management": Briefcase,
+  "Agile & Scrum": Layers,
+  "Digital Transformation": Globe,
+  "Business Strategy": Target,
+  "Project Delivery": GraduationCap,
+  "Bid Writing": FileText,
+  "Consulting & Leadership": Users,
+  "Data Analysis": TrendingUp,
+  "Leadership": Award,
+  "Finance & Accounting": BarChart3,
+  "Marketing": Star,
+  "IT & Technology": Cpu,
+  "General": FolderOpen,
+};
 
 
 
@@ -45,13 +50,14 @@ function useHScroll() {
 
 const Explore = () => {
   const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
   const trending = useHScroll();
   const { user } = useAuth();
-
   const { data: courses, isLoading: coursesLoading } = useCourses();
   const { data: mentors, isLoading: mentorsLoading } = useMentors();
   const { data: bookmarksData } = useBookmarks();
   const { data: enrollmentsData } = useEnrollments();
+  const { data: categoriesData } = useCategories();
   const toggleBookmark = useToggleBookmark();
 
   const bookmarkedIds = (bookmarksData || []).map((b: any) => b.course_id);
@@ -77,18 +83,28 @@ const Explore = () => {
               <SelectTrigger className="w-[120px] h-9 bg-card border-border text-sm"><SelectValue placeholder="Duration" /></SelectTrigger>
               <SelectContent><SelectItem value="short">&lt; 10h</SelectItem><SelectItem value="medium">10-30h</SelectItem><SelectItem value="long">30h+</SelectItem></SelectContent>
             </Select>
-            <Select>
-              <SelectTrigger className="w-[140px] h-9 bg-card border-border text-sm"><SelectValue placeholder="Category" /></SelectTrigger>
-              <SelectContent>{categories.map((c) => <SelectItem key={c.label} value={c.label}>{c.label}</SelectItem>)}</SelectContent>
+            <Select value={selectedCategory} onValueChange={(val) => setSelectedCategory(val === "all" ? "" : val)}>
+              <SelectTrigger className="w-[160px] h-9 bg-card border-border text-sm"><SelectValue placeholder="Category" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {(categoriesData || []).filter(c => c.name !== "General").map((c) => (
+                  <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           </div>
         </motion.section>
 
-        {/* Trending Courses */}
+        {/* Trending / Filtered Courses */}
         <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={1} className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-serif font-bold text-foreground">🔥 Trending Courses</h2>
-            <div className="flex gap-1">
+            <h2 className="text-lg font-serif font-bold text-foreground">
+              {selectedCategory ? `📂 ${selectedCategory}` : "🔥 Trending Courses"}
+            </h2>
+            <div className="flex items-center gap-2">
+              {selectedCategory && (
+                <button onClick={() => setSelectedCategory("")} className="text-xs text-muted-foreground hover:text-foreground underline transition-colors">Clear filter</button>
+              )}
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => trending.scroll("left")}><ChevronLeft size={16} /></Button>
               <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => trending.scroll("right")}><ChevronRight size={16} /></Button>
             </div>
@@ -101,7 +117,7 @@ const Explore = () => {
                 </div>
               ))
             ) : (
-              (courses || []).map((c) => (
+              (courses || []).filter(c => !selectedCategory || c.category === selectedCategory).map((c) => (
                 <Link key={c.id} to={`/course/${c.id}`} className="min-w-[280px] max-w-[280px] snap-start flex-shrink-0">
                   <Card className="border-border bg-card hover:border-primary/30 transition-all hover:shadow-lg hover:-translate-y-0.5 duration-200 h-full">
                     <CardContent className="p-0">
@@ -148,13 +164,25 @@ const Explore = () => {
         {/* Categories */}
         <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={2} className="space-y-4">
           <h2 className="text-lg font-serif font-bold text-foreground">Browse Categories</h2>
-          <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-3">
-            {categories.map((cat) => (
-              <button key={cat.label} className="group flex flex-col items-center gap-2 p-4 rounded-xl bg-card border border-border hover:border-primary/40 hover:bg-primary/5 transition-all duration-200 hover:-translate-y-0.5">
-                <cat.icon size={22} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                <span className="text-[11px] text-muted-foreground group-hover:text-foreground font-medium text-center leading-tight transition-colors">{cat.label}</span>
-              </button>
-            ))}
+          <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-7 gap-3">
+            {(categoriesData || []).filter(c => c.name !== "General").map((cat) => {
+              const Icon = CATEGORY_ICONS[cat.name] || FolderOpen;
+              const isActive = selectedCategory === cat.name;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategory(isActive ? "" : cat.name)}
+                  className={`group flex flex-col items-center gap-2 p-4 rounded-xl border transition-all duration-200 hover:-translate-y-0.5 ${
+                    isActive
+                      ? "bg-primary/10 border-primary text-primary"
+                      : "bg-card border-border hover:border-primary/40 hover:bg-primary/5"
+                  }`}
+                >
+                  <Icon size={22} className={isActive ? "text-primary" : "text-muted-foreground group-hover:text-primary transition-colors"} />
+                  <span className={`text-[11px] font-medium text-center leading-tight transition-colors ${isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"}`}>{cat.name}</span>
+                </button>
+              );
+            })}
           </div>
         </motion.section>
 

@@ -2,8 +2,9 @@ import { useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  BookOpen, Clock, Star, Bookmark,
-  BarChart3, GraduationCap, Award, Users, FileText, Play
+  BookOpen, Clock, Star,
+  BarChart3, GraduationCap, Award, Users, Briefcase,
+  Play, Layers, Globe, Target, FileText, TrendingUp, Cpu, FolderOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,16 +15,25 @@ import { fadeUp } from "@/lib/animations";
 import Layout from "@/components/Layout";
 import { useCourses } from "@/hooks/use-courses";
 import { useEnrollments } from "@/hooks/use-enrollments";
+import { useCategories } from "@/hooks/use-categories";
 import { useQuery } from "@tanstack/react-query";
 
-const categories = [
-  { icon: Award, label: "Certificates" },
-  { icon: Users, label: "Mentorship" },
-  { icon: FileText, label: "Templates" },
-  { icon: BarChart3, label: "Career Tools" },
-  { icon: GraduationCap, label: "Workshops" },
-  { icon: BookOpen, label: "Resources" },
-];
+const CATEGORY_ICONS: Record<string, React.ElementType> = {
+  "Business Analysis": BarChart3,
+  "Project Management": Briefcase,
+  "Agile & Scrum": Layers,
+  "Digital Transformation": Globe,
+  "Business Strategy": Target,
+  "Project Delivery": GraduationCap,
+  "Bid Writing": FileText,
+  "Consulting & Leadership": Users,
+  "Data Analysis": TrendingUp,
+  "Leadership": Award,
+  "Finance & Accounting": BarChart3,
+  "Marketing": Star,
+  "IT & Technology": Cpu,
+  "General": FolderOpen,
+};
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
@@ -37,6 +47,7 @@ const Dashboard = () => {
 
   const { data: courses, isLoading: coursesLoading } = useCourses();
   const { data: enrollmentsData, isLoading: enrollmentsLoading } = useEnrollments();
+  const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
 
   const enrolledCourses = (enrollmentsData || []).map((e: any) => ({
     ...e.courses,
@@ -122,17 +133,35 @@ const Dashboard = () => {
 
         {/* Categories */}
         <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={2}>
-          <h2 className="text-xl font-serif font-bold text-foreground mb-4">Categories</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {categories.map((cat, i) => (
-              <Card key={i} className="bg-card border-border hover:border-primary/50 transition-colors cursor-pointer group">
-                <CardContent className="p-4 flex flex-col items-center gap-2">
-                  <cat.icon size={24} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                  <span className="text-xs font-medium text-foreground">{cat.label}</span>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <h2 className="text-xl font-serif font-bold text-foreground mb-4">Browse Categories</h2>
+          {categoriesLoading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <Card key={i} className="bg-card border-border">
+                  <CardContent className="p-4 flex flex-col items-center gap-2">
+                    <Skeleton className="h-6 w-6 rounded" />
+                    <Skeleton className="h-3 w-16" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+              {(categoriesData || []).filter(c => c.name !== "General").map((cat) => {
+                const Icon = CATEGORY_ICONS[cat.name] || FolderOpen;
+                return (
+                  <Link key={cat.id} to={`/courses?category=${encodeURIComponent(cat.name)}`}>
+                    <Card className="bg-card border-border hover:border-primary/50 transition-colors cursor-pointer group h-full">
+                      <CardContent className="p-4 flex flex-col items-center gap-2">
+                        <Icon size={24} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                        <span className="text-xs font-medium text-foreground text-center leading-tight">{cat.name}</span>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </motion.section>
 
         {/* My Progress */}
