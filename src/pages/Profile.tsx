@@ -14,7 +14,7 @@ import { fadeUp } from "@/lib/animations";
 import Layout from "@/components/Layout";
 
 const Profile = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, setUser } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
@@ -47,6 +47,7 @@ const Profile = () => {
         bio: form.bio,
         avatar_url: form.avatar_url,
       });
+      setUser({ ...user, full_name: form.full_name, bio: form.bio, avatar_url: form.avatar_url || null });
       toast({ title: "Saved", description: "Your profile has been updated." });
     } catch {
       toast({ title: "Error", description: "Failed to save profile.", variant: "destructive" });

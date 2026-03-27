@@ -41,7 +41,8 @@ const SidebarLayout = ({ children }: { children: ReactNode }) => {
     navigate("/");
   };
 
-  const displayName = user?.email?.split("@")[0] || "User";
+  const displayName = user?.full_name || user?.email?.split("@")[0] || "User";
+  const avatarInitial = displayName.charAt(0).toUpperCase();
 
   return (
     <div className="min-h-screen flex bg-background">
@@ -145,8 +146,10 @@ const SidebarLayout = ({ children }: { children: ReactNode }) => {
               {user && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <button className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-bold ml-2 cursor-pointer hover:opacity-80 transition-opacity">
-                      {displayName.charAt(0).toUpperCase()}
+                    <button className="w-8 h-8 rounded-full overflow-hidden bg-primary flex items-center justify-center text-primary-foreground text-sm font-bold ml-2 cursor-pointer hover:opacity-80 transition-opacity shrink-0">
+                      {user?.avatar_url
+                        ? <img src={user.avatar_url} alt={displayName} className="w-full h-full object-cover" />
+                        : avatarInitial}
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-48">
