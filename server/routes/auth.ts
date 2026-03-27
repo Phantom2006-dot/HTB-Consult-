@@ -64,7 +64,7 @@ router.post("/login", async (req, res) => {
     if (user.is_blocked) return res.status(403).json({ error: "Your account has been suspended. Please contact support." });
 
     const { rows: roleRows } = await pool.query(
-      "SELECT role FROM user_roles WHERE user_id = $1 ORDER BY CASE role WHEN 'admin' THEN 0 WHEN 'instructor' THEN 1 ELSE 2 END LIMIT 1",
+      "SELECT role FROM user_roles WHERE user_id = $1 ORDER BY CASE role WHEN 'admin' THEN 0 WHEN 'instructor' THEN 1 WHEN 'mentor' THEN 2 ELSE 3 END LIMIT 1",
       [user.id]
     );
     const role = roleRows[0]?.role || "student";

@@ -58,7 +58,7 @@ const Footer = () => {
             <ul className="space-y-3">
               {[
                 { label: "Contact Us", path: "/contact" },
-                { label: "FAQ", path: "/contact" },
+                { label: "FAQ", path: "/faq" },
               ].map((link) => (
                 <li key={link.path}>
                   <Link to={link.path} className="text-sm text-muted-foreground hover:text-primary transition-colors">
