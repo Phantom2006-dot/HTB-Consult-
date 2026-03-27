@@ -1,22 +1,64 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel,
+  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+  AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { fadeUp } from "@/lib/animations";
 import AdminLayout from "@/components/AdminLayout";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
+import { Search, ShieldOff, ShieldCheck } from "lucide-react";
 
 const AdminUsers = () => {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [search, setSearch] = useState("");
+  const [confirmUser, setConfirmUser] = useState<{ id: string; name: string; blocked: boolean } | null>(null);
+
   const { data: profiles, isLoading } = useQuery({
     queryKey: ["admin-profiles"],
     queryFn: () => api.get<any[]>("/api/admin/users"),
   });
 
+  const blockMutation = useMutation({
+    mutationFn: ({ id, blocked }: { id: string; blocked: boolean }) =>
+      api.patch(`/api/admin/users/${id}/block`, { blocked }),
+    onSuccess: (_data, { blocked }) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-profiles"] });
+      toast({
+        title: blocked ? "Account blocked" : "Account unblocked",
+        description: blocked
+          ? "The user can no longer log in."
+          : "The user can now log in again.",
+      });
+      setConfirmUser(null);
+    },
+    onError: (err: any) => {
+      toast({ title: "Action failed", description: err.message, variant: "destructive" });
+      setConfirmUser(null);
+    },
+  });
+
   const getInitials = (name: string | null) => {
     if (!name) return "?";
-    return name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
+    return name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
   };
+
+  const filtered = (profiles || []).filter((p) => {
+    const q = search.toLowerCase();
+    return (
+      (p.full_name || "").toLowerCase().includes(q) ||
+      (p.email || "").toLowerCase().includes(q)
+    );
+  });
 
   return (
     <AdminLayout>
@@ -26,37 +68,121 @@ const AdminUsers = () => {
           <p className="text-sm text-muted-foreground">{(profiles || []).length} registered users</p>
         </motion.div>
 
-        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={1} className="space-y-3">
+        {/* Search */}
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={1} className="relative max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={15} />
+          <Input
+            placeholder="Search by name or email…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 bg-card border-border text-sm"
+          />
+        </motion.div>
+
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={2} className="space-y-3">
           {isLoading ? (
             Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-lg" />)
-          ) : (profiles || []).length === 0 ? (
-            <Card className="border-border bg-card"><CardContent className="p-8 text-center text-muted-foreground">No users yet.</CardContent></Card>
+          ) : filtered.length === 0 ? (
+            <Card className="border-border bg-card">
+              <CardContent className="p-8 text-center text-muted-foreground">
+                {search ? "No users match your search." : "No users yet."}
+              </CardContent>
+            </Card>
           ) : (
-            (profiles || []).map((profile: any) => (
-                <Card key={profile.id} className="border-border bg-card">
-                  <CardContent className="p-4 flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-primary/15 text-primary flex items-center justify-center text-sm font-bold shrink-0">
-                      {getInitials(profile.full_name)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{profile.full_name || "Unnamed"}</p>
-                      <p className="text-xs text-muted-foreground">{profile.email}</p>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      {(profile.roles || []).map((r: string) => (
-                        <Badge key={r} variant={r === "admin" ? "default" : "secondary"} className="text-[10px]">{r}</Badge>
-                      ))}
-                      {(!profile.roles || profile.roles.length === 0) && (
-                        <Badge variant="outline" className="text-[10px]">student</Badge>
+            filtered.map((profile: any) => (
+              <Card
+                key={profile.id}
+                className={`border-border bg-card transition-colors ${profile.is_blocked ? "opacity-60 border-destructive/20" : "hover:border-primary/20"}`}
+              >
+                <CardContent className="p-4 flex items-center gap-4">
+                  {/* Avatar */}
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
+                    profile.is_blocked ? "bg-destructive/10 text-destructive" : "bg-primary/15 text-primary"
+                  }`}>
+                    {getInitials(profile.full_name)}
+                  </div>
+
+                  {/* Name + email */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p className="text-sm font-semibold text-foreground truncate">{profile.full_name || "Unnamed"}</p>
+                      {profile.is_blocked && (
+                        <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Blocked</Badge>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground shrink-0">{new Date(profile.created_at).toLocaleDateString()}</p>
-                  </CardContent>
-                </Card>
+                    <p className="text-xs text-muted-foreground">{profile.email}</p>
+                  </div>
+
+                  {/* Roles */}
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {(profile.roles || []).map((r: string) => (
+                      <Badge key={r} variant={r === "admin" ? "default" : "secondary"} className="text-[10px]">{r}</Badge>
+                    ))}
+                    {(!profile.roles || profile.roles.length === 0) && (
+                      <Badge variant="outline" className="text-[10px] border-border">student</Badge>
+                    )}
+                  </div>
+
+                  {/* Date */}
+                  <p className="text-xs text-muted-foreground shrink-0 hidden md:block">
+                    {new Date(profile.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                  </p>
+
+                  {/* Block / Unblock button — don't show for admins */}
+                  {!(profile.roles || []).includes("admin") && (
+                    <Button
+                      size="sm"
+                      variant={profile.is_blocked ? "outline" : "ghost"}
+                      className={`shrink-0 text-xs gap-1.5 h-8 ${
+                        profile.is_blocked
+                          ? "border-green-500/30 text-green-500 hover:bg-green-500/10"
+                          : "text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      }`}
+                      onClick={() =>
+                        setConfirmUser({ id: profile.id, name: profile.full_name || profile.email, blocked: !profile.is_blocked })
+                      }
+                    >
+                      {profile.is_blocked ? (
+                        <><ShieldCheck size={13} /> Unblock</>
+                      ) : (
+                        <><ShieldOff size={13} /> Block</>
+                      )}
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
             ))
           )}
         </motion.div>
       </div>
+
+      {/* Confirm dialog */}
+      <AlertDialog open={!!confirmUser} onOpenChange={(o) => { if (!o) setConfirmUser(null); }}>
+        <AlertDialogContent className="bg-card border-border">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-serif">
+              {confirmUser?.blocked ? "Block account?" : "Unblock account?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              {confirmUser?.blocked
+                ? `This will prevent "${confirmUser?.name}" from logging in. Their data will be preserved and you can unblock them at any time.`
+                : `This will restore login access for "${confirmUser?.name}".`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-border">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className={confirmUser?.blocked ? "bg-destructive hover:bg-destructive/90" : "bg-gradient-gold hover:opacity-90"}
+              onClick={() => confirmUser && blockMutation.mutate({ id: confirmUser.id, blocked: confirmUser.blocked })}
+              disabled={blockMutation.isPending}
+            >
+              {blockMutation.isPending
+                ? "Updating…"
+                : confirmUser?.blocked ? "Yes, Block Account" : "Yes, Unblock Account"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </AdminLayout>
   );
 };

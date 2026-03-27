@@ -26,7 +26,7 @@ router.get("/stats", requireAdmin, async (_req, res) => {
 router.get("/users", requireAdmin, async (_req, res) => {
   try {
     const { rows: users } = await pool.query(
-      "SELECT id, email, full_name, bio, avatar_url, created_at FROM users ORDER BY created_at DESC"
+      "SELECT id, email, full_name, bio, avatar_url, created_at, is_blocked FROM users ORDER BY created_at DESC"
     );
     const { rows: roles } = await pool.query("SELECT user_id, role FROM user_roles");
     const usersWithRoles = users.map((u) => ({
@@ -36,6 +36,17 @@ router.get("/users", requireAdmin, async (_req, res) => {
     return res.json(usersWithRoles);
   } catch (err) {
     return res.status(500).json({ error: "Failed to fetch users" });
+  }
+});
+
+router.patch("/users/:id/block", requireAdmin, async (req, res) => {
+  const { blocked } = req.body;
+  if (typeof blocked !== "boolean") return res.status(400).json({ error: "blocked (boolean) required" });
+  try {
+    await pool.query("UPDATE users SET is_blocked = $1, updated_at = now() WHERE id = $2", [blocked, req.params.id]);
+    return res.json({ success: true, is_blocked: blocked });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to update user block status" });
   }
 });
 
