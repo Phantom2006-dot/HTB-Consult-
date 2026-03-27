@@ -189,12 +189,12 @@ const Auth = () => {
 
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1 block">Email</label>
-                    <Input type="email" placeholder="your@email.com" value={loginData.email} onChange={(e) => setLoginData({ ...loginData, email: e.target.value })} className="bg-secondary border-border" maxLength={255} />
+                    <Input type="email" placeholder="your@email.com" value={loginData.email} onChange={(e) => setLoginData({ ...loginData, email: e.target.value })} className="bg-muted border-border text-foreground placeholder:text-muted-foreground" maxLength={255} />
                   </div>
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1 block">Password</label>
                     <div className="relative">
-                      <Input type={showPassword ? "text" : "password"} placeholder="••••••••" value={loginData.password} onChange={(e) => setLoginData({ ...loginData, password: e.target.value })} className="bg-secondary border-border pr-10" maxLength={128} />
+                      <Input type={showPassword ? "text" : "password"} placeholder="••••••••" value={loginData.password} onChange={(e) => setLoginData({ ...loginData, password: e.target.value })} className="bg-muted border-border text-foreground placeholder:text-muted-foreground pr-10" maxLength={128} />
                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
@@ -215,16 +215,16 @@ const Auth = () => {
                   <p className="text-sm text-muted-foreground mb-4">Join HTB Consults and start your learning journey.</p>
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1 block">Full Name</label>
-                    <Input placeholder="Your full name" value={signupData.name} onChange={(e) => setSignupData({ ...signupData, name: e.target.value })} className="bg-secondary border-border" maxLength={100} />
+                    <Input placeholder="Your full name" value={signupData.name} onChange={(e) => setSignupData({ ...signupData, name: e.target.value })} className="bg-muted border-border text-foreground placeholder:text-muted-foreground" maxLength={100} />
                   </div>
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1 block">Email</label>
-                    <Input type="email" placeholder="your@email.com" value={signupData.email} onChange={(e) => setSignupData({ ...signupData, email: e.target.value })} className="bg-secondary border-border" maxLength={255} />
+                    <Input type="email" placeholder="your@email.com" value={signupData.email} onChange={(e) => setSignupData({ ...signupData, email: e.target.value })} className="bg-muted border-border text-foreground placeholder:text-muted-foreground" maxLength={255} />
                   </div>
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1 block">Password</label>
                     <div className="relative">
-                      <Input type={showPassword ? "text" : "password"} placeholder="Min. 6 characters" value={signupData.password} onChange={(e) => setSignupData({ ...signupData, password: e.target.value })} className="bg-secondary border-border pr-10" maxLength={128} />
+                      <Input type={showPassword ? "text" : "password"} placeholder="Min. 6 characters" value={signupData.password} onChange={(e) => setSignupData({ ...signupData, password: e.target.value })} className="bg-muted border-border text-foreground placeholder:text-muted-foreground pr-10" maxLength={128} />
                       <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                         {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                       </button>
@@ -232,7 +232,7 @@ const Auth = () => {
                   </div>
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1 block">Confirm Password</label>
-                    <Input type="password" placeholder="Confirm your password" value={signupData.confirm} onChange={(e) => setSignupData({ ...signupData, confirm: e.target.value })} className="bg-secondary border-border" maxLength={128} />
+                    <Input type="password" placeholder="Confirm your password" value={signupData.confirm} onChange={(e) => setSignupData({ ...signupData, confirm: e.target.value })} className="bg-muted border-border text-foreground placeholder:text-muted-foreground" maxLength={128} />
                   </div>
                   <Button type="submit" disabled={loading} className="w-full bg-gradient-gold hover:opacity-90">
                     {loading ? "Creating account..." : "Create Account"}
@@ -261,7 +261,7 @@ const Auth = () => {
                     <p className="text-sm text-muted-foreground mb-4">Enter your email and we'll send you a reset link. It expires in 1 hour.</p>
                     <div>
                       <label className="text-sm font-medium text-foreground mb-1 block">Email</label>
-                      <Input type="email" placeholder="your@email.com" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} className="bg-secondary border-border" maxLength={255} autoFocus />
+                      <Input type="email" placeholder="your@email.com" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} className="bg-muted border-border text-foreground placeholder:text-muted-foreground" maxLength={255} autoFocus />
                     </div>
                     <Button type="submit" disabled={loading} className="w-full bg-gradient-gold hover:opacity-90">
                       {loading ? "Sending..." : "Send Reset Link"}

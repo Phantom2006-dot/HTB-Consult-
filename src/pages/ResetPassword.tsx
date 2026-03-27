@@ -119,7 +119,7 @@ const ResetPassword = () => {
                         placeholder="Min. 6 characters"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="bg-secondary border-border pr-10"
+                        className="bg-muted border-border text-foreground placeholder:text-muted-foreground pr-10"
                         maxLength={128}
                         autoFocus
                       />
@@ -140,7 +140,7 @@ const ResetPassword = () => {
                       placeholder="Re-enter your new password"
                       value={confirm}
                       onChange={(e) => setConfirm(e.target.value)}
-                      className="bg-secondary border-border"
+                      className="bg-muted border-border text-foreground placeholder:text-muted-foreground"
                       maxLength={128}
                     />
                   </div>
