@@ -1,9 +1,25 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { pool } from "../db.js";
 import { requireAuth, signToken, type AuthRequest } from "../middleware/auth.js";
+import { sendEmail, buildResetEmailHtml } from "../lib/email.js";
 
 const router = Router();
+
+async function ensureResetTable() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS password_reset_tokens (
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      token       TEXT NOT NULL UNIQUE,
+      expires_at  TIMESTAMPTZ NOT NULL,
+      used        BOOLEAN NOT NULL DEFAULT false,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+    )
+  `);
+}
+ensureResetTable().catch(console.error);
 
 router.post("/register", async (req, res) => {
   const { email, password, full_name } = req.body;
@@ -83,6 +99,97 @@ router.patch("/profile", requireAuth, async (req: AuthRequest, res) => {
     return res.json({ ...rows[0], role: req.user!.role });
   } catch (err) {
     return res.status(500).json({ error: "Failed to update profile" });
+  }
+});
+
+router.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: "Email is required" });
+
+  try {
+    const { rows } = await pool.query(
+      "SELECT id, full_name, email FROM users WHERE email = $1",
+      [email.toLowerCase()]
+    );
+
+    if (rows.length === 0) {
+      return res.json({ message: "If that email is registered, a reset link has been sent." });
+    }
+
+    const user = rows[0];
+
+    await pool.query(
+      "DELETE FROM password_reset_tokens WHERE user_id = $1 AND used = false",
+      [user.id]
+    );
+
+    const rawToken = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+    await pool.query(
+      "INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)",
+      [user.id, rawToken, expiresAt]
+    );
+
+    const frontendUrl = (process.env.FRONTEND_URL || "").replace(/\/$/, "");
+    const resetUrl = `${frontendUrl}/reset-password?token=${rawToken}`;
+
+    await sendEmail({
+      to: user.email,
+      subject: "Reset your HTB Consult Academy password",
+      html: buildResetEmailHtml(resetUrl, user.full_name || ""),
+      text: `Hi ${user.full_name || ""},\n\nClick this link to reset your password (expires in 1 hour):\n\n${resetUrl}\n\nIf you didn't request this, ignore this email.\n\nHTB Consult Academy`,
+    });
+
+    return res.json({ message: "If that email is registered, a reset link has been sent." });
+  } catch (err: any) {
+    console.error("[forgot-password]", err);
+    return res.status(500).json({ error: "Failed to process request" });
+  }
+});
+
+router.post("/reset-password", async (req, res) => {
+  const { token, password } = req.body;
+  if (!token || !password) return res.status(400).json({ error: "Token and new password are required" });
+  if (password.length < 6) return res.status(400).json({ error: "Password must be at least 6 characters" });
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT t.id, t.user_id, t.expires_at, t.used, u.email
+       FROM password_reset_tokens t
+       JOIN users u ON u.id = t.user_id
+       WHERE t.token = $1`,
+      [token]
+    );
+
+    if (rows.length === 0) {
+      return res.status(400).json({ error: "Invalid or expired reset link" });
+    }
+
+    const record = rows[0];
+
+    if (record.used) {
+      return res.status(400).json({ error: "This reset link has already been used" });
+    }
+
+    if (new Date(record.expires_at) < new Date()) {
+      await pool.query("DELETE FROM password_reset_tokens WHERE id = $1", [record.id]);
+      return res.status(400).json({ error: "This reset link has expired. Please request a new one." });
+    }
+
+    const password_hash = await bcrypt.hash(password, 12);
+
+    await pool.query("UPDATE users SET password_hash = $1, updated_at = now() WHERE id = $2", [
+      password_hash,
+      record.user_id,
+    ]);
+
+    await pool.query("UPDATE password_reset_tokens SET used = true WHERE id = $1", [record.id]);
+
+    return res.json({ message: "Password updated successfully. You can now log in." });
+  } catch (err: any) {
+    console.error("[reset-password]", err);
+    return res.status(500).json({ error: "Failed to reset password" });
   }
 });
 

@@ -87,13 +87,23 @@ const Auth = () => {
     }
   };
 
+  const [forgotSent, setForgotSent] = useState(false);
+
   const handleForgot = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!forgotEmail) {
       toast({ title: "Please enter your email", variant: "destructive" });
       return;
     }
-    toast({ title: "Password reset", description: "Please contact support to reset your password." });
+    setLoading(true);
+    try {
+      await api.post("/api/auth/forgot-password", { email: forgotEmail });
+      setForgotSent(true);
+    } catch (err: any) {
+      toast({ title: "Request failed", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (authLoading) return null;
@@ -231,17 +241,33 @@ const Auth = () => {
               )}
 
               {tab === "forgot" && (
-                <form onSubmit={handleForgot} className="space-y-4">
-                  <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Reset Password</h2>
-                  <p className="text-sm text-muted-foreground mb-4">Enter your email and we'll send you a reset link.</p>
-                  <div>
-                    <label className="text-sm font-medium text-foreground mb-1 block">Email</label>
-                    <Input type="email" placeholder="your@email.com" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} className="bg-secondary border-border" maxLength={255} />
+                forgotSent ? (
+                  <div className="text-center py-4">
+                    <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Check Your Email</h2>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      If <strong className="text-foreground">{forgotEmail}</strong> is registered, a password reset link has been sent.
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-6">The link expires in 1 hour. Check your spam folder if you don't see it.</p>
+                    <button type="button" onClick={() => { setForgotSent(false); setTab("login"); }} className="text-xs text-primary hover:underline">
+                      Back to Login
+                    </button>
                   </div>
-                  <Button type="submit" disabled={loading} className="w-full bg-gradient-gold hover:opacity-90">
-                    {loading ? "Sending..." : "Send Reset Link"}
-                  </Button>
-                </form>
+                ) : (
+                  <form onSubmit={handleForgot} className="space-y-4">
+                    <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Reset Password</h2>
+                    <p className="text-sm text-muted-foreground mb-4">Enter your email and we'll send you a reset link. It expires in 1 hour.</p>
+                    <div>
+                      <label className="text-sm font-medium text-foreground mb-1 block">Email</label>
+                      <Input type="email" placeholder="your@email.com" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} className="bg-secondary border-border" maxLength={255} autoFocus />
+                    </div>
+                    <Button type="submit" disabled={loading} className="w-full bg-gradient-gold hover:opacity-90">
+                      {loading ? "Sending..." : "Send Reset Link"}
+                    </Button>
+                  </form>
+                )
               )}
             </CardContent>
           </Card>

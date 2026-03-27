@@ -51,3 +51,6 @@ SERVER_PORT = "3001"
 NODE_ENV = "development"
 VITE_CLOUDINARY_CLOUD_NAME = "di2u0n1qj"
 VITE_CLOUDINARY_UPLOAD_PRESET = "htb_academy"
+
+[userenv.development]
+FRONTEND_URL = "https://876456f9-d7a3-4fb8-a4e1-36e0a06d0556-00-ifoifnze6ikg.spock.replit.dev"
