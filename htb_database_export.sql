@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict K5mU3oiX1m3nf9cQjemoFLoLr04DBhKBaufsvPpjn55qEdpoKNFfha6Y3IAerUC
+\restrict mQC1heiT1p6lcs0fd8BLFd04oNiCtNsk2aJd30sSgeF5J6eULrhinDap8nxzkRV
 
 -- Dumped from database version 16.10
 -- Dumped by pg_dump version 16.10
@@ -385,6 +385,7 @@ COPY public.bookings (id, mentor_id, student_id, session_date, start_time, end_t
 --
 
 COPY public.bookmarks (id, user_id, course_id, created_at) FROM stdin;
+f0a302ad-679e-42d2-8b85-19fd556b4c7a	5925c495-5dd6-4b13-8292-53333f7b5d6e	2bdc9626-b949-4e65-bd1c-9149c1b7dee5	2026-03-28 08:19:35.404357+00
 \.
 
 
@@ -473,6 +474,7 @@ COPY public.emails (id, user_id, sender_id, recipient_id, subject, body, is_read
 --
 
 COPY public.enrollments (id, user_id, course_id, progress, completed, enrolled_at, updated_at) FROM stdin;
+23c70b03-3285-469a-a6fc-d986f48764e4	5925c495-5dd6-4b13-8292-53333f7b5d6e	2bdc9626-b949-4e65-bd1c-9149c1b7dee5	0	f	2026-03-28 08:19:18.511863+00	2026-03-28 08:19:18.511863+00
 \.
 
 
@@ -489,6 +491,7 @@ COPY public.lessons (id, module_id, course_id, title, content, video_url, durati
 --
 
 COPY public.mentors (id, user_id, name, title, bio, avatar_url, specializations, years_experience, hourly_rate, rating, total_sessions, published, created_at, updated_at) FROM stdin;
+a8866054-7e95-4e1e-9470-61fef23fa3f9	5925c495-5dd6-4b13-8292-53333f7b5d6e	nworah daniel			\N	{}	0	0.00	5.00	0	f	2026-03-28 08:18:47.580952+00	2026-03-28 08:18:47.580952+00
 \.
 
 
@@ -514,6 +517,8 @@ COPY public.password_reset_tokens (id, user_id, token, expires_at, used, created
 
 COPY public.user_roles (id, user_id, role, created_at) FROM stdin;
 08e512fc-e5c6-4092-8e25-8f30288ac40f	ac71044b-61db-4b7c-b5d6-046e7a234222	admin	2026-03-28 07:55:24.321249+00
+8ff490fb-6e1d-4039-a8ae-d13128168268	5925c495-5dd6-4b13-8292-53333f7b5d6e	mentor	2026-03-28 08:18:47.576893+00
+a4a0ca26-dbe1-4d48-a4c3-e405d6a48122	5f00a114-1371-4ef6-bebf-f45e85319826	admin	2026-03-28 08:24:37.924316+00
 \.
 
 
@@ -523,6 +528,8 @@ COPY public.user_roles (id, user_id, role, created_at) FROM stdin;
 
 COPY public.users (id, email, password_hash, full_name, bio, avatar_url, created_at, updated_at) FROM stdin;
 ac71044b-61db-4b7c-b5d6-046e7a234222	phantom@htbconsult.com	$2a$12$Jpx20p11LZkzowh3b6.21eVwpt6Aaflt1OB6n0vW1zqRoLgTeJnVS	Phantom	\N	\N	2026-03-28 07:55:24.317789+00	2026-03-28 07:55:24.317789+00
+5925c495-5dd6-4b13-8292-53333f7b5d6e	danielnworah2006at@gmail.com	$2b$12$3AE2XRhJpbdNXlNtU0U.DOxPWY7E/DzinEjj5BTWwc56oOGUupRRW	nworah daniel	\N	\N	2026-03-28 08:18:47.544559+00	2026-03-28 08:18:47.544559+00
+5f00a114-1371-4ef6-bebf-f45e85319826	admin@htbconsult.com	$2b$12$KFulpTKg9gZQ.insB7Sc9ON0JgDuhGCeUNFLGq4VemOxvM2MMACHC	HTB Admin	\N	\N	2026-03-28 08:24:37.924316+00	2026-03-28 08:24:37.924316+00
 \.
 
 
@@ -946,5 +953,5 @@ ALTER TABLE ONLY public.user_roles
 -- PostgreSQL database dump complete
 --
 
-\unrestrict K5mU3oiX1m3nf9cQjemoFLoLr04DBhKBaufsvPpjn55qEdpoKNFfha6Y3IAerUC
+\unrestrict mQC1heiT1p6lcs0fd8BLFd04oNiCtNsk2aJd30sSgeF5J6eULrhinDap8nxzkRV
 

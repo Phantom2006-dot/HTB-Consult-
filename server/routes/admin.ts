@@ -51,13 +51,17 @@ router.patch("/users/:id/block", requireAdmin, async (req, res) => {
 });
 
 router.patch("/users/:id/role", requireAdmin, async (req, res) => {
-  const { role } = req.body;
+  const { role, grant } = req.body;
   if (!role) return res.status(400).json({ error: "role required" });
   try {
-    await pool.query(
-      "INSERT INTO user_roles (user_id, role) VALUES ($1, $2) ON CONFLICT (user_id, role) DO NOTHING",
-      [req.params.id, role]
-    );
+    if (grant === false) {
+      await pool.query("DELETE FROM user_roles WHERE user_id = $1 AND role = $2", [req.params.id, role]);
+    } else {
+      await pool.query(
+        "INSERT INTO user_roles (user_id, role) VALUES ($1, $2) ON CONFLICT (user_id, role) DO NOTHING",
+        [req.params.id, role]
+      );
+    }
     return res.json({ success: true });
   } catch (err) {
     return res.status(500).json({ error: "Failed to update role" });

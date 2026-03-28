@@ -42,12 +42,11 @@ router.patch("/:course_id/progress", requireAuth, async (req: AuthRequest, res) 
   if (isNaN(pct) || pct < 0 || pct > 100) return res.status(400).json({ error: "progress must be 0–100" });
 
   const completed = pct === 100;
-  const completed_at = completed ? "now()" : "NULL";
 
   try {
     const { rows } = await pool.query(
       `UPDATE enrollments
-       SET progress = $1, completed = $2, completed_at = ${completed ? "now()" : "NULL"}
+       SET progress = $1, completed = $2, updated_at = now()
        WHERE user_id = $3 AND course_id = $4
        RETURNING *`,
       [pct, completed, req.user!.id, req.params.course_id]

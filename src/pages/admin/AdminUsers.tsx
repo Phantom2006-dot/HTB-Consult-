@@ -15,13 +15,16 @@ import AdminLayout from "@/components/AdminLayout";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
-import { Search, ShieldOff, ShieldCheck } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { Search, ShieldOff, ShieldCheck, ShieldPlus, ShieldMinus } from "lucide-react";
 
 const AdminUsers = () => {
   const { toast } = useToast();
+  const { user: currentUser } = useAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [confirmUser, setConfirmUser] = useState<{ id: string; name: string; blocked: boolean } | null>(null);
+  const [confirmRole, setConfirmRole] = useState<{ id: string; name: string; grant: boolean } | null>(null);
 
   const { data: profiles, isLoading } = useQuery({
     queryKey: ["admin-profiles"],
@@ -44,6 +47,25 @@ const AdminUsers = () => {
     onError: (err: any) => {
       toast({ title: "Action failed", description: err.message, variant: "destructive" });
       setConfirmUser(null);
+    },
+  });
+
+  const roleMutation = useMutation({
+    mutationFn: ({ id, grant }: { id: string; grant: boolean }) =>
+      api.patch(`/api/admin/users/${id}/role`, { role: "admin", grant }),
+    onSuccess: (_data, { grant }) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-profiles"] });
+      toast({
+        title: grant ? "Admin access granted" : "Admin access removed",
+        description: grant
+          ? "This user now has admin access."
+          : "Admin access has been revoked.",
+      });
+      setConfirmRole(null);
+    },
+    onError: (err: any) => {
+      toast({ title: "Action failed", description: err.message, variant: "destructive" });
+      setConfirmRole(null);
     },
   });
 
@@ -128,6 +150,32 @@ const AdminUsers = () => {
                     {new Date(profile.created_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                   </p>
 
+                  {/* Make Admin / Remove Admin — don't show for self */}
+                  {profile.id !== currentUser?.id && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className={`shrink-0 text-xs gap-1.5 h-8 ${
+                        (profile.roles || []).includes("admin")
+                          ? "text-amber-500 hover:text-amber-600 hover:bg-amber-500/10"
+                          : "text-muted-foreground hover:text-primary hover:bg-primary/10"
+                      }`}
+                      onClick={() =>
+                        setConfirmRole({
+                          id: profile.id,
+                          name: profile.full_name || profile.email,
+                          grant: !(profile.roles || []).includes("admin"),
+                        })
+                      }
+                    >
+                      {(profile.roles || []).includes("admin") ? (
+                        <><ShieldMinus size={13} /> Remove Admin</>
+                      ) : (
+                        <><ShieldPlus size={13} /> Make Admin</>
+                      )}
+                    </Button>
+                  )}
+
                   {/* Block / Unblock button — don't show for admins */}
                   {!(profile.roles || []).includes("admin") && (
                     <Button
@@ -156,7 +204,35 @@ const AdminUsers = () => {
         </motion.div>
       </div>
 
-      {/* Confirm dialog */}
+      {/* Confirm role change dialog */}
+      <AlertDialog open={!!confirmRole} onOpenChange={(o) => { if (!o) setConfirmRole(null); }}>
+        <AlertDialogContent className="bg-card border-border">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-serif">
+              {confirmRole?.grant ? "Grant admin access?" : "Remove admin access?"}
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              {confirmRole?.grant
+                ? `"${confirmRole?.name}" will be able to access the admin dashboard and manage all platform content.`
+                : `"${confirmRole?.name}" will lose admin access. They will return to their standard role.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-border">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className={confirmRole?.grant ? "bg-gradient-gold hover:opacity-90" : "bg-destructive hover:bg-destructive/90"}
+              onClick={() => confirmRole && roleMutation.mutate({ id: confirmRole.id, grant: confirmRole.grant })}
+              disabled={roleMutation.isPending}
+            >
+              {roleMutation.isPending
+                ? "Updating…"
+                : confirmRole?.grant ? "Yes, Grant Admin" : "Yes, Remove Admin"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Confirm block/unblock dialog */}
       <AlertDialog open={!!confirmUser} onOpenChange={(o) => { if (!o) setConfirmUser(null); }}>
         <AlertDialogContent className="bg-card border-border">
           <AlertDialogHeader>
