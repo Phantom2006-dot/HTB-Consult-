@@ -22,9 +22,11 @@ async function ensureResetTable() {
 ensureResetTable().catch(console.error);
 
 router.post("/register", async (req, res) => {
-  const { email, password, full_name } = req.body;
+  const { email, password, full_name, role: requestedRole } = req.body;
   if (!email || !password) return res.status(400).json({ error: "Email and password required" });
   if (password.length < 6) return res.status(400).json({ error: "Password must be at least 6 characters" });
+
+  const isMentorSignup = requestedRole === "mentor";
 
   try {
     const existing = await pool.query("SELECT id FROM users WHERE email = $1", [email.toLowerCase()]);
@@ -37,13 +39,22 @@ router.post("/register", async (req, res) => {
     );
     const user = rows[0];
 
+    const assignedRole = isMentorSignup ? "mentor" : "student";
     await pool.query(
-      "INSERT INTO user_roles (user_id, role) VALUES ($1, 'student') ON CONFLICT DO NOTHING",
-      [user.id]
+      "INSERT INTO user_roles (user_id, role) VALUES ($1, $2) ON CONFLICT DO NOTHING",
+      [user.id, assignedRole]
     );
 
-    const token = signToken({ id: user.id, email: user.email, role: "student" });
-    return res.json({ token, user: { ...user, role: "student" } });
+    if (isMentorSignup) {
+      const name = full_name || email.split("@")[0];
+      await pool.query(
+        `INSERT INTO mentors (user_id, name, title, bio, published) VALUES ($1, $2, '', '', false)`,
+        [user.id, name]
+      );
+    }
+
+    const token = signToken({ id: user.id, email: user.email, role: assignedRole });
+    return res.json({ token, user: { ...user, role: assignedRole } });
   } catch (err: any) {
     console.error(err);
     return res.status(500).json({ error: "Registration failed" });

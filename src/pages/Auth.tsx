@@ -22,6 +22,7 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const [signupRole, setSignupRole] = useState<"student" | "mentor">("student");
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "", confirm: "" });
   const [forgotEmail, setForgotEmail] = useState("");
@@ -75,11 +76,17 @@ const Auth = () => {
         email: signupData.email,
         password: signupData.password,
         full_name: signupData.name,
+        role: signupRole,
       });
       setToken(result.token);
       setUser(result.user);
-      toast({ title: "Account created!", description: "Welcome to HTB Consult Academy." });
-      navigate("/dashboard");
+      toast({
+        title: "Account created!",
+        description: signupRole === "mentor"
+          ? "Welcome! Complete your mentor profile to get started."
+          : "Welcome to HTB Consult Academy.",
+      });
+      navigate(signupRole === "mentor" ? "/mentor-dashboard" : "/dashboard");
     } catch (err: any) {
       toast({ title: "Sign up failed", description: err.message, variant: "destructive" });
     } finally {
@@ -213,6 +220,38 @@ const Auth = () => {
                 <form onSubmit={handleSignup} className="space-y-4">
                   <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Create Account</h2>
                   <p className="text-sm text-muted-foreground mb-4">Join HTB Consults and start your learning journey.</p>
+
+                  {/* Role selector */}
+                  <div className="flex rounded-lg bg-muted p-1">
+                    <button
+                      type="button"
+                      onClick={() => setSignupRole("student")}
+                      className={`flex-1 text-sm font-medium py-2 rounded-md transition-all ${
+                        signupRole === "student"
+                          ? "bg-background text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Student
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSignupRole("mentor")}
+                      className={`flex-1 text-sm font-medium py-2 rounded-md transition-all ${
+                        signupRole === "mentor"
+                          ? "bg-background text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Mentor
+                    </button>
+                  </div>
+                  {signupRole === "mentor" && (
+                    <p className="text-xs text-accent bg-accent/10 rounded-md px-3 py-2">
+                      You'll be registered as a mentor. Your profile will need to be reviewed and published by an admin before students can book you.
+                    </p>
+                  )}
+
                   <div>
                     <label className="text-sm font-medium text-foreground mb-1 block">Full Name</label>
                     <Input placeholder="Your full name" value={signupData.name} onChange={(e) => setSignupData({ ...signupData, name: e.target.value })} className="bg-muted border-border text-foreground placeholder:text-muted-foreground" maxLength={100} />
@@ -235,7 +274,7 @@ const Auth = () => {
                     <Input type="password" placeholder="Confirm your password" value={signupData.confirm} onChange={(e) => setSignupData({ ...signupData, confirm: e.target.value })} className="bg-muted border-border text-foreground placeholder:text-muted-foreground" maxLength={128} />
                   </div>
                   <Button type="submit" disabled={loading} className="w-full bg-gradient-gold hover:opacity-90">
-                    {loading ? "Creating account..." : "Create Account"}
+                    {loading ? "Creating account..." : signupRole === "mentor" ? "Register as Mentor" : "Create Account"}
                   </Button>
                 </form>
               )}
