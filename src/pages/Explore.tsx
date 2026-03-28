@@ -1,10 +1,10 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   Filter, Star, Clock, Bookmark, ChevronRight, ChevronLeft,
   Briefcase, BarChart3, Award, Users, FileText, Globe, FolderOpen,
-  Play, Sparkles, Layers, Target, TrendingUp, Cpu, GraduationCap, CalendarDays
+  Play, Sparkles, Layers, Target, TrendingUp, Cpu, GraduationCap, CalendarDays, Search, X
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -49,10 +49,18 @@ function useHScroll() {
 }
 
 const Explore = () => {
-  const [search, setSearch] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get("q") || "");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const trending = useHScroll();
   const { user } = useAuth();
+
+  // Sync search state with URL ?q= param
+  useEffect(() => {
+    const q = searchParams.get("q") || "";
+    setSearch(q);
+  }, [searchParams]);
+
   const { data: courses, isLoading: coursesLoading } = useCourses();
   const { data: mentors, isLoading: mentorsLoading } = useMentors();
   const { data: bookmarksData } = useBookmarks();
@@ -68,12 +76,57 @@ const Explore = () => {
 
   const getInitials = (name: string) => name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
 
+  const q = search.toLowerCase().trim();
+  const filteredCourses = (courses || []).filter((c) => {
+    const matchesCategory = !selectedCategory || c.category === selectedCategory;
+    const matchesSearch = !q ||
+      c.title.toLowerCase().includes(q) ||
+      (c.description || "").toLowerCase().includes(q) ||
+      (c.category || "").toLowerCase().includes(q) ||
+      (c.tags || []).some((t) => t.toLowerCase().includes(q));
+    return matchesCategory && matchesSearch;
+  });
+
+  const filteredMentors = (mentors || []).filter((m) =>
+    !q ||
+    m.name.toLowerCase().includes(q) ||
+    (m.title || "").toLowerCase().includes(q) ||
+    (m.specializations || []).some((s: string) => s.toLowerCase().includes(q))
+  );
+
+  const isSearching = !!q;
+
   return (
     <SidebarLayout>
       <div className="px-4 lg:px-8 py-6 max-w-6xl mx-auto space-y-10">
 
         {/* Filters */}
         <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={0} className="space-y-4">
+          <form
+            className="relative w-full max-w-xl"
+            onSubmit={(e) => e.preventDefault()}
+          >
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                if (!e.target.value.trim()) setSearchParams({});
+              }}
+              placeholder="Search courses or mentors..."
+              className="w-full pl-10 pr-10 py-2.5 bg-card border border-border rounded-xl text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => { setSearch(""); setSearchParams({}); }}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X size={15} />
+              </button>
+            )}
+          </form>
           <div className="flex flex-wrap gap-2">
             <Select>
               <SelectTrigger className="w-[140px] h-9 bg-card border-border text-sm"><Filter size={14} className="mr-1 text-muted-foreground" /><SelectValue placeholder="Skill Level" /></SelectTrigger>
@@ -99,7 +152,7 @@ const Explore = () => {
         <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={1} className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-serif font-bold text-foreground">
-              {selectedCategory ? `📂 ${selectedCategory}` : "🔥 Trending Courses"}
+              {isSearching ? `🔍 Results for "${search}"` : selectedCategory ? `📂 ${selectedCategory}` : "🔥 Trending Courses"}
             </h2>
             <div className="flex items-center gap-2">
               {selectedCategory && (
@@ -117,7 +170,11 @@ const Explore = () => {
                 </div>
               ))
             ) : (
-              (courses || []).filter(c => !selectedCategory || c.category === selectedCategory).map((c) => (
+              <>
+                {filteredCourses.length === 0 && (
+                  <div className="text-sm text-muted-foreground py-8 px-4">No courses found{isSearching ? ` for "${search}"` : ""}.</div>
+                )}
+                {filteredCourses.map((c) => (
                 <Link key={c.id} to={`/course/${c.id}`} className="min-w-[280px] max-w-[280px] snap-start flex-shrink-0">
                   <Card className="border-border bg-card hover:border-primary/30 transition-all hover:shadow-lg hover:-translate-y-0.5 duration-200 h-full">
                     <CardContent className="p-0">
@@ -156,7 +213,8 @@ const Explore = () => {
                     </CardContent>
                   </Card>
                 </Link>
-              ))
+              ))}
+              </>
             )}
           </div>
         </motion.section>
@@ -221,14 +279,18 @@ const Explore = () => {
 
         {/* Mentors */}
         <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={4} className="space-y-4">
-          <h2 className="text-lg font-serif font-bold text-foreground">Mentors to Connect With</h2>
+          <h2 className="text-lg font-serif font-bold text-foreground">
+            {isSearching ? "Matching Mentors" : "Mentors to Connect With"}
+          </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {mentorsLoading ? (
               Array.from({ length: 4 }).map((_, i) => (
                 <Card key={i} className="border-border bg-card"><CardContent className="p-5 flex flex-col items-center space-y-3"><Skeleton className="w-14 h-14 rounded-full" /><Skeleton className="h-4 w-24" /><Skeleton className="h-3 w-16" /></CardContent></Card>
               ))
+            ) : filteredMentors.length === 0 ? (
+              <p className="col-span-4 text-sm text-muted-foreground py-4">No mentors found{isSearching ? ` for "${search}"` : ""}.</p>
             ) : (
-              (mentors || []).map((m) => (
+              filteredMentors.map((m) => (
                 <Link key={m.id} to={`/mentor/${m.id}`}>
                   <Card className="border-border bg-card hover:border-primary/30 transition-all duration-200 hover:-translate-y-0.5 h-full">
                     <CardContent className="p-5 flex flex-col items-center text-center space-y-3">

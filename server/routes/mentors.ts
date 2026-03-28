@@ -18,20 +18,23 @@ router.get("/me", requireAuth, async (req: AuthRequest, res) => {
     const { rows } = await pool.query("SELECT * FROM mentors WHERE user_id = $1", [req.user!.id]);
     if (rows.length > 0) return res.json(rows[0]);
 
-    const { rows: roleRows } = await pool.query(
-      "SELECT 1 FROM user_roles WHERE user_id = $1 AND role = 'mentor'",
-      [req.user!.id]
-    );
-    if (roleRows.length > 0) {
-      const { rows: userRows } = await pool.query("SELECT full_name FROM users WHERE id = $1", [req.user!.id]);
-      const name = userRows[0]?.full_name || req.user!.email.split("@")[0];
-      const { rows: created } = await pool.query(
-        `INSERT INTO mentors (user_id, name, title, bio, published) VALUES ($1,$2,'','',false) RETURNING *`,
-        [req.user!.id, name]
+    // Admins automatically get mentor access — create a profile if they don't have one
+    const isMentorOrAdmin = req.user!.role === "admin" || req.user!.role === "mentor";
+    if (!isMentorOrAdmin) {
+      const { rows: roleRows } = await pool.query(
+        "SELECT 1 FROM user_roles WHERE user_id = $1 AND role = 'mentor'",
+        [req.user!.id]
       );
-      return res.json(created[0]);
+      if (roleRows.length === 0) return res.json(null);
     }
-    return res.json(null);
+
+    const { rows: userRows } = await pool.query("SELECT full_name FROM users WHERE id = $1", [req.user!.id]);
+    const name = userRows[0]?.full_name || req.user!.email.split("@")[0];
+    const { rows: created } = await pool.query(
+      `INSERT INTO mentors (user_id, name, title, bio, published) VALUES ($1,$2,'','',false) RETURNING *`,
+      [req.user!.id, name]
+    );
+    return res.json(created[0]);
   } catch (err) {
     return res.status(500).json({ error: "Failed to fetch mentor record" });
   }

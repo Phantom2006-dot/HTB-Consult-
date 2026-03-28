@@ -31,6 +31,15 @@ export function requireAdmin(req: AuthRequest, res: Response, next: NextFunction
   });
 }
 
+export function requireMentorOrAdmin(req: AuthRequest, res: Response, next: NextFunction) {
+  requireAuth(req, res, () => {
+    if (req.user?.role !== "mentor" && req.user?.role !== "admin") {
+      return res.status(403).json({ error: "Mentor or admin access required" });
+    }
+    next();
+  });
+}
+
 export function signToken(payload: { id: string; email: string; role: string }) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: "30d" });
 }

@@ -29,6 +29,7 @@ const sidebarLinks = [
 
 const SidebarLayout = ({ children }: { children: ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [globalSearch, setGlobalSearch] = useState("");
   const mainRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -123,14 +124,25 @@ const SidebarLayout = ({ children }: { children: ReactNode }) => {
             </div>
 
             <div className="hidden md:flex items-center flex-1 max-w-lg mx-8">
-              <div className="relative w-full">
+              <form
+                className="relative w-full"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (globalSearch.trim()) {
+                    navigate(`/explore?q=${encodeURIComponent(globalSearch.trim())}`);
+                    setGlobalSearch("");
+                  }
+                }}
+              >
                 <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="text"
+                  value={globalSearch}
+                  onChange={(e) => setGlobalSearch(e.target.value)}
                   placeholder="Search courses or mentors..."
                   className="w-full pl-11 pr-4 py-2.5 bg-secondary border border-border rounded-xl text-sm text-secondary-foreground placeholder:text-secondary-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
                 />
-              </div>
+              </form>
             </div>
 
             <div className="flex items-center gap-3">
