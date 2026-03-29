@@ -76,17 +76,55 @@ const Dashboard = () => {
   const displayName = profile?.full_name || user.email?.split("@")[0] || "User";
   const featuredCourses = (courses || []).slice(0, 4);
 
+  const inProgress = enrolledCourses.filter((e: any) => !e.completed && e.progress > 0);
+  const completed = enrolledCourses.filter((e: any) => e.completed);
+
+  const learningStats = [
+    { label: "Enrolled", value: enrolledCourses.length, icon: BookOpen, color: "text-primary" },
+    { label: "In Progress", value: inProgress.length, icon: Clock, color: "text-blue-500" },
+    { label: "Completed", value: completed.length, icon: GraduationCap, color: "text-green-500" },
+    { label: "Certificates", value: completed.length, icon: Award, color: "text-amber-500" },
+  ];
+
   return (
     <Layout>
       <div className="px-4 lg:px-8 py-6 space-y-8">
         {/* Welcome */}
-        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
-          <h1 className="text-xl lg:text-2xl font-serif font-bold text-foreground mb-1">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back, <span className="text-primary font-semibold">{displayName}</span></p>
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="text-xl lg:text-2xl font-serif font-bold text-foreground mb-1">
+              Welcome back, <span className="text-primary">{displayName}</span>
+            </h1>
+            <p className="text-sm text-muted-foreground">Continue your professional development journey</p>
+          </div>
+          <Button asChild size="sm" className="bg-gradient-gold hover:opacity-90 gap-1.5 shrink-0">
+            <Link to="/explore"><BookOpen size={14} /> Browse Courses</Link>
+          </Button>
+        </motion.div>
+
+        {/* Learning Stats */}
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={1} className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {learningStats.map((s) => (
+            <Card key={s.label} className="bg-card border-border">
+              <CardContent className="p-4 flex items-center gap-3">
+                <div className={`w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0 ${s.color}`}>
+                  <s.icon size={16} />
+                </div>
+                <div>
+                  {enrollmentsLoading ? (
+                    <Skeleton className="h-6 w-8 mb-0.5" />
+                  ) : (
+                    <p className="text-xl font-bold text-foreground">{s.value}</p>
+                  )}
+                  <p className="text-[11px] text-muted-foreground">{s.label}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
         </motion.div>
 
         {/* Featured Courses */}
-        <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={1}>
+        <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={2}>
           <h2 className="text-xl font-serif font-bold text-foreground mb-4">Featured Courses</h2>
           {coursesLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

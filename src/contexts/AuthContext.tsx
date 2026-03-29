@@ -8,6 +8,7 @@ export interface AppUser {
   bio: string | null;
   avatar_url: string | null;
   role: string;
+  created_at?: string;
 }
 
 interface AuthContextType {

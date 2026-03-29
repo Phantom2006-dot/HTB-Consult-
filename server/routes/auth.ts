@@ -93,7 +93,7 @@ router.post("/login", async (req, res) => {
 
 router.get("/me", requireAuth, async (req: AuthRequest, res) => {
   try {
-    const { rows } = await pool.query("SELECT id, email, full_name, bio, avatar_url FROM users WHERE id = $1", [req.user!.id]);
+    const { rows } = await pool.query("SELECT id, email, full_name, bio, avatar_url, created_at FROM users WHERE id = $1", [req.user!.id]);
     if (rows.length === 0) return res.status(404).json({ error: "User not found" });
     return res.json({ ...rows[0], role: req.user!.role });
   } catch (err) {
@@ -202,6 +202,27 @@ router.post("/reset-password", async (req, res) => {
   } catch (err: any) {
     console.error("[reset-password]", err);
     return res.status(500).json({ error: "Failed to reset password" });
+  }
+});
+
+router.post("/change-password", requireAuth, async (req: AuthRequest, res) => {
+  const { current_password, new_password } = req.body;
+  if (!current_password || !new_password) {
+    return res.status(400).json({ error: "current_password and new_password required" });
+  }
+  if (new_password.length < 6) {
+    return res.status(400).json({ error: "New password must be at least 6 characters" });
+  }
+  try {
+    const { rows } = await pool.query("SELECT password_hash FROM users WHERE id = $1", [req.user!.id]);
+    if (rows.length === 0) return res.status(404).json({ error: "User not found" });
+    const valid = await bcrypt.compare(current_password, rows[0].password_hash);
+    if (!valid) return res.status(400).json({ error: "Current password is incorrect" });
+    const password_hash = await bcrypt.hash(new_password, 12);
+    await pool.query("UPDATE users SET password_hash = $1, updated_at = now() WHERE id = $2", [password_hash, req.user!.id]);
+    return res.json({ message: "Password changed successfully" });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || "Failed to change password" });
   }
 });
 

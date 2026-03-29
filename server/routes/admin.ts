@@ -6,17 +6,21 @@ const router = Router();
 
 router.get("/stats", requireAdmin, async (_req, res) => {
   try {
-    const [courses, mentors, enrollments, users] = await Promise.all([
-      pool.query("SELECT COUNT(*) FROM courses"),
-      pool.query("SELECT COUNT(*) FROM mentors"),
+    const [courses, mentors, enrollments, users, revenue, completed] = await Promise.all([
+      pool.query("SELECT COUNT(*) FROM courses WHERE published = true"),
+      pool.query("SELECT COUNT(*) FROM mentors WHERE published = true"),
       pool.query("SELECT COUNT(*) FROM enrollments"),
       pool.query("SELECT COUNT(*) FROM users"),
+      pool.query("SELECT COALESCE(SUM(c.price), 0) AS total FROM enrollments e JOIN courses c ON c.id = e.course_id"),
+      pool.query("SELECT COUNT(*) FROM enrollments WHERE completed = true"),
     ]);
     return res.json({
       courses: parseInt(courses.rows[0].count),
       mentors: parseInt(mentors.rows[0].count),
       enrollments: parseInt(enrollments.rows[0].count),
       users: parseInt(users.rows[0].count),
+      revenue: parseFloat(revenue.rows[0].total),
+      completed: parseInt(completed.rows[0].count),
     });
   } catch (err) {
     return res.status(500).json({ error: "Failed to fetch stats" });
