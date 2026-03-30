@@ -14,7 +14,7 @@ import chatRoutes from "./routes/chat.js";
 import emailsRoutes from "./routes/emails.js";
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8080;
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5000";
 
 app.use(cors({
@@ -48,6 +48,6 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/emails", emailsRoutes);
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`HTB Backend running on port ${PORT}`);
 });
