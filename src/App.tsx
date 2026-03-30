@@ -31,6 +31,10 @@ import AdminMentors from "./pages/admin/AdminMentors";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminEnrollments from "./pages/admin/AdminEnrollments";
 import AdminCategories from "./pages/admin/AdminCategories";
+import AdminArticles from "./pages/admin/AdminArticles";
+import AdminArticleEditor from "./pages/admin/AdminArticleEditor";
+import Blog from "./pages/Blog";
+import ArticleReader from "./pages/ArticleReader";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 
@@ -72,6 +76,10 @@ const App = () => (
             <Route path="/admin/mentors" element={<AdminMentors />} />
             <Route path="/admin/users" element={<AdminUsers />} />
             <Route path="/admin/enrollments" element={<AdminEnrollments />} />
+            <Route path="/admin/articles" element={<AdminArticles />} />
+            <Route path="/admin/articles/:id" element={<AdminArticleEditor />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<ArticleReader />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

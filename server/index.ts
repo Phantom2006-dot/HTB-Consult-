@@ -15,6 +15,7 @@ import adminRoutes from "./routes/admin.js";
 import chatRoutes from "./routes/chat.js";
 import emailsRoutes from "./routes/emails.js";
 import notificationsRoutes from "./routes/notifications.js";
+import articlesRoutes from "./routes/articles.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -40,6 +41,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/emails", emailsRoutes);
 app.use("/api/notifications", notificationsRoutes);
+app.use("/api/articles", articlesRoutes);
 
 if (process.env.NODE_ENV === "production") {
   const distPath = path.join(__dirname, "../public");

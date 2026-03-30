@@ -1,0 +1,209 @@
+import { useEffect, useRef, useState } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import { ArrowLeft, Clock, User, CheckCircle2, Newspaper } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { api } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
+import { fadeUp } from "@/lib/animations";
+import SidebarLayout from "@/components/SidebarLayout";
+
+interface Article {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  content: string;
+  cover_image_url: string | null;
+  read_time_minutes: number;
+  created_at: string;
+  author_name: string | null;
+  author_avatar: string | null;
+  author_role: string;
+  author_bio: string | null;
+}
+
+function formatDate(d: string) {
+  return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function parseContent(content: string) {
+  return content.split(/\n\n+/).map((block, i) => {
+    const trimmed = block.trim();
+    if (!trimmed) return null;
+    if (trimmed.startsWith("## ")) return <h2 key={i} className="font-serif font-bold text-xl text-foreground mt-8 mb-3">{trimmed.slice(3)}</h2>;
+    if (trimmed.startsWith("### ")) return <h3 key={i} className="font-serif font-semibold text-lg text-foreground mt-6 mb-2">{trimmed.slice(4)}</h3>;
+    if (trimmed.startsWith("# ")) return <h1 key={i} className="font-serif font-bold text-2xl text-foreground mt-8 mb-4">{trimmed.slice(2)}</h1>;
+    if (trimmed.startsWith("- ")) {
+      const items = trimmed.split("\n").filter(l => l.startsWith("- ")).map(l => l.slice(2));
+      return <ul key={i} className="list-disc list-inside space-y-1 text-muted-foreground text-[15px] leading-relaxed my-3">{items.map((item, j) => <li key={j}>{item}</li>)}</ul>;
+    }
+    return <p key={i} className="text-[15px] leading-[1.85] text-muted-foreground my-4">{trimmed}</p>;
+  });
+}
+
+const ArticleReader = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [readRecorded, setReadRecorded] = useState(false);
+  const [showBadge, setShowBadge] = useState(false);
+
+  const { data: article, isLoading, isError } = useQuery({
+    queryKey: ["article", slug],
+    queryFn: () => api.get<Article>(`/api/articles/${slug}`),
+    enabled: !!slug,
+  });
+
+  const { data: readStatus } = useQuery({
+    queryKey: ["article-read", article?.id],
+    queryFn: () => api.get<{ read: boolean }>(`/api/articles/${article!.id}/read-status`),
+    enabled: !!user && !!article?.id,
+  });
+
+  const recordRead = useMutation({
+    mutationFn: () => api.post(`/api/articles/${article!.id}/read`, {}),
+    onSuccess: () => {
+      setReadRecorded(true);
+      setShowBadge(true);
+      setTimeout(() => setShowBadge(false), 4000);
+    },
+  });
+
+  useEffect(() => {
+    if (!user || !article || readStatus?.read || readRecorded) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          recordRead.mutate();
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.9 }
+    );
+    const sentinel = document.getElementById("article-end");
+    if (sentinel) observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [user, article, readStatus, readRecorded]);
+
+  if (isLoading) {
+    return (
+      <SidebarLayout>
+        <div className="max-w-2xl mx-auto px-4 lg:px-8 py-8 space-y-6">
+          <Skeleton className="h-6 w-24" />
+          <Skeleton className="h-8 w-3/4" />
+          <Skeleton className="h-56 w-full rounded-xl" />
+          <div className="space-y-3">
+            {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-4 w-full" />)}
+          </div>
+        </div>
+      </SidebarLayout>
+    );
+  }
+
+  if (isError || !article) {
+    return (
+      <SidebarLayout>
+        <div className="max-w-2xl mx-auto px-4 py-20 text-center">
+          <Newspaper size={40} className="mx-auto text-muted-foreground mb-4 opacity-40" />
+          <p className="text-muted-foreground">Article not found.</p>
+          <Button variant="ghost" className="mt-4" onClick={() => navigate("/blog")}>← Back to Blog</Button>
+        </div>
+      </SidebarLayout>
+    );
+  }
+
+  const alreadyRead = readStatus?.read || readRecorded;
+
+  return (
+    <SidebarLayout>
+      <div className="max-w-2xl mx-auto px-4 lg:px-8 py-6">
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="mb-6">
+          <Link to="/blog" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft size={14} /> Back to Blog
+          </Link>
+        </motion.div>
+
+        {showBadge && (
+          <motion.div
+            initial={{ opacity: 0, y: -16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="fixed top-4 right-4 z-50 bg-green-600 text-white text-sm px-4 py-2 rounded-full flex items-center gap-2 shadow-lg"
+          >
+            <CheckCircle2 size={15} /> Article marked as read!
+          </motion.div>
+        )}
+
+        <motion.article initial="hidden" animate="visible" variants={fadeUp} custom={1}>
+          {article.cover_image_url && (
+            <div className="rounded-xl overflow-hidden mb-6 h-56 sm:h-72">
+              <img src={article.cover_image_url} alt={article.title} className="w-full h-full object-cover" />
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mb-4">
+            <span className="flex items-center gap-1"><Clock size={12} /> {article.read_time_minutes} min read</span>
+            <span>·</span>
+            <span>{formatDate(article.created_at)}</span>
+            {alreadyRead && (
+              <span className="flex items-center gap-1 text-green-500 font-medium">
+                <CheckCircle2 size={12} /> Read
+              </span>
+            )}
+          </div>
+
+          <h1 className="font-serif font-bold text-2xl sm:text-3xl text-foreground leading-tight mb-4">{article.title}</h1>
+
+          {article.excerpt && (
+            <p className="text-base text-muted-foreground italic border-l-2 border-primary/40 pl-4 mb-6 leading-relaxed">{article.excerpt}</p>
+          )}
+
+          <div className="flex items-center gap-3 mb-8 pb-6 border-b border-border">
+            {article.author_avatar ? (
+              <img src={article.author_avatar} alt={article.author_name || ""} className="w-10 h-10 rounded-full object-cover" />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                <User size={16} className="text-muted-foreground" />
+              </div>
+            )}
+            <div>
+              <p className="text-sm font-medium text-foreground">{article.author_name || "HTB Team"}</p>
+              <p className="text-xs text-muted-foreground capitalize">{article.author_role === "admin" ? "HTB Consult Team" : "Mentor"}</p>
+            </div>
+          </div>
+
+          <div ref={contentRef} className="prose-article">
+            {parseContent(article.content)}
+          </div>
+
+          <div id="article-end" className="h-4 mt-8" />
+
+          {article.author_bio && (
+            <div className="mt-10 pt-6 border-t border-border">
+              <div className="flex items-center gap-3 mb-2">
+                {article.author_avatar ? (
+                  <img src={article.author_avatar} alt={article.author_name || ""} className="w-10 h-10 rounded-full object-cover" />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                    <User size={16} className="text-muted-foreground" />
+                  </div>
+                )}
+                <div>
+                  <p className="text-sm font-semibold text-foreground">About {article.author_name || "the author"}</p>
+                  <p className="text-xs text-muted-foreground capitalize">{article.author_role === "admin" ? "HTB Consult Team" : "Mentor"}</p>
+                </div>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">{article.author_bio}</p>
+            </div>
+          )}
+        </motion.article>
+      </div>
+    </SidebarLayout>
+  );
+};
+
+export default ArticleReader;

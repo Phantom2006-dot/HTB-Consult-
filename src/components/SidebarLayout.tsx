@@ -2,7 +2,7 @@ import { ReactNode, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home, Compass, BookOpen, Bookmark, Users, LogOut, GraduationCap,
-  Search, Bell, Mail, MessageSquare, Menu, User, Settings, Shield, Briefcase
+  Search, Bell, Mail, MessageSquare, Menu, User, Settings, Shield, Briefcase, Newspaper
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/use-admin";
@@ -25,6 +25,7 @@ const sidebarLinks = [
   { icon: GraduationCap, label: "My Learning", path: "/my-learning" },
   { icon: Bookmark, label: "Saved", path: "/saved" },
   { icon: Users, label: "Mentors", path: "/mentors" },
+  { icon: Newspaper, label: "Blog", path: "/blog" },
 ];
 
 const SidebarLayout = ({ children }: { children: ReactNode }) => {
