@@ -269,3 +269,34 @@ SELECT id, 'admin'
 FROM users
 WHERE email = 'phantom@htbconsult.com'
 ON CONFLICT (user_id, role) DO NOTHING;
+
+-- ============================================================
+-- ARTICLES
+-- ============================================================
+CREATE TABLE IF NOT EXISTS articles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  excerpt TEXT,
+  content TEXT NOT NULL DEFAULT '',
+  cover_image_url TEXT,
+  author_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  read_time_minutes INT DEFAULT 1,
+  published BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS article_reads (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  article_id UUID NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
+  read_at TIMESTAMPTZ DEFAULT now(),
+  UNIQUE (user_id, article_id)
+);
+
+-- ============================================================
+-- ADDITIONAL COLUMNS
+-- ============================================================
+-- is_blocked added to users for admin management
+-- (already applied; kept here for fresh installs)

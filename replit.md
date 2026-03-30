@@ -1,70 +1,80 @@
 # HTB Consult Academy
 
-A full-stack learning management platform for HighTicketBoss (HTB Consults), offering courses, mentoring bookings, an AI chat assistant, and an admin dashboard.
+A full-stack learning management platform for HighTicketBoss (HTB Consults), offering professional training in Project Management, Business Analysis, and career development.
 
 ## Architecture
 
-- **Frontend**: React 18 + Vite + TypeScript, Tailwind CSS, shadcn/ui, TanStack Query
-- **Backend**: Node.js + Express (TypeScript), running on port 3001
-- **Database**: Replit PostgreSQL (connected via `pg` pool using `DATABASE_URL`)
-- **Auth**: Custom JWT-based auth (bcryptjs passwords, jsonwebtoken tokens)
-- **AI Chat**: OpenAI GPT-4o-mini via server-side Express route (`/api/chat`)
-- **Image uploads**: Cloudinary (cloud name: `di2u0n1qj`)
+- **Frontend**: React 18 + TypeScript + Vite (port 5000)
+- **Backend**: Express.js + TypeScript (port 3001)
+- **Database**: Replit PostgreSQL (via `pg` driver)
+- **Auth**: JWT stored in localStorage (`htb_token`), 30-day expiry
+- **Styling**: Tailwind CSS + shadcn/ui + Radix UI
+- **Animations**: Framer Motion
 
-## Development
-
-The `dev` script runs both the Vite frontend (port 5000) and Express backend (port 3001) concurrently. Vite proxies `/api/*` requests to the backend.
+## Project Structure
 
 ```
-npm run dev
+src/                  React frontend
+  components/         Reusable UI components
+  pages/              Route-level page components
+    admin/            Admin-only pages
+  contexts/           React context providers (AuthContext)
+  hooks/              Custom data-fetching hooks
+  lib/                API client (api.ts), utilities
+  integrations/       Supabase stub (replaced by Express API)
+server/               Express backend
+  routes/             API route handlers
+  middleware/         Auth middleware (JWT verification)
+  lib/                Email helper (nodemailer)
+  db.ts               PostgreSQL pool connection
+  index.ts            Server entry point
+schema.sql            Full database schema for Replit PostgreSQL
 ```
+
+## Key Features
+
+- **Courses**: Browse, enroll, track progress through video/live/book courses
+- **Mentors**: Book mentoring sessions with availability management
+- **AI Chat**: HTB Consults AI assistant (OpenAI GPT-4o-mini, streaming SSE)
+- **Admin Panel**: Manage users, courses, mentors, enrollments
+- **Blog/Articles**: Published articles with read tracking
+- **Email System**: Internal messaging between users
+- **Notifications**: Activity-based notification feed
 
 ## Environment Variables
 
-Set in Replit Secrets:
-- `DATABASE_URL` — Replit PostgreSQL connection string (auto-set)
-- `JWT_SECRET` — Token signing secret
-- `OPENAI_API_KEY` — Required for the AI chat assistant
-- `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` — Image uploads
+Set in `.replit` `[userenv]` section:
+- `JWT_SECRET` — JWT signing secret
+- `SERVER_PORT` — Express port (3001)
+- `NODE_ENV` — development/production
+- `VITE_CLOUDINARY_CLOUD_NAME` — Cloudinary for image uploads
+- `VITE_CLOUDINARY_UPLOAD_PRESET` — Cloudinary upload preset
+- `FRONTEND_URL` — Used for password reset email links
 
-Set in Replit env vars (shared):
-- `VITE_CLOUDINARY_CLOUD_NAME=di2u0n1qj`
-- `VITE_CLOUDINARY_UPLOAD_PRESET=htb_academy`
-- `SERVER_PORT=3001`
-- `JWT_SECRET=htb-consults-jwt-secret-2025-replit`
+Optional (for AI chat and email):
+- `OPENAI_API_KEY` — Required for AI chat feature
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` — For email delivery
 
-## Database Schema
+## Database
 
-16 tables in Replit PostgreSQL (created via executeSql, not migrations):
-`users`, `user_roles`, `categories`, `courses`, `modules`, `lessons`, `enrollments`, `lesson_progress`, `mentors`, `availability_slots`, `bookings`, `bookmarks`, `certificates`, `chat_conversations`, `chat_messages`, `emails`
+Schema is defined in `schema.sql`. Applied to Replit's built-in PostgreSQL.
 
-pgcrypto extension is enabled for `gen_random_bytes()` in certificate verification codes.
+Tables: `users`, `user_roles`, `categories`, `courses`, `modules`, `lessons`, `enrollments`, `bookmarks`, `mentors`, `availability_slots`, `bookings`, `chat_conversations`, `chat_messages`, `emails`, `certificates`, `articles`, `article_reads`
 
-## Key Routes
+Default admin account:
+- Email: `phantom@htbconsult.com`
+- Password: `Phantom2006++`
 
-### Backend API (`server/routes/`)
-- `/api/auth` — register, login, me, profile update
-- `/api/courses` — public + admin CRUD
-- `/api/mentors` — mentor profiles + admin CRUD
-- `/api/enrollments` — user course enrollments
-- `/api/bookings` — mentor session bookings
-- `/api/bookmarks` — saved courses
-- `/api/categories` — course categories
-- `/api/admin` — stats, user management, enrollments
-- `/api/chat` — AI chat (streaming) + conversation history
-- `/api/emails` — internal messaging
+## Development
 
-### Frontend Pages (`src/pages/`)
-- `/` — Homepage
-- `/courses` — Course catalogue
-- `/mentors` — Mentor listing
-- `/auth` — Login / Register
-- `/dashboard` — Student dashboard
-- `/chat` — AI assistant
-- `/admin` — Admin dashboard (admin role required)
+```bash
+npm run dev   # Starts both Vite (5000) and Express (3001) concurrently
+```
 
-## Notes
+## Deployment
 
-- Supabase has been fully replaced with Replit PostgreSQL. The `src/integrations/supabase/client.ts` is a no-op stub.
-- The `supabase/` directory contains historical migrations for reference only — not used at runtime.
-- The `backend/` directory is a legacy duplicate — the active server is `server/`.
+Build and serve statically:
+```bash
+npm run build  # Builds frontend to dist/public, compiles server to dist/
+npm start      # Runs compiled server serving static frontend
+```

@@ -24,7 +24,7 @@ router.get("/", requireAuth, async (req: AuthRequest, res) => {
                 m.name AS mentor_name
          FROM bookings b
          JOIN mentors m ON m.id = b.mentor_id
-         WHERE b.user_id = $1
+         WHERE b.student_id = $1
          ORDER BY b.created_at DESC
          LIMIT 5`,
         [userId]

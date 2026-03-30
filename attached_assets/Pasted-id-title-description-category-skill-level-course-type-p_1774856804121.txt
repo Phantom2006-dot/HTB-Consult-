@@ -1,0 +1,266 @@
+id,title,description,category,skill_level,course_type,price,rating,total_duration,tags,thumbnail_url,published,created_at
+"Official BCS International Diploma in Business Analysis. Learn requirements engineering, stakeholder analysis, and more.",Business Analysis,Beginner,live,0,4.8,30 hours,"{BCS,""Business Analysis"",Requirements}",,t,2026-03-08 16:45:01.277277+00
+c6dcd003-fa13-445b-b83a-e811d92fccd7,User Stories and Agile Requirements,"Bridge the gap between traditional requirements and Agile delivery. Learn to write effective user stories, acceptance criteria, and manage product backlogs in Agile environments.",Business Analysis,Intermediate,video,45,0,6 hours,"{Agile,""User Stories"",""Product Backlog""}",,t,2026-03-10 12:27:23.786048+00
+3bec5877-1ead-44ee-8a5c-5686801d5e0c,Digital Transformation Strategy,"Understand how to plan, lead, and execute digital transformation initiatives. Covers digital maturity assessment, technology selection, change management, and measuring transformation success.",Digital Transformation,Intermediate,video,59,0,10 hours,"{""Digital Transformation"",Strategy,""Change Management""}",,t,2026-03-10 12:27:23.786048+00
+7cdfa195-d699-44d8-9733-a1f8e1a47f14,AI in Business Operations,"Explore practical applications of artificial intelligence in business. Learn how AI can automate processes, enhance decision-making, and create competitive advantages across industries.",Digital Transformation,Beginner,video,49,0,8 hours,"{AI,Automation,""Machine Learning""}",,t,2026-03-10 12:27:23.786048+00
+fbd26343-808e-4781-9947-cad6ba942d8c,Data Driven Decision Making,"Develop the skills to leverage data for strategic business decisions. Covers data literacy, analytics frameworks, KPI design, dashboarding, and building a data-driven culture.",Digital Transformation,Beginner,video,39,0,7 hours,"{""Data Analytics"",KPIs,""Business Intelligence""}",,t,2026-03-10 12:27:23.786048+00
+3a4da74b-3382-49b4-a34a-5af65256b1bb,Business Model Design,"Master the tools and techniques for designing, testing, and iterating business models. Covers Business Model Canvas, value proposition design, and lean startup principles.",Business Strategy,Beginner,video,45,0,6 hours,"{""Business Model Canvas"",""Value Proposition"",""Lean Startup""}",,t,2026-03-10 12:27:23.786048+00
+655b59a0-b149-465f-9b02-9ab243e33068,Foundations of Project Management,"A thorough grounding in project management principles, methodologies, and tools. Covers project lifecycle, scope, time, cost, quality, and stakeholder management fundamentals.",Project Delivery,Beginner,video,0,0,14 hours,"{""Project Management"",PRINCE2,PMI}",,t,2026-03-10 12:27:23.786048+00
+cc15db3f-9259-4646-83e3-0433191707c5,Agile Project Delivery,"Learn to deliver projects using Agile methodologies including Scrum, Kanban, and hybrid approaches. Covers sprint planning, retrospectives, and scaling Agile across teams.",Project Delivery,Intermediate,video,49,0,10 hours,"{Agile,Scrum,Kanban}",,t,2026-03-10 12:27:23.786048+00
+36628239-c892-4cd0-af44-6b41079d1dc8,Project Planning and Execution,"Deep dive into project planning techniques including work breakdown structures, scheduling, resource allocation, and execution monitoring for successful project delivery.",Project Delivery,Intermediate,video,45,0,8 hours,"{Planning,WBS,Scheduling}",,t,2026-03-10 12:27:23.786048+00
+9ee6e8ad-ef51-4ae5-9893-eb565f9ed633,Risk Management in Projects,"Identify, assess, and mitigate project risks effectively. Covers risk registers, qualitative and quantitative analysis, response strategies, and risk monitoring throughout the project lifecycle.",Project Delivery,Advanced,video,55,0,7 hours,"{""Risk Management"",""Risk Analysis"",Mitigation}",,t,2026-03-10 12:27:23.786048+00
+dd915d0e-5798-4529-9d4e-fc34d4889921,Project Governance and Reporting,"Establish effective governance frameworks and reporting mechanisms for project oversight. Covers steering committees, stage gates, status reporting, and benefits realisation.",Project Delivery,Advanced,video,49,0,6 hours,"{Governance,Reporting,""Benefits Realisation""}",,t,2026-03-10 12:27:23.786048+00
+cd459a55-43a9-434d-b658-38cb5a7cc046,Bid Writing Fundamentals,"Learn to craft compelling, winning bids and proposals. Covers bid strategy, compliance matrices, persuasive writing techniques, pricing strategies, and quality review processes.",Bid Writing,Beginner,video,39,0,6 hours,"{""Bid Writing"",Proposals,Procurement}",,t,2026-03-10 12:27:23.786048+00
+53f40282-7131-4ed3-9ad0-55a8665e63e5,Building a Consulting Practice,"Practical guidance on establishing and growing a successful consulting business. Covers positioning, client acquisition, delivery frameworks, pricing models, and scaling your practice.",Consulting & Leadership,Intermediate,video,59,0,8 hours,"{Consulting,""Business Development"",""Practice Management""}",,t,2026-03-10 12:27:23.786048+00
+b0d850f6-e24c-4318-8516-3a949274e6b0,Stakeholder Management for Complex Projects,"Master the techniques for identifying, engaging, and managing stakeholders in complex transformation programmes. Covers influence mapping, communication planning, and conflict resolution.",Consulting & Leadership,Intermediate,video,49,0,6 hours,"{""Stakeholder Management"",Communication,Influence}",,t,2026-03-10 12:27:23.786048+00
+0903bb1b-eda2-498d-b7c1-f12b174d7701,Strategic Planning for Business Growth,"This course provides a structured approach to developing and implementing strategies that support sustainable business growth. Learners will explore how to assess opportunities, define strategic objectives, and create clear plans that guide decision making, resource alignment, and long term organisational performance.",Business Strategy,Intermediate,video,55,0,9 hours,"{Strategy,Growth,""Market Analysis""}",,t,2026-03-10 12:27:23.786048+00
+0f73b856-b800-46a7-a9ac-a3632e6322db,Requirements Engineering for Business Analysts,"Master the art of eliciting, documenting, and managing requirements. Covers stakeholder interviews, workshops, use cases, and requirements traceability for successful project delivery.",Business Analysis,Intermediate,video,49,0,10 hours,"{Requirements,Elicitation,Documentation}",,t,2026-03-10 12:27:23.786048+00
+2bdc9626-b949-4e65-bd1c-9149c1b7dee5,Process Mapping and BPMN Fundamentals,"Learn to visualise and optimise business processes using industry-standard BPMN notation. Understand process flows, swimlanes, gateways, and how to identify improvement opportunities.",Business Analysis,Beginner,video,39,0,8 hours,"{BPMN,""Process Mapping"",""Process Improvement""}",,t,2026-03-10 12:27:23.786048+00
+e22f9dad-2867-4941-a520-18bc8e3db625,Foundations of Business Analysis,"This course introduces the core principles and practices of business analysis. Learners will explore how to identify business needs, gather and document requirements, and support organisations in improving processes, systems, and decision making. The course provides a practical foundation for understanding how business analysts contribute to successful project and business outcomes.",Business Analysis,Beginner,video,100,0,12 hours,"{""BA Fundamentals"",""BA Principles"",""Stakeholder Identification and Analysis"",""Requirements Engineering"",""Problem Analysis and Solution Evaluation"",""Introduction to SDLC"",""BA Tools and Techniques"",""Communication and Documentation Skills"",""Agile Business Analysis""}",https://ywdiepwksgjmfjvjffpt.supabase.co/storage/v1/object/public/course-thumbnails/16bd6422-5314-4a19-ac5c-e7840610cede.png,t,2026-03-10 12:27:23.786048+00
+24d8c897-2555-4fa9-af55-d6a626da3aed,Data Analysis,"This course introduces the fundamentals of data analysis and how data can be used to support informed business decisions. Participants will learn how to collect, organise, interpret and present data using practical tools and analytical techniques. The course also explores how businesses use data insights to improve performance, identify trends and support strategic planning. Ideal for professionals who want to build confidence in working with data within business and digital transformation environments.",5e,Beginner,live,50,0,1hour,{},https://ywdiepwksgjmfjvjffpt.supabase.co/storage/v1/object/public/course-thumbnails/a1227fbd-ef21-4735-aeb1-878ab794315e.jpg,t,2026-03-10 17:32:10.68942+00
+
+CREATE SCHEMA "public";
+CREATE TABLE "article_reads" (
+	"user_id" uuid,
+	"article_id" uuid,
+	"read_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "article_reads_pkey" PRIMARY KEY("user_id","article_id")
+);
+CREATE TABLE "articles" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"title" text NOT NULL,
+	"slug" text NOT NULL CONSTRAINT "articles_slug_key" UNIQUE,
+	"excerpt" text,
+	"content" text DEFAULT '' NOT NULL,
+	"cover_image_url" text,
+	"author_id" uuid,
+	"read_time_minutes" integer DEFAULT 1 NOT NULL,
+	"published" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+CREATE TABLE "availability_slots" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"mentor_id" uuid NOT NULL,
+	"day_of_week" integer NOT NULL,
+	"start_time" text NOT NULL,
+	"end_time" text NOT NULL,
+	"is_active" boolean DEFAULT true,
+	CONSTRAINT "availability_slots_day_of_week_check" CHECK (CHECK (((day_of_week >= 0) AND (day_of_week <= 6))))
+);
+CREATE TABLE "bookings" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"mentor_id" uuid NOT NULL,
+	"student_id" uuid NOT NULL,
+	"session_date" date NOT NULL,
+	"start_time" text NOT NULL,
+	"end_time" text NOT NULL,
+	"status" text DEFAULT 'pending',
+	"notes" text,
+	"meet_link" text,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "bookings_status_check" CHECK (CHECK ((status = ANY (ARRAY['pending'::text, 'confirmed'::text, 'cancelled'::text, 'completed'::text]))))
+);
+CREATE TABLE "bookmarks" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"user_id" uuid NOT NULL UNIQUE,
+	"course_id" uuid NOT NULL UNIQUE,
+	"created_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "bookmarks_user_id_course_id_key" UNIQUE("user_id","course_id")
+);
+CREATE TABLE "categories" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"name" text NOT NULL CONSTRAINT "categories_name_key" UNIQUE,
+	"created_at" timestamp with time zone DEFAULT now()
+);
+CREATE TABLE "certificates" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"user_id" uuid NOT NULL UNIQUE,
+	"course_id" uuid NOT NULL UNIQUE,
+	"issued_at" timestamp with time zone DEFAULT now(),
+	"certificate_url" text,
+	CONSTRAINT "certificates_user_id_course_id_key" UNIQUE("user_id","course_id")
+);
+CREATE TABLE "chat_conversations" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"user_id" uuid NOT NULL,
+	"participant_id" uuid,
+	"title" text DEFAULT 'New Chat',
+	"type" text DEFAULT 'ai',
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "chat_conversations_type_check" CHECK (CHECK ((type = ANY (ARRAY['ai'::text, 'user'::text]))))
+);
+CREATE TABLE "chat_messages" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"conversation_id" uuid NOT NULL,
+	"role" text NOT NULL,
+	"content" text NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "chat_messages_role_check" CHECK (CHECK ((role = ANY (ARRAY['user'::text, 'assistant'::text, 'system'::text]))))
+);
+CREATE TABLE "courses" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"title" text NOT NULL,
+	"description" text,
+	"category" text,
+	"skill_level" text DEFAULT 'Beginner',
+	"course_type" text DEFAULT 'video',
+	"price" numeric(10, 2) DEFAULT '0',
+	"total_duration" text,
+	"tags" text[] DEFAULT '{}',
+	"thumbnail_url" text,
+	"live_class_url" text,
+	"published" boolean DEFAULT false,
+	"instructor_id" uuid,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "courses_course_type_check" CHECK (CHECK ((course_type = ANY (ARRAY['video'::text, 'live'::text, 'book'::text]))))
+);
+CREATE TABLE "emails" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"user_id" uuid NOT NULL,
+	"sender_id" uuid,
+	"recipient_id" uuid,
+	"subject" text DEFAULT '(No subject)',
+	"body" text DEFAULT '',
+	"is_read" boolean DEFAULT false,
+	"is_draft" boolean DEFAULT false,
+	"has_attachment" boolean DEFAULT false,
+	"folder" text DEFAULT 'inbox',
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "emails_folder_check" CHECK (CHECK ((folder = ANY (ARRAY['inbox'::text, 'sent'::text, 'drafts'::text, 'trash'::text]))))
+);
+CREATE TABLE "enrollments" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"user_id" uuid NOT NULL UNIQUE,
+	"course_id" uuid NOT NULL UNIQUE,
+	"progress" integer DEFAULT 0,
+	"completed" boolean DEFAULT false,
+	"enrolled_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "enrollments_user_id_course_id_key" UNIQUE("user_id","course_id"),
+	CONSTRAINT "enrollments_progress_check" CHECK (CHECK (((progress >= 0) AND (progress <= 100))))
+);
+CREATE TABLE "lessons" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"module_id" uuid NOT NULL,
+	"course_id" uuid NOT NULL,
+	"title" text NOT NULL,
+	"content" text,
+	"video_url" text,
+	"duration" text,
+	"position" integer DEFAULT 0,
+	"is_free" boolean DEFAULT false,
+	"created_at" timestamp with time zone DEFAULT now()
+);
+CREATE TABLE "mentors" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"user_id" uuid,
+	"name" text NOT NULL,
+	"title" text,
+	"bio" text,
+	"avatar_url" text,
+	"specializations" text[] DEFAULT '{}',
+	"years_experience" integer DEFAULT 0,
+	"hourly_rate" numeric(10, 2) DEFAULT '0',
+	"rating" numeric(3, 2) DEFAULT '5.0',
+	"total_sessions" integer DEFAULT 0,
+	"published" boolean DEFAULT false,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now()
+);
+CREATE TABLE "modules" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"course_id" uuid NOT NULL,
+	"title" text NOT NULL,
+	"position" integer DEFAULT 0,
+	"created_at" timestamp with time zone DEFAULT now()
+);
+CREATE TABLE "password_reset_tokens" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"user_id" uuid NOT NULL,
+	"token" text NOT NULL CONSTRAINT "password_reset_tokens_token_key" UNIQUE,
+	"expires_at" timestamp with time zone NOT NULL,
+	"used" boolean DEFAULT false NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+CREATE TABLE "user_roles" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"user_id" uuid NOT NULL UNIQUE,
+	"role" text NOT NULL UNIQUE,
+	"created_at" timestamp with time zone DEFAULT now(),
+	CONSTRAINT "user_roles_user_id_role_key" UNIQUE("user_id","role"),
+	CONSTRAINT "user_roles_role_check" CHECK (CHECK ((role = ANY (ARRAY['admin'::text, 'instructor'::text, 'mentor'::text, 'student'::text]))))
+);
+CREATE TABLE "users" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	"email" text NOT NULL CONSTRAINT "users_email_key" UNIQUE,
+	"password_hash" text NOT NULL,
+	"full_name" text,
+	"bio" text,
+	"avatar_url" text,
+	"created_at" timestamp with time zone DEFAULT now(),
+	"updated_at" timestamp with time zone DEFAULT now()
+);
+ALTER TABLE "article_reads" ADD CONSTRAINT "article_reads_article_id_fkey" FOREIGN KEY ("article_id") REFERENCES "articles"("id") ON DELETE CASCADE;
+ALTER TABLE "article_reads" ADD CONSTRAINT "article_reads_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE;
+ALTER TABLE "articles" ADD CONSTRAINT "articles_author_id_fkey" FOREIGN KEY ("author_id") REFERENCES "users"("id") ON DELETE SET NULL;
+ALTER TABLE "availability_slots" ADD CONSTRAINT "availability_slots_mentor_id_fkey" FOREIGN KEY ("mentor_id") REFERENCES "mentors"("id") ON DELETE CASCADE;
+ALTER TABLE "bookings" ADD CONSTRAINT "bookings_mentor_id_fkey" FOREIGN KEY ("mentor_id") REFERENCES "mentors"("id") ON DELETE CASCADE;
+ALTER TABLE "bookings" ADD CONSTRAINT "bookings_student_id_fkey" FOREIGN KEY ("student_id") REFERENCES "users"("id") ON DELETE CASCADE;
+ALTER TABLE "bookmarks" ADD CONSTRAINT "bookmarks_course_id_fkey" FOREIGN KEY ("course_id") REFERENCES "courses"("id") ON DELETE CASCADE;
+ALTER TABLE "bookmarks" ADD CONSTRAINT "bookmarks_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE;
+ALTER TABLE "certificates" ADD CONSTRAINT "certificates_course_id_fkey" FOREIGN KEY ("course_id") REFERENCES "courses"("id") ON DELETE CASCADE;
+ALTER TABLE "certificates" ADD CONSTRAINT "certificates_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE;
+ALTER TABLE "chat_conversations" ADD CONSTRAINT "chat_conversations_participant_id_fkey" FOREIGN KEY ("participant_id") REFERENCES "users"("id") ON DELETE SET NULL;
+ALTER TABLE "chat_conversations" ADD CONSTRAINT "chat_conversations_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE;
+ALTER TABLE "chat_messages" ADD CONSTRAINT "chat_messages_conversation_id_fkey" FOREIGN KEY ("conversation_id") REFERENCES "chat_conversations"("id") ON DELETE CASCADE;
+ALTER TABLE "courses" ADD CONSTRAINT "courses_instructor_id_fkey" FOREIGN KEY ("instructor_id") REFERENCES "users"("id") ON DELETE SET NULL;
+ALTER TABLE "emails" ADD CONSTRAINT "emails_recipient_id_fkey" FOREIGN KEY ("recipient_id") REFERENCES "users"("id") ON DELETE SET NULL;
+ALTER TABLE "emails" ADD CONSTRAINT "emails_sender_id_fkey" FOREIGN KEY ("sender_id") REFERENCES "users"("id") ON DELETE SET NULL;
+ALTER TABLE "emails" ADD CONSTRAINT "emails_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE;
+ALTER TABLE "enrollments" ADD CONSTRAINT "enrollments_course_id_fkey" FOREIGN KEY ("course_id") REFERENCES "courses"("id") ON DELETE CASCADE;
+ALTER TABLE "enrollments" ADD CONSTRAINT "enrollments_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE;
+ALTER TABLE "lessons" ADD CONSTRAINT "lessons_course_id_fkey" FOREIGN KEY ("course_id") REFERENCES "courses"("id") ON DELETE CASCADE;
+ALTER TABLE "lessons" ADD CONSTRAINT "lessons_module_id_fkey" FOREIGN KEY ("module_id") REFERENCES "modules"("id") ON DELETE CASCADE;
+ALTER TABLE "mentors" ADD CONSTRAINT "mentors_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE SET NULL;
+ALTER TABLE "modules" ADD CONSTRAINT "modules_course_id_fkey" FOREIGN KEY ("course_id") REFERENCES "courses"("id") ON DELETE CASCADE;
+ALTER TABLE "password_reset_tokens" ADD CONSTRAINT "password_reset_tokens_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE;
+ALTER TABLE "user_roles" ADD CONSTRAINT "user_roles_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE;
+CREATE UNIQUE INDEX "article_reads_pkey" ON "article_reads" ("user_id","article_id");
+CREATE UNIQUE INDEX "articles_pkey" ON "articles" ("id");
+CREATE UNIQUE INDEX "articles_slug_key" ON "articles" ("slug");
+CREATE UNIQUE INDEX "availability_slots_pkey" ON "availability_slots" ("id");
+CREATE UNIQUE INDEX "bookings_pkey" ON "bookings" ("id");
+CREATE INDEX "idx_bookings_mentor" ON "bookings" ("mentor_id");
+CREATE INDEX "idx_bookings_student" ON "bookings" ("student_id");
+CREATE UNIQUE INDEX "bookmarks_pkey" ON "bookmarks" ("id");
+CREATE UNIQUE INDEX "bookmarks_user_id_course_id_key" ON "bookmarks" ("user_id","course_id");
+CREATE INDEX "idx_bookmarks_user" ON "bookmarks" ("user_id");
+CREATE UNIQUE INDEX "categories_name_key" ON "categories" ("name");
+CREATE UNIQUE INDEX "categories_pkey" ON "categories" ("id");
+CREATE UNIQUE INDEX "certificates_pkey" ON "certificates" ("id");
+CREATE UNIQUE INDEX "certificates_user_id_course_id_key" ON "certificates" ("user_id","course_id");
+CREATE UNIQUE INDEX "chat_conversations_pkey" ON "chat_conversations" ("id");
+CREATE UNIQUE INDEX "chat_messages_pkey" ON "chat_messages" ("id");
+CREATE INDEX "idx_chat_msgs_conv" ON "chat_messages" ("conversation_id");
+CREATE UNIQUE INDEX "courses_pkey" ON "courses" ("id");
+CREATE INDEX "idx_courses_published" ON "courses" ("published");
+CREATE UNIQUE INDEX "emails_pkey" ON "emails" ("id");
+CREATE INDEX "idx_emails_user" ON "emails" ("user_id");
+CREATE UNIQUE INDEX "enrollments_pkey" ON "enrollments" ("id");
+CREATE UNIQUE INDEX "enrollments_user_id_course_id_key" ON "enrollments" ("user_id","course_id");
+CREATE INDEX "idx_enrollments_course" ON "enrollments" ("course_id");
+CREATE INDEX "idx_enrollments_user" ON "enrollments" ("user_id");
+CREATE UNIQUE INDEX "lessons_pkey" ON "lessons" ("id");
+CREATE UNIQUE INDEX "mentors_pkey" ON "mentors" ("id");
+CREATE UNIQUE INDEX "modules_pkey" ON "modules" ("id");
+CREATE UNIQUE INDEX "password_reset_tokens_pkey" ON "password_reset_tokens" ("id");
+CREATE UNIQUE INDEX "password_reset_tokens_token_key" ON "password_reset_tokens" ("token");
+CREATE UNIQUE INDEX "user_roles_pkey" ON "user_roles" ("id");
+CREATE UNIQUE INDEX "user_roles_user_id_role_key" ON "user_roles" ("user_id","role");
+CREATE UNIQUE INDEX "users_email_key" ON "users" ("email");
+CREATE UNIQUE INDEX "users_pkey" ON "users" ("id");
