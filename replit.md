@@ -37,7 +37,7 @@ schema.sql            Full database schema for Replit PostgreSQL
 - **Mentors**: Book mentoring sessions with availability management
 - **AI Chat**: HTB Consults AI assistant (OpenAI GPT-4o-mini, streaming SSE)
 - **Admin Panel**: Manage users, courses, mentors, enrollments
-- **Blog/Articles**: Published articles with read tracking
+- **Blog/Articles**: Full Medium/Substack-style blog — rich markdown editor with toolbar + live preview, ReactMarkdown rendering with prose styling, featured article toggle (admin-only), read-tracking via IntersectionObserver, mentor article management at `/mentor/articles`, public blog at `/blog` with search + featured hero layout
 - **Email System**: Internal messaging between users
 - **Notifications**: Activity-based notification feed
 

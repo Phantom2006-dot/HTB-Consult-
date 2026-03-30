@@ -4,12 +4,14 @@ import { motion } from "framer-motion";
 import {
   BookOpen, Clock, Star,
   BarChart3, GraduationCap, Award, Users, Briefcase,
-  Play, Layers, Globe, Target, FileText, TrendingUp, Cpu, FolderOpen
+  Play, Layers, Globe, Target, FileText, TrendingUp, Cpu, FolderOpen,
+  Newspaper, ArrowRight
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { fadeUp } from "@/lib/animations";
 import Layout from "@/components/Layout";
@@ -17,6 +19,7 @@ import { useCourses } from "@/hooks/use-courses";
 import { useEnrollments } from "@/hooks/use-enrollments";
 import { useCategories } from "@/hooks/use-categories";
 import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 
 const CATEGORY_ICONS: Record<string, React.ElementType> = {
   "Business Analysis": BarChart3,
@@ -35,6 +38,22 @@ const CATEGORY_ICONS: Record<string, React.ElementType> = {
   "General": FolderOpen,
 };
 
+interface FeaturedArticle {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string | null;
+  cover_image_url: string | null;
+  read_time_minutes: number;
+  is_featured: boolean;
+  created_at: string;
+  author_name: string | null;
+}
+
+function formatDate(d: string) {
+  return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+}
+
 const Dashboard = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -48,6 +67,10 @@ const Dashboard = () => {
   const { data: courses, isLoading: coursesLoading } = useCourses();
   const { data: enrollmentsData, isLoading: enrollmentsLoading } = useEnrollments();
   const { data: categoriesData, isLoading: categoriesLoading } = useCategories();
+  const { data: featuredArticles, isLoading: articlesLoading } = useQuery({
+    queryKey: ["featured-articles"],
+    queryFn: () => api.get<FeaturedArticle[]>("/api/articles/featured"),
+  });
 
   const enrolledCourses = (enrollmentsData || []).map((e: any) => ({
     ...e.courses,
@@ -56,9 +79,7 @@ const Dashboard = () => {
   }));
 
   useEffect(() => {
-    if (!loading && !user) {
-      navigate("/auth");
-    }
+    if (!loading && !user) navigate("/auth");
   }, [user, loading, navigate]);
 
   if (loading) {
@@ -123,8 +144,79 @@ const Dashboard = () => {
           ))}
         </motion.div>
 
+        {/* Featured Articles */}
+        {(articlesLoading || (featuredArticles && featuredArticles.length > 0)) && (
+          <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={2}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-serif font-bold text-foreground flex items-center gap-2">
+                <Newspaper size={20} className="text-primary" /> From the Blog
+              </h2>
+              <Link to="/blog" className="flex items-center gap-1 text-sm text-primary hover:opacity-80 transition-opacity">
+                View all <ArrowRight size={14} />
+              </Link>
+            </div>
+            {articlesLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Card key={i} className="bg-card border-border overflow-hidden">
+                    <Skeleton className="h-36 w-full rounded-none" />
+                    <CardContent className="p-4 space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-3 w-full" />
+                      <Skeleton className="h-3 w-1/2" />
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {(featuredArticles || []).map((article) => (
+                  <Link key={article.id} to={`/blog/${article.slug}`}>
+                    <Card className="bg-card border-border hover:border-primary/40 transition-colors group overflow-hidden h-full">
+                      {article.cover_image_url ? (
+                        <div className="overflow-hidden h-36">
+                          <img
+                            src={article.cover_image_url}
+                            alt={article.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        </div>
+                      ) : (
+                        <div className="h-36 bg-gradient-to-br from-primary/20 via-primary/5 to-muted flex items-center justify-center">
+                          <Newspaper size={28} className="text-primary/40" />
+                        </div>
+                      )}
+                      <CardContent className="p-4 space-y-2">
+                        <div className="flex items-center gap-2">
+                          {article.is_featured && (
+                            <Badge className="text-[10px] bg-amber-500/20 text-amber-400 border-amber-500/30 border">
+                              Featured
+                            </Badge>
+                          )}
+                          <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                            <Clock size={11} /> {article.read_time_minutes} min read
+                          </span>
+                        </div>
+                        <h3 className="font-serif font-bold text-sm text-foreground leading-snug group-hover:text-primary transition-colors line-clamp-2">
+                          {article.title}
+                        </h3>
+                        {article.excerpt && (
+                          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{article.excerpt}</p>
+                        )}
+                        <p className="text-[11px] text-muted-foreground">
+                          {article.author_name || "HTB Team"} · {formatDate(article.created_at)}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </motion.section>
+        )}
+
         {/* Featured Courses */}
-        <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={2}>
+        <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={3}>
           <h2 className="text-xl font-serif font-bold text-foreground mb-4">Featured Courses</h2>
           {coursesLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -157,7 +249,7 @@ const Dashboard = () => {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1"><Clock size={12} /> {course.total_duration || "—"}</span>
-                          <span className="flex items-center gap-1"><Star size={12} className="text-accent" /> {course.rating}/5</span>
+                          <span className="flex items-center gap-1"><Star size={12} className="text-accent" /> {course.rating || 0}/5</span>
                         </div>
                         <span className="text-sm font-bold text-primary">{course.price > 0 ? `£${course.price}` : "Free"}</span>
                       </div>
@@ -170,7 +262,7 @@ const Dashboard = () => {
         </motion.section>
 
         {/* Categories */}
-        <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={2}>
+        <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={4}>
           <h2 className="text-xl font-serif font-bold text-foreground mb-4">Browse Categories</h2>
           {categoriesLoading ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
@@ -185,7 +277,7 @@ const Dashboard = () => {
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
-              {(categoriesData || []).filter(c => c.name !== "General").map((cat) => {
+              {(categoriesData || []).filter((c: any) => c.name !== "General").map((cat: any) => {
                 const Icon = CATEGORY_ICONS[cat.name] || FolderOpen;
                 return (
                   <Link key={cat.id} to={`/courses?category=${encodeURIComponent(cat.name)}`}>
@@ -203,7 +295,7 @@ const Dashboard = () => {
         </motion.section>
 
         {/* My Progress */}
-        <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={3}>
+        <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={5}>
           <h2 className="text-xl font-serif font-bold text-foreground mb-4">My Progress</h2>
           {enrollmentsLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -214,7 +306,8 @@ const Dashboard = () => {
           ) : enrolledCourses.length === 0 ? (
             <Card className="bg-card border-border">
               <CardContent className="p-8 text-center text-muted-foreground">
-                You haven't enrolled in any courses yet. <Link to="/explore" className="text-primary hover:underline">Explore courses</Link>
+                You haven't enrolled in any courses yet.{" "}
+                <Link to="/explore" className="text-primary hover:underline">Explore courses</Link>
               </CardContent>
             </Card>
           ) : (

@@ -8,7 +8,7 @@ router.get("/", requireAuth, async (req: AuthRequest, res) => {
   try {
     const userId = req.user!.id;
 
-    const [enrollments, bookings] = await Promise.all([
+    const [enrollments, bookings, articles] = await Promise.all([
       pool.query(
         `SELECT e.enrolled_at AS created_at, e.completed, e.progress,
                 c.title AS course_title, c.id AS course_id
@@ -29,6 +29,15 @@ router.get("/", requireAuth, async (req: AuthRequest, res) => {
          LIMIT 5`,
         [userId]
       ),
+      pool.query(
+        `SELECT a.id, a.title, a.slug, a.created_at, a.cover_image_url,
+                u.full_name AS author_name
+         FROM articles a
+         LEFT JOIN users u ON u.id = a.author_id
+         WHERE a.published = true
+         ORDER BY a.created_at DESC
+         LIMIT 5`
+      ),
     ]);
 
     const notifications: any[] = [];
@@ -41,6 +50,7 @@ router.get("/", requireAuth, async (req: AuthRequest, res) => {
           title: "Course completed!",
           desc: `You completed "${e.course_title}". Well done!`,
           time: e.created_at,
+          link: `/course/${e.course_id}`,
         });
       } else if (e.progress > 0 && e.progress < 100) {
         notifications.push({
@@ -49,6 +59,7 @@ router.get("/", requireAuth, async (req: AuthRequest, res) => {
           title: "Learning in progress",
           desc: `You're ${e.progress}% through "${e.course_title}". Keep going!`,
           time: e.created_at,
+          link: `/course/${e.course_id}`,
         });
       } else {
         notifications.push({
@@ -57,6 +68,7 @@ router.get("/", requireAuth, async (req: AuthRequest, res) => {
           title: "Enrolled in a course",
           desc: `You enrolled in "${e.course_title}".`,
           time: e.created_at,
+          link: `/course/${e.course_id}`,
         });
       }
     }
@@ -73,12 +85,25 @@ router.get("/", requireAuth, async (req: AuthRequest, res) => {
         title: statusMap[b.status] || "Mentoring booking",
         desc: `Session with ${b.mentor_name}${b.session_date ? " on " + new Date(b.session_date).toLocaleDateString("en-GB", { day: "numeric", month: "long" }) : ""}.`,
         time: b.created_at,
+        link: "/mentors",
+      });
+    }
+
+    for (const a of articles.rows) {
+      notifications.push({
+        id: `article-${a.id}`,
+        type: "article",
+        title: "New article published",
+        desc: `"${a.title}"${a.author_name ? ` by ${a.author_name}` : ""} — tap to read.`,
+        time: a.created_at,
+        link: `/blog/${a.slug}`,
+        cover: a.cover_image_url,
       });
     }
 
     notifications.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
 
-    return res.json(notifications.slice(0, 15));
+    return res.json(notifications.slice(0, 20));
   } catch (err: any) {
     return res.status(500).json({ error: err.message || "Failed to fetch notifications" });
   }

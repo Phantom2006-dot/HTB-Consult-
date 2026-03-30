@@ -18,19 +18,53 @@ function slugify(title: string) {
     .slice(0, 80);
 }
 
-router.get("/", async (req, res) => {
+router.get("/", async (_req, res) => {
   try {
     const { rows } = await pool.query(`
       SELECT a.id, a.title, a.slug, a.excerpt, a.cover_image_url,
-             a.read_time_minutes, a.published, a.created_at,
+             a.read_time_minutes, a.published, a.is_featured, a.created_at,
              u.full_name AS author_name, u.avatar_url AS author_avatar,
-             u.role AS author_role
+             ur.role AS author_role
       FROM articles a
       LEFT JOIN users u ON u.id = a.author_id
+      LEFT JOIN user_roles ur ON ur.user_id = a.author_id
       WHERE a.published = true
-      ORDER BY a.created_at DESC
+      ORDER BY a.is_featured DESC, a.created_at DESC
     `);
     return res.json(rows);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/featured", async (_req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT a.id, a.title, a.slug, a.excerpt, a.cover_image_url,
+             a.read_time_minutes, a.is_featured, a.created_at,
+             u.full_name AS author_name, u.avatar_url AS author_avatar,
+             ur.role AS author_role
+      FROM articles a
+      LEFT JOIN users u ON u.id = a.author_id
+      LEFT JOIN user_roles ur ON ur.user_id = a.author_id
+      WHERE a.published = true AND a.is_featured = true
+      ORDER BY a.created_at DESC
+      LIMIT 3
+    `);
+    if (rows.length > 0) return res.json(rows);
+    const { rows: recent } = await pool.query(`
+      SELECT a.id, a.title, a.slug, a.excerpt, a.cover_image_url,
+             a.read_time_minutes, a.is_featured, a.created_at,
+             u.full_name AS author_name, u.avatar_url AS author_avatar,
+             ur.role AS author_role
+      FROM articles a
+      LEFT JOIN users u ON u.id = a.author_id
+      LEFT JOIN user_roles ur ON ur.user_id = a.author_id
+      WHERE a.published = true
+      ORDER BY a.created_at DESC
+      LIMIT 3
+    `);
+    return res.json(recent);
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
@@ -40,10 +74,11 @@ router.get("/admin/all", requireAuth, requireAdmin, async (_req, res) => {
   try {
     const { rows } = await pool.query(`
       SELECT a.id, a.title, a.slug, a.excerpt, a.cover_image_url,
-             a.read_time_minutes, a.published, a.created_at, a.updated_at,
-             u.full_name AS author_name, u.role AS author_role
+             a.read_time_minutes, a.published, a.is_featured, a.created_at, a.updated_at,
+             u.full_name AS author_name, ur.role AS author_role
       FROM articles a
       LEFT JOIN users u ON u.id = a.author_id
+      LEFT JOIN user_roles ur ON ur.user_id = a.author_id
       ORDER BY a.created_at DESC
     `);
     return res.json(rows);
@@ -56,7 +91,7 @@ router.get("/mentor/mine", requireAuth, requireMentorOrAdmin, async (req: AuthRe
   try {
     const { rows } = await pool.query(`
       SELECT a.id, a.title, a.slug, a.excerpt, a.cover_image_url,
-             a.read_time_minutes, a.published, a.created_at, a.updated_at
+             a.read_time_minutes, a.published, a.is_featured, a.created_at, a.updated_at
       FROM articles a
       WHERE a.author_id = $1
       ORDER BY a.created_at DESC
@@ -71,11 +106,12 @@ router.get("/:slug", async (req, res) => {
   try {
     const { rows } = await pool.query(`
       SELECT a.id, a.title, a.slug, a.excerpt, a.content, a.cover_image_url,
-             a.read_time_minutes, a.published, a.created_at,
+             a.read_time_minutes, a.published, a.is_featured, a.created_at,
              u.full_name AS author_name, u.avatar_url AS author_avatar,
-             u.role AS author_role, u.bio AS author_bio
+             ur.role AS author_role, u.bio AS author_bio
       FROM articles a
       LEFT JOIN users u ON u.id = a.author_id
+      LEFT JOIN user_roles ur ON ur.user_id = a.author_id
       WHERE a.slug = $1 AND a.published = true
     `, [req.params.slug]);
     if (rows.length === 0) return res.status(404).json({ error: "Article not found" });
@@ -85,11 +121,14 @@ router.get("/:slug", async (req, res) => {
   }
 });
 
-router.get("/admin/:id", requireAuth, requireAdmin, async (req, res) => {
+router.get("/admin/:id", requireAuth, requireMentorOrAdmin, async (req: AuthRequest, res) => {
   try {
+    const isAdmin = req.user!.role === "admin";
     const { rows } = await pool.query(
-      `SELECT * FROM articles WHERE id = $1`,
-      [req.params.id]
+      isAdmin
+        ? `SELECT * FROM articles WHERE id = $1`
+        : `SELECT * FROM articles WHERE id = $1 AND author_id = $2`,
+      isAdmin ? [req.params.id] : [req.params.id, req.user!.id]
     );
     if (rows.length === 0) return res.status(404).json({ error: "Not found" });
     return res.json(rows[0]);
@@ -99,7 +138,7 @@ router.get("/admin/:id", requireAuth, requireAdmin, async (req, res) => {
 });
 
 router.post("/", requireAuth, requireMentorOrAdmin, async (req: AuthRequest, res) => {
-  const { title, excerpt, content, cover_image_url, published } = req.body;
+  const { title, excerpt, content, cover_image_url, published, is_featured } = req.body;
   if (!title || !content) return res.status(400).json({ error: "title and content are required" });
   const read_time_minutes = calcReadTime(content);
   let slug = slugify(title);
@@ -107,10 +146,10 @@ router.post("/", requireAuth, requireMentorOrAdmin, async (req: AuthRequest, res
   if (existing.length > 0) slug = `${slug}-${Date.now()}`;
   try {
     const { rows } = await pool.query(`
-      INSERT INTO articles (title, slug, excerpt, content, cover_image_url, author_id, read_time_minutes, published)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      INSERT INTO articles (title, slug, excerpt, content, cover_image_url, author_id, read_time_minutes, published, is_featured)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *
-    `, [title, slug, excerpt || null, content, cover_image_url || null, req.user!.id, read_time_minutes, published ?? false]);
+    `, [title, slug, excerpt || null, content, cover_image_url || null, req.user!.id, read_time_minutes, published ?? false, is_featured ?? false]);
     return res.status(201).json(rows[0]);
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
@@ -118,7 +157,7 @@ router.post("/", requireAuth, requireMentorOrAdmin, async (req: AuthRequest, res
 });
 
 router.patch("/:id", requireAuth, requireMentorOrAdmin, async (req: AuthRequest, res) => {
-  const { title, excerpt, content, cover_image_url, published } = req.body;
+  const { title, excerpt, content, cover_image_url, published, is_featured } = req.body;
   try {
     const { rows: existing } = await pool.query(
       "SELECT * FROM articles WHERE id = $1",
@@ -131,11 +170,12 @@ router.patch("/:id", requireAuth, requireMentorOrAdmin, async (req: AuthRequest,
     }
     const newContent = content ?? article.content;
     const read_time_minutes = calcReadTime(newContent);
+    const canFeature = req.user!.role === "admin";
     const { rows } = await pool.query(`
       UPDATE articles SET
         title = $1, excerpt = $2, content = $3, cover_image_url = $4,
-        published = $5, read_time_minutes = $6, updated_at = now()
-      WHERE id = $7
+        published = $5, read_time_minutes = $6, is_featured = $7, updated_at = now()
+      WHERE id = $8
       RETURNING *
     `, [
       title ?? article.title,
@@ -144,6 +184,7 @@ router.patch("/:id", requireAuth, requireMentorOrAdmin, async (req: AuthRequest,
       cover_image_url ?? article.cover_image_url,
       published ?? article.published,
       read_time_minutes,
+      canFeature ? (is_featured ?? article.is_featured) : article.is_featured,
       req.params.id,
     ]);
     return res.json(rows[0]);
@@ -170,7 +211,7 @@ router.post("/:id/read", requireAuth, async (req: AuthRequest, res) => {
   try {
     await pool.query(`
       INSERT INTO article_reads (user_id, article_id) VALUES ($1, $2)
-      ON CONFLICT DO NOTHING
+      ON CONFLICT (user_id, article_id) DO NOTHING
     `, [req.user!.id, req.params.id]);
     return res.json({ recorded: true });
   } catch (err: any) {

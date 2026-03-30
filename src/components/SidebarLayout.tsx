@@ -81,16 +81,28 @@ const SidebarLayout = ({ children }: { children: ReactNode }) => {
         {user && (
           <div className="flex flex-col items-center gap-0 mt-auto w-full">
             {isMentor && (
-              <Link
-                to="/mentor-dashboard"
-                onClick={() => setSidebarOpen(false)}
-                className={`flex flex-col items-center justify-center gap-1 py-3 w-full transition-colors ${
-                  location.pathname === "/mentor-dashboard" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-primary hover:bg-primary/5"
-                }`}
-              >
-                <Briefcase size={22} strokeWidth={location.pathname === "/mentor-dashboard" ? 2.5 : 1.5} />
-                <span className="text-[9px] font-medium leading-tight">Mentor</span>
-              </Link>
+              <>
+                <Link
+                  to="/mentor-dashboard"
+                  onClick={() => setSidebarOpen(false)}
+                  className={`flex flex-col items-center justify-center gap-1 py-3 w-full transition-colors ${
+                    location.pathname === "/mentor-dashboard" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-primary hover:bg-primary/5"
+                  }`}
+                >
+                  <Briefcase size={22} strokeWidth={location.pathname === "/mentor-dashboard" ? 2.5 : 1.5} />
+                  <span className="text-[9px] font-medium leading-tight">Mentor</span>
+                </Link>
+                <Link
+                  to="/mentor/articles"
+                  onClick={() => setSidebarOpen(false)}
+                  className={`flex flex-col items-center justify-center gap-1 py-3 w-full transition-colors ${
+                    location.pathname.startsWith("/mentor/articles") ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-primary hover:bg-primary/5"
+                  }`}
+                >
+                  <Newspaper size={22} strokeWidth={location.pathname.startsWith("/mentor/articles") ? 2.5 : 1.5} />
+                  <span className="text-[9px] font-medium leading-tight">Articles</span>
+                </Link>
+              </>
             )}
             {isAdmin && (
               <Link

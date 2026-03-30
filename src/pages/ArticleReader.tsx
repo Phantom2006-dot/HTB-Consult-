@@ -9,6 +9,7 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { fadeUp } from "@/lib/animations";
 import SidebarLayout from "@/components/SidebarLayout";
+import ReactMarkdown from "react-markdown";
 
 interface Article {
   id: string;
@@ -29,26 +30,10 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 }
 
-function parseContent(content: string) {
-  return content.split(/\n\n+/).map((block, i) => {
-    const trimmed = block.trim();
-    if (!trimmed) return null;
-    if (trimmed.startsWith("## ")) return <h2 key={i} className="font-serif font-bold text-xl text-foreground mt-8 mb-3">{trimmed.slice(3)}</h2>;
-    if (trimmed.startsWith("### ")) return <h3 key={i} className="font-serif font-semibold text-lg text-foreground mt-6 mb-2">{trimmed.slice(4)}</h3>;
-    if (trimmed.startsWith("# ")) return <h1 key={i} className="font-serif font-bold text-2xl text-foreground mt-8 mb-4">{trimmed.slice(2)}</h1>;
-    if (trimmed.startsWith("- ")) {
-      const items = trimmed.split("\n").filter(l => l.startsWith("- ")).map(l => l.slice(2));
-      return <ul key={i} className="list-disc list-inside space-y-1 text-muted-foreground text-[15px] leading-relaxed my-3">{items.map((item, j) => <li key={j}>{item}</li>)}</ul>;
-    }
-    return <p key={i} className="text-[15px] leading-[1.85] text-muted-foreground my-4">{trimmed}</p>;
-  });
-}
-
 const ArticleReader = () => {
   const { slug } = useParams<{ slug: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const contentRef = useRef<HTMLDivElement>(null);
   const [readRecorded, setReadRecorded] = useState(false);
   const [showBadge, setShowBadge] = useState(false);
 
@@ -97,7 +82,7 @@ const ArticleReader = () => {
           <Skeleton className="h-8 w-3/4" />
           <Skeleton className="h-56 w-full rounded-xl" />
           <div className="space-y-3">
-            {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-4 w-full" />)}
+            {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-4 w-full" />)}
           </div>
         </div>
       </SidebarLayout>
@@ -172,19 +157,36 @@ const ArticleReader = () => {
             )}
             <div>
               <p className="text-sm font-medium text-foreground">{article.author_name || "HTB Team"}</p>
-              <p className="text-xs text-muted-foreground capitalize">{article.author_role === "admin" ? "HTB Consult Team" : "Mentor"}</p>
+              <p className="text-xs text-muted-foreground capitalize">
+                {article.author_role === "admin" ? "HTB Consult Team" : "Mentor"}
+              </p>
             </div>
           </div>
 
-          <div ref={contentRef} className="prose-article">
-            {parseContent(article.content)}
+          <div className="prose prose-invert prose-sm max-w-none
+            prose-headings:font-serif prose-headings:text-foreground
+            prose-h1:text-2xl prose-h1:mt-8 prose-h1:mb-4
+            prose-h2:text-xl prose-h2:mt-7 prose-h2:mb-3
+            prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-2
+            prose-p:text-muted-foreground prose-p:leading-[1.85] prose-p:my-4
+            prose-strong:text-foreground prose-strong:font-semibold
+            prose-em:text-muted-foreground
+            prose-a:text-primary prose-a:underline-offset-4 hover:prose-a:opacity-80
+            prose-blockquote:border-primary/40 prose-blockquote:text-muted-foreground prose-blockquote:italic
+            prose-li:text-muted-foreground prose-li:leading-relaxed
+            prose-ul:my-4 prose-ol:my-4
+            prose-hr:border-border prose-hr:my-8
+            prose-img:rounded-lg prose-img:shadow-md
+            prose-code:text-primary prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
+            prose-pre:bg-muted prose-pre:rounded-lg prose-pre:border prose-pre:border-border">
+            <ReactMarkdown>{article.content}</ReactMarkdown>
           </div>
 
           <div id="article-end" className="h-4 mt-8" />
 
           {article.author_bio && (
             <div className="mt-10 pt-6 border-t border-border">
-              <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center gap-3 mb-3">
                 {article.author_avatar ? (
                   <img src={article.author_avatar} alt={article.author_name || ""} className="w-10 h-10 rounded-full object-cover" />
                 ) : (
@@ -194,7 +196,9 @@ const ArticleReader = () => {
                 )}
                 <div>
                   <p className="text-sm font-semibold text-foreground">About {article.author_name || "the author"}</p>
-                  <p className="text-xs text-muted-foreground capitalize">{article.author_role === "admin" ? "HTB Consult Team" : "Mentor"}</p>
+                  <p className="text-xs text-muted-foreground capitalize">
+                    {article.author_role === "admin" ? "HTB Consult Team" : "Mentor"}
+                  </p>
                 </div>
               </div>
               <p className="text-sm text-muted-foreground leading-relaxed">{article.author_bio}</p>

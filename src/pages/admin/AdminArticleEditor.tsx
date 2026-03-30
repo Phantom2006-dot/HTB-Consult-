@@ -1,24 +1,44 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { ArrowLeft, Save, Eye, EyeOff, Clock, Image as ImageIcon, Loader2 } from "lucide-react";
+import {
+  ArrowLeft, Save, Eye, EyeOff, Clock, Loader2, Star,
+  Bold, Italic, Heading1, Heading2, Heading3, List, Link as LinkIcon,
+  Image as ImageIcon, Quote, SeparatorHorizontal, AlignLeft
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
 import { CloudinaryUpload } from "@/components/CloudinaryUpload";
 import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { fadeUp } from "@/lib/animations";
 import SidebarLayout from "@/components/SidebarLayout";
+import ReactMarkdown from "react-markdown";
 
 function calcReadTime(content: string) {
   const words = content.trim().split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
 }
+
+const ToolbarButton = ({
+  onClick, title, children,
+}: { onClick: () => void; title: string; children: React.ReactNode }) => (
+  <button
+    type="button"
+    title={title}
+    onClick={onClick}
+    className="p-1.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+  >
+    {children}
+  </button>
+);
 
 const AdminArticleEditor = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,6 +48,10 @@ const AdminArticleEditor = () => {
   const { toast } = useToast();
   const qc = useQueryClient();
   const contentRef = useRef<HTMLTextAreaElement>(null);
+  const [tab, setTab] = useState<"write" | "preview">("write");
+
+  const isAdmin = user?.role === "admin";
+  const isMentor = user?.role === "mentor";
 
   const [form, setForm] = useState({
     title: "",
@@ -35,12 +59,14 @@ const AdminArticleEditor = () => {
     content: "",
     cover_image_url: "",
     published: false,
+    is_featured: false,
   });
 
   const readTime = calcReadTime(form.content);
+  const wordCount = form.content.trim().split(/\s+/).filter(Boolean).length;
 
   useEffect(() => {
-    if (!loading && (!user || (user.role !== "admin" && user.role !== "mentor"))) navigate("/");
+    if (!loading && (!user || (!isAdmin && !isMentor))) navigate("/");
   }, [user, loading, navigate]);
 
   const { data: existing, isLoading: loadingExisting } = useQuery({
@@ -57,6 +83,7 @@ const AdminArticleEditor = () => {
         content: existing.content || "",
         cover_image_url: existing.cover_image_url || "",
         published: existing.published || false,
+        is_featured: existing.is_featured || false,
       });
     }
   }, [existing]);
@@ -65,28 +92,51 @@ const AdminArticleEditor = () => {
     mutationFn: () => {
       if (!form.title.trim()) throw new Error("Title is required");
       if (!form.content.trim()) throw new Error("Content is required");
-      if (isEdit) {
-        return api.patch(`/api/articles/${id}`, form);
-      } else {
-        return api.post("/api/articles", form);
-      }
+      const payload = isAdmin ? form : { ...form, is_featured: undefined };
+      if (isEdit) return api.patch(`/api/articles/${id}`, payload);
+      return api.post("/api/articles", payload);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["admin-articles"] });
-      toast({ title: isEdit ? "Article saved" : "Article created", description: form.published ? "It's now live on the blog." : "Saved as draft." });
-      navigate("/admin/articles");
+      qc.invalidateQueries({ queryKey: ["mentor-articles"] });
+      toast({
+        title: isEdit ? "Article saved" : "Article created",
+        description: form.published ? "It's now live on the blog." : "Saved as draft.",
+      });
+      navigate(isAdmin ? "/admin/articles" : "/mentor/articles");
     },
     onError: (err: any) => {
       toast({ title: "Error", description: err.message || "Could not save article.", variant: "destructive" });
     },
   });
 
-  const autoResize = () => {
-    if (contentRef.current) {
-      contentRef.current.style.height = "auto";
-      contentRef.current.style.height = contentRef.current.scrollHeight + "px";
-    }
-  };
+  const insertAtCursor = useCallback((before: string, after = "", placeholder = "") => {
+    const el = contentRef.current;
+    if (!el) return;
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const selected = el.value.slice(start, end) || placeholder;
+    const newText = el.value.slice(0, start) + before + selected + after + el.value.slice(end);
+    setForm(f => ({ ...f, content: newText }));
+    setTimeout(() => {
+      el.focus();
+      const newPos = start + before.length + selected.length + after.length;
+      el.setSelectionRange(newPos, newPos);
+    }, 0);
+  }, []);
+
+  const insertLine = useCallback((prefix: string) => {
+    const el = contentRef.current;
+    if (!el) return;
+    const start = el.selectionStart;
+    const lineStart = el.value.lastIndexOf("\n", start - 1) + 1;
+    const lineEnd = el.value.indexOf("\n", start);
+    const line = el.value.slice(lineStart, lineEnd === -1 ? undefined : lineEnd);
+    const newLine = line.startsWith(prefix) ? line.slice(prefix.length) : prefix + line;
+    const newText = el.value.slice(0, lineStart) + newLine + (lineEnd === -1 ? "" : el.value.slice(lineEnd));
+    setForm(f => ({ ...f, content: newText }));
+    setTimeout(() => el.focus(), 0);
+  }, []);
 
   if (loadingExisting) {
     return (
@@ -100,11 +150,12 @@ const AdminArticleEditor = () => {
 
   return (
     <SidebarLayout>
-      <div className="px-4 lg:px-8 py-6 max-w-3xl mx-auto space-y-6">
+      <div className="px-4 lg:px-8 py-6 max-w-4xl mx-auto space-y-5">
         <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}
           className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate("/admin/articles")}>
+            <Button variant="ghost" size="icon" className="h-8 w-8"
+              onClick={() => navigate(isAdmin ? "/admin/articles" : "/mentor/articles")}>
               <ArrowLeft size={16} />
             </Button>
             <div>
@@ -112,11 +163,22 @@ const AdminArticleEditor = () => {
                 {isEdit ? "Edit Article" : "New Article"}
               </h1>
               <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                <Clock size={10} /> Estimated read time: {readTime} min
+                <Clock size={10} /> {wordCount} words · {readTime} min read
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
+            {isAdmin && (
+              <div className="flex items-center gap-2">
+                <Star size={13} className={form.is_featured ? "text-amber-400 fill-amber-400" : "text-muted-foreground"} />
+                <Label htmlFor="featured" className="text-sm text-muted-foreground">Featured</Label>
+                <Switch
+                  id="featured"
+                  checked={form.is_featured}
+                  onCheckedChange={(v) => setForm({ ...form, is_featured: v })}
+                />
+              </div>
+            )}
             <div className="flex items-center gap-2">
               {form.published ? <Eye size={14} className="text-green-500" /> : <EyeOff size={14} className="text-muted-foreground" />}
               <Label htmlFor="published" className="text-sm text-muted-foreground">
@@ -139,34 +201,25 @@ const AdminArticleEditor = () => {
           </div>
         </motion.div>
 
-        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={1} className="space-y-5">
-          <div>
-            <Label htmlFor="title" className="text-sm font-medium text-foreground mb-1 block">Title *</Label>
-            <Input
-              id="title"
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-              placeholder="Your article title..."
-              className="text-base font-semibold h-12"
-            />
-          </div>
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={1} className="space-y-4">
+          <Input
+            value={form.title}
+            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            placeholder="Article title..."
+            className="text-xl font-serif font-bold h-14 border-0 border-b border-border rounded-none px-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/40"
+          />
+
+          <Textarea
+            value={form.excerpt}
+            onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
+            placeholder="Short summary shown on the blog listing page..."
+            rows={2}
+            className="resize-none text-sm text-muted-foreground border-0 border-b border-border rounded-none px-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-muted-foreground/40"
+          />
 
           <div>
-            <Label htmlFor="excerpt" className="text-sm font-medium text-foreground mb-1 block">
-              Excerpt <span className="text-muted-foreground font-normal">(shown on blog listing)</span>
-            </Label>
-            <Textarea
-              id="excerpt"
-              value={form.excerpt}
-              onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
-              placeholder="A short summary of your article..."
-              rows={2}
-            />
-          </div>
-
-          <div>
-            <Label className="text-sm font-medium text-foreground mb-1 flex items-center gap-1.5 block">
-              <ImageIcon size={13} className="text-primary" /> Cover Image
+            <Label className="text-xs font-medium text-muted-foreground mb-1.5 flex items-center gap-1.5">
+              <ImageIcon size={12} /> Cover Image
             </Label>
             <CloudinaryUpload
               value={form.cover_image_url}
@@ -176,48 +229,101 @@ const AdminArticleEditor = () => {
             />
           </div>
 
-          <div>
-            <Label htmlFor="content" className="text-sm font-medium text-foreground mb-2 block">
-              Content *
-              <span className="text-muted-foreground font-normal ml-2 text-xs">
-                Supports headings (# ## ###), bullet lists (- item), and paragraphs
-              </span>
-            </Label>
-            <div className="relative">
-              <Textarea
-                id="content"
-                ref={contentRef}
-                value={form.content}
-                onChange={(e) => {
-                  setForm({ ...form, content: e.target.value });
-                  autoResize();
-                }}
-                onInput={autoResize}
-                placeholder={`# Article Heading
+          <Separator />
 
-Write your introduction here...
-
-## Section Title
-
-Your content goes here. Each blank line creates a new paragraph.
-
-- Bullet point one
-- Bullet point two
-
-## Another Section
-
-Continue writing your article...`}
-                className="min-h-[480px] font-mono text-sm leading-relaxed resize-none overflow-hidden"
-                style={{ height: "480px" }}
-              />
-              <div className="absolute bottom-3 right-3 text-xs text-muted-foreground bg-card px-2 py-0.5 rounded">
-                {form.content.trim().split(/\s+/).filter(Boolean).length} words · {readTime} min read
-              </div>
+          <Tabs value={tab} onValueChange={(v) => setTab(v as "write" | "preview")}>
+            <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
+              <TabsList className="h-8">
+                <TabsTrigger value="write" className="text-xs gap-1"><AlignLeft size={12} /> Write</TabsTrigger>
+                <TabsTrigger value="preview" className="text-xs gap-1"><Eye size={12} /> Preview</TabsTrigger>
+              </TabsList>
+              {tab === "write" && (
+                <div className="flex items-center gap-0.5 flex-wrap">
+                  <ToolbarButton title="Bold" onClick={() => insertAtCursor("**", "**", "bold text")}>
+                    <Bold size={14} />
+                  </ToolbarButton>
+                  <ToolbarButton title="Italic" onClick={() => insertAtCursor("*", "*", "italic text")}>
+                    <Italic size={14} />
+                  </ToolbarButton>
+                  <Separator orientation="vertical" className="h-5 mx-1" />
+                  <ToolbarButton title="Heading 1" onClick={() => insertLine("# ")}>
+                    <Heading1 size={14} />
+                  </ToolbarButton>
+                  <ToolbarButton title="Heading 2" onClick={() => insertLine("## ")}>
+                    <Heading2 size={14} />
+                  </ToolbarButton>
+                  <ToolbarButton title="Heading 3" onClick={() => insertLine("### ")}>
+                    <Heading3 size={14} />
+                  </ToolbarButton>
+                  <Separator orientation="vertical" className="h-5 mx-1" />
+                  <ToolbarButton title="Bullet list" onClick={() => insertLine("- ")}>
+                    <List size={14} />
+                  </ToolbarButton>
+                  <ToolbarButton title="Blockquote" onClick={() => insertLine("> ")}>
+                    <Quote size={14} />
+                  </ToolbarButton>
+                  <ToolbarButton title="Horizontal rule" onClick={() => insertAtCursor("\n\n---\n\n")}>
+                    <SeparatorHorizontal size={14} />
+                  </ToolbarButton>
+                  <Separator orientation="vertical" className="h-5 mx-1" />
+                  <ToolbarButton title="Link" onClick={() => insertAtCursor("[", "](url)", "link text")}>
+                    <LinkIcon size={14} />
+                  </ToolbarButton>
+                  <ToolbarButton title="Image" onClick={() => insertAtCursor("![", "](image-url)", "alt text")}>
+                    <ImageIcon size={14} />
+                  </ToolbarButton>
+                </div>
+              )}
             </div>
-          </div>
+
+            <TabsContent value="write" className="mt-0">
+              <div className="relative">
+                <Textarea
+                  ref={contentRef}
+                  value={form.content}
+                  onChange={(e) => setForm({ ...form, content: e.target.value })}
+                  placeholder={`# Start with a heading\n\nWrite your introduction here...\n\n## Section Title\n\nYour content goes here. Use **bold**, *italic*, and markdown formatting.\n\n- Bullet point one\n- Bullet point two\n\n> Blockquotes for key insights\n\n## Another Section\n\nContinue writing...`}
+                  className="min-h-[520px] font-mono text-sm leading-[1.9] resize-none bg-card"
+                />
+                <div className="absolute bottom-3 right-3 text-[10px] text-muted-foreground bg-card/80 backdrop-blur px-2 py-0.5 rounded-full border border-border">
+                  {wordCount} words · {readTime} min read
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Supports Markdown: **bold**, *italic*, # headings, - lists, {">"} quotes, [links](url)
+              </p>
+            </TabsContent>
+
+            <TabsContent value="preview" className="mt-0">
+              <div className="min-h-[520px] bg-card rounded-md border border-border p-6 prose prose-invert prose-sm max-w-none
+                prose-headings:font-serif prose-headings:text-foreground
+                prose-p:text-muted-foreground prose-p:leading-[1.85]
+                prose-strong:text-foreground
+                prose-a:text-primary
+                prose-blockquote:border-primary/40 prose-blockquote:text-muted-foreground
+                prose-li:text-muted-foreground
+                prose-hr:border-border
+                prose-code:text-primary prose-code:bg-muted prose-code:px-1 prose-code:rounded">
+                {form.title && (
+                  <h1 className="font-serif font-bold text-2xl text-foreground mb-2">{form.title}</h1>
+                )}
+                {form.excerpt && (
+                  <p className="text-muted-foreground italic border-l-2 border-primary/40 pl-4 mb-6">{form.excerpt}</p>
+                )}
+                {form.content ? (
+                  <ReactMarkdown>{form.content}</ReactMarkdown>
+                ) : (
+                  <p className="text-muted-foreground/40 italic">Nothing to preview yet. Start writing!</p>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
 
           <div className="pt-2 flex justify-end gap-2">
-            <Button variant="outline" onClick={() => navigate("/admin/articles")}>Cancel</Button>
+            <Button variant="outline"
+              onClick={() => navigate(isAdmin ? "/admin/articles" : "/mentor/articles")}>
+              Cancel
+            </Button>
             <Button
               className="bg-gradient-gold hover:opacity-90 gap-1.5"
               onClick={() => saveMutation.mutate()}

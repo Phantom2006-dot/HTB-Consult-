@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Bell, CheckCircle2, BookOpen, Calendar, Info, Clock } from "lucide-react";
+import { Bell, CheckCircle2, BookOpen, Calendar, Info, Clock, Newspaper } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fadeUp } from "@/lib/animations";
@@ -7,7 +7,7 @@ import SidebarLayout from "@/components/SidebarLayout";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useEffect } from "react";
 
 const TYPE_CONFIG: Record<string, { icon: React.ElementType; color: string; dot: string }> = {
@@ -15,6 +15,7 @@ const TYPE_CONFIG: Record<string, { icon: React.ElementType; color: string; dot:
   enroll:   { icon: BookOpen,     color: "text-primary",    dot: "bg-primary" },
   info:     { icon: Info,         color: "text-blue-400",   dot: "bg-blue-400" },
   warning:  { icon: Calendar,     color: "text-amber-500",  dot: "bg-amber-500" },
+  article:  { icon: Newspaper,    color: "text-violet-400", dot: "bg-violet-400" },
 };
 
 function timeAgo(dateStr: string) {
@@ -40,6 +41,7 @@ const Notifications = () => {
     queryKey: ["notifications"],
     queryFn: () => api.get<any[]>("/api/notifications"),
     enabled: !!user,
+    refetchInterval: 60_000,
   });
 
   return (
@@ -49,7 +51,7 @@ const Notifications = () => {
           <h1 className="text-xl lg:text-2xl font-serif font-bold text-foreground mb-1 flex items-center gap-2">
             <Bell size={22} className="text-primary" /> Notifications
           </h1>
-          <p className="text-muted-foreground text-sm">Your latest activity and updates</p>
+          <p className="text-muted-foreground text-sm">Your latest activity and updates from HTB Consult</p>
         </motion.div>
 
         <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={1} className="space-y-3">
@@ -74,25 +76,38 @@ const Notifications = () => {
               </CardContent>
             </Card>
           ) : (
-            notifications.map((n: any) => {
+            notifications.map((n: any, i: number) => {
               const cfg = TYPE_CONFIG[n.type] || TYPE_CONFIG.info;
               const Icon = cfg.icon;
+              const inner = (
+                <CardContent className="p-4 flex items-start gap-3">
+                  <div className={`w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0 ${cfg.color}`}>
+                    <Icon size={16} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cfg.dot}`} />
+                      <p className="text-sm font-medium text-foreground">{n.title}</p>
+                    </div>
+                    <p className="text-xs text-muted-foreground leading-relaxed">{n.desc}</p>
+                  </div>
+                  <span className="text-[10px] text-muted-foreground shrink-0 mt-0.5">{timeAgo(n.time)}</span>
+                </CardContent>
+              );
               return (
-                <Card key={n.id} className="bg-card border-border hover:border-primary/30 transition-colors">
-                  <CardContent className="p-4 flex items-start gap-3">
-                    <div className={`w-9 h-9 rounded-lg bg-muted flex items-center justify-center shrink-0 ${cfg.color}`}>
-                      <Icon size={16} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cfg.dot}`} />
-                        <p className="text-sm font-medium text-foreground">{n.title}</p>
-                      </div>
-                      <p className="text-xs text-muted-foreground leading-relaxed">{n.desc}</p>
-                    </div>
-                    <span className="text-[10px] text-muted-foreground shrink-0 mt-0.5">{timeAgo(n.time)}</span>
-                  </CardContent>
-                </Card>
+                <motion.div key={n.id} initial="hidden" animate="visible" variants={fadeUp} custom={i}>
+                  {n.link ? (
+                    <Link to={n.link}>
+                      <Card className="bg-card border-border hover:border-primary/30 transition-colors cursor-pointer">
+                        {inner}
+                      </Card>
+                    </Link>
+                  ) : (
+                    <Card className="bg-card border-border">
+                      {inner}
+                    </Card>
+                  )}
+                </motion.div>
               );
             })
           )}

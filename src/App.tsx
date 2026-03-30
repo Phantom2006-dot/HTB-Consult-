@@ -35,6 +35,7 @@ import AdminArticles from "./pages/admin/AdminArticles";
 import AdminArticleEditor from "./pages/admin/AdminArticleEditor";
 import Blog from "./pages/Blog";
 import ArticleReader from "./pages/ArticleReader";
+import MentorArticles from "./pages/MentorArticles";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 
@@ -80,6 +81,8 @@ const App = () => (
             <Route path="/admin/articles/:id" element={<AdminArticleEditor />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<ArticleReader />} />
+            <Route path="/mentor/articles" element={<MentorArticles />} />
+            <Route path="/mentor/articles/:id" element={<AdminArticleEditor />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
