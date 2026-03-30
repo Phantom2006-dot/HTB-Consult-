@@ -51,6 +51,7 @@ if (process.env.NODE_ENV === "production") {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`HTB Consults server running on port ${PORT}`);
+const HOST = "0.0.0.0";
+app.listen(Number(PORT), HOST, () => {
+  console.log(`HTB Consults server running on http://${HOST}:${PORT}`);
 });
