@@ -1,8 +1,9 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Clock, Star, Users, BookOpen, Play, CheckCircle2, Award,
-  Bookmark, Share2, ExternalLink, Video
+  Bookmark, ExternalLink, Video, Download, Presentation, FileText,
+  FileType, FileSpreadsheet, File
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,7 +19,16 @@ import { useToggleBookmark, useBookmarks } from "@/hooks/use-bookmarks";
 import { useEnroll, useEnrollments } from "@/hooks/use-enrollments";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+
+const FILE_ICONS: Record<string, React.ElementType> = {
+  pptx: Presentation, ppt: Presentation,
+  pdf: FileType,
+  docx: FileText, doc: FileText,
+  xlsx: FileSpreadsheet, xls: FileSpreadsheet,
+};
+function getFileIconComp(t: string) { return FILE_ICONS[t?.toLowerCase()] || File; }
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -33,6 +43,12 @@ const CourseDetail = () => {
 
   const isBookmarked = (bookmarksData || []).some((b: any) => b.course_id === id);
   const isEnrolled = (enrollmentsData || []).some((e: any) => e.course_id === id);
+
+  const { data: resources } = useQuery({
+    queryKey: ["course-resources", id],
+    queryFn: () => api.get<any[]>(`/api/resources/course/${id}`),
+    enabled: !!id,
+  });
 
   const handleEnroll = async () => {
     if (!user) {
@@ -163,9 +179,13 @@ const CourseDetail = () => {
         <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={1}>
           <Tabs defaultValue="curriculum" className="w-full">
             <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none p-0 h-auto gap-0">
-              {["curriculum", "overview"].map((t) => (
-                <TabsTrigger key={t} value={t} className="capitalize rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-2.5 text-sm">
-                  {t}
+              {[
+                { value: "curriculum", label: "Curriculum" },
+                { value: "overview", label: "Overview" },
+                ...(resources && resources.length > 0 ? [{ value: "resources", label: `Resources (${resources.length})` }] : []),
+              ].map((t) => (
+                <TabsTrigger key={t.value} value={t.value} className="capitalize rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none px-4 py-2.5 text-sm">
+                  {t.label}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -212,6 +232,46 @@ const CourseDetail = () => {
                   <div><span className="text-muted-foreground">Modules:</span> <span className="text-foreground">{modules.length}</span></div>
                 </div>
               </div>
+            </TabsContent>
+
+            <TabsContent value="resources" className="mt-6 space-y-3">
+              <p className="text-sm text-muted-foreground mb-4">
+                Download course materials, slides, and supporting documents.
+              </p>
+              {(resources || []).map((resource: any) => {
+                const IconComp = getFileIconComp(resource.file_type);
+                return (
+                  <a
+                    key={resource.id}
+                    href={resource.file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <Card className="border-border bg-card hover:border-primary/40 transition-colors group cursor-pointer">
+                      <CardContent className="p-4 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                          <IconComp size={20} className="text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors truncate">
+                            {resource.title}
+                          </p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <Badge variant="outline" className="text-[10px] border-primary/20 text-primary uppercase px-1.5 py-0">
+                              {resource.file_type}
+                            </Badge>
+                            {resource.file_size && (
+                              <span className="text-[11px] text-muted-foreground">{resource.file_size}</span>
+                            )}
+                          </div>
+                        </div>
+                        <Download size={15} className="text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                      </CardContent>
+                    </Card>
+                  </a>
+                );
+              })}
             </TabsContent>
           </Tabs>
         </motion.div>

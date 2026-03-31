@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Plus, Pencil, Trash2, Eye, EyeOff, X } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, X, Presentation } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -264,6 +265,11 @@ const AdminCourses = () => {
                     <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => togglePublish.mutate({ id: course.id, published: !course.published })}>
                       {course.published ? <EyeOff size={14} /> : <Eye size={14} />}
                     </Button>
+                    <Link to={`/admin/courses/${course.id}/resources`}>
+                      <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-primary" title="Manage resources">
+                        <Presentation size={14} />
+                      </Button>
+                    </Link>
                     <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEdit(course)}>
                       <Pencil size={14} />
                     </Button>
