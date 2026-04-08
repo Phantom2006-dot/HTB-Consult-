@@ -60,7 +60,10 @@ router.post("/", async (req, res) => {
       },
       body: JSON.stringify({
         model: provider.model,
-        messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          ...messages.map((m: any) => ({ role: m.role, content: m.content })),
+        ],
         stream: true,
       }),
     });
