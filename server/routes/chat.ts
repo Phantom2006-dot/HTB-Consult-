@@ -13,22 +13,53 @@ const SYSTEM_PROMPT = `You are the HTB Consults AI Assistant — a helpful, prof
 
 Be concise, encouraging, and professional. Use markdown formatting for clarity. If asked about pricing or bookings, direct users to the Services or Courses pages.`;
 
+function getAIProvider(): { url: string; key: string; model: string; provider: string } | null {
+  if (process.env.GROQ_API_KEY) {
+    return {
+      url: "https://api.groq.com/openai/v1/chat/completions",
+      key: process.env.GROQ_API_KEY,
+      model: "llama-3.1-8b-instant",
+      provider: "Groq",
+    };
+  }
+  if (process.env.GEMINI_API_KEY) {
+    return {
+      url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+      key: process.env.GEMINI_API_KEY,
+      model: "gemini-1.5-flash",
+      provider: "Google Gemini",
+    };
+  }
+  if (process.env.OPENAI_API_KEY) {
+    return {
+      url: "https://api.openai.com/v1/chat/completions",
+      key: process.env.OPENAI_API_KEY,
+      model: "gpt-4o-mini",
+      provider: "OpenAI",
+    };
+  }
+  return null;
+}
+
 router.post("/", async (req, res) => {
   const { messages } = req.body;
-  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-  if (!OPENAI_API_KEY) {
-    return res.status(500).json({ error: "AI API key is not configured." });
+
+  const provider = getAIProvider();
+  if (!provider) {
+    return res.status(500).json({
+      error: "No AI API key configured. Please add GROQ_API_KEY, GEMINI_API_KEY, or OPENAI_API_KEY.",
+    });
   }
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch(provider.url, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
+        Authorization: `Bearer ${provider.key}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: provider.model,
         messages: [{ role: "system", content: SYSTEM_PROMPT }, ...messages],
         stream: true,
       }),
@@ -36,20 +67,22 @@ router.post("/", async (req, res) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("OpenAI API error:", response.status, errorText);
+      console.error(`${provider.provider} API error:`, response.status, errorText);
+
       if (response.status === 429) {
-        let detail = "Rate limit exceeded. Please try again in a moment.";
+        let detail = `${provider.provider} rate limit reached. Please try again in a moment.`;
         try {
           const parsed = JSON.parse(errorText);
           const code = parsed?.error?.code || "";
-          const msg = parsed?.error?.message || "";
-          if (code === "insufficient_quota" || msg.includes("quota") || msg.includes("billing")) {
-            detail = "OpenAI quota exceeded. Please add billing credits at platform.openai.com and try again.";
+          const msg = (parsed?.error?.message || "").toLowerCase();
+          if (code === "insufficient_quota" || msg.includes("quota") || msg.includes("billing") || msg.includes("exceeded your current quota")) {
+            detail = `${provider.provider} quota exceeded — your API key has no remaining credits. Please top up at the provider dashboard.`;
           }
         } catch {}
         return res.status(429).json({ error: detail });
       }
-      return res.status(500).json({ error: "AI service unavailable" });
+
+      return res.status(500).json({ error: `${provider.provider} service unavailable` });
     }
 
     res.setHeader("Content-Type", "text/event-stream");
