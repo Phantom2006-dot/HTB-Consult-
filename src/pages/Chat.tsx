@@ -93,7 +93,7 @@ const Chat = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
   const [chatError, setChatError] = useState<ChatError>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth");
@@ -124,7 +124,8 @@ const Chat = () => {
   }, [activeConv]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = messagesContainerRef.current;
+    if (el) el.scrollTop = el.scrollHeight;
   }, [messages]);
 
   const selectConversation = (conv: Conversation) => {
@@ -326,7 +327,7 @@ const Chat = () => {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
             {messages.length === 0 && !isStreaming && (
               <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="flex flex-col items-center justify-center h-full text-center">
                 <HeaderIcon size={48} className="text-primary mb-4" />
@@ -383,7 +384,6 @@ const Chat = () => {
                 </Card>
               </div>
             )}
-            <div ref={bottomRef} />
           </div>
 
           {/* Error banner */}
