@@ -1,14 +1,23 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Clock, ArrowRight, BookOpen, Star, SlidersHorizontal } from "lucide-react";
+import { Clock, ArrowRight, BookOpen, SlidersHorizontal, ArrowDownAZ, ArrowUpAZ, Hash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import Layout from "@/components/Layout";
 import { fadeUp } from "@/lib/animations";
 import { useCourses } from "@/hooks/use-courses";
+
+type SortOption = "numeric" | "az" | "za";
 
 const LEVEL_COLORS: Record<string, string> = {
   Beginner: "bg-green-500/10 text-green-500 border-green-500/20",
@@ -16,9 +25,21 @@ const LEVEL_COLORS: Record<string, string> = {
   Advanced: "bg-purple-500/10 text-purple-500 border-purple-500/20",
 };
 
+const SORT_LABELS: Record<SortOption, string> = {
+  numeric: "Numeric (1, 2, 3…)",
+  az: "A → Z",
+  za: "Z → A",
+};
+
+function extractLeadingNumber(title: string): number {
+  const match = title.match(/\d+/);
+  return match ? parseInt(match[0], 10) : Infinity;
+}
+
 const Courses = () => {
   const { data: courses, isLoading } = useCourses();
   const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [sortBy, setSortBy] = useState<SortOption>("numeric");
 
   const categories = useMemo(() => {
     if (!courses) return [];
@@ -29,9 +50,14 @@ const Courses = () => {
 
   const filtered = useMemo(() => {
     if (!courses) return [];
-    if (activeCategory === "All") return courses;
-    return courses.filter((c) => c.category === activeCategory);
-  }, [courses, activeCategory]);
+    const base = activeCategory === "All" ? courses : courses.filter((c) => c.category === activeCategory);
+    return [...base].sort((a, b) => {
+      if (sortBy === "numeric") return extractLeadingNumber(a.title) - extractLeadingNumber(b.title);
+      if (sortBy === "az") return a.title.localeCompare(b.title);
+      if (sortBy === "za") return b.title.localeCompare(a.title);
+      return 0;
+    });
+  }, [courses, activeCategory, sortBy]);
 
   return (
     <Layout>
@@ -56,34 +82,64 @@ const Courses = () => {
         </div>
       </section>
 
-      {/* Category filters */}
+      {/* Category filters + Sort */}
       <section className="bg-card border-b border-border sticky top-0 z-20">
         <div className="container mx-auto px-4 lg:px-8">
-          <div className="flex items-center gap-2 py-3 overflow-x-auto scrollbar-hide">
-            <SlidersHorizontal size={14} className="text-muted-foreground shrink-0" />
-            <button
-              onClick={() => setActiveCategory("All")}
-              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
-                activeCategory === "All"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/70"
-              }`}
-            >
-              All ({courses?.length ?? 0})
-            </button>
-            {categories.map(([cat, count]) => (
+          <div className="flex items-center gap-2 py-3">
+            {/* Category pills — scrollable */}
+            <div className="flex items-center gap-2 flex-1 overflow-x-auto scrollbar-hide min-w-0">
+              <SlidersHorizontal size={14} className="text-muted-foreground shrink-0" />
               <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
+                onClick={() => setActiveCategory("All")}
                 className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
-                  activeCategory === cat
+                  activeCategory === "All"
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/70"
                 }`}
               >
-                {cat} ({count})
+                All ({courses?.length ?? 0})
               </button>
-            ))}
+              {categories.map(([cat, count]) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors whitespace-nowrap ${
+                    activeCategory === cat
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/70"
+                  }`}
+                >
+                  {cat} ({count})
+                </button>
+              ))}
+            </div>
+
+            {/* Sort dropdown — always visible */}
+            <div className="shrink-0 ml-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-muted text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors whitespace-nowrap border border-border">
+                    {sortBy === "numeric" && <Hash size={12} />}
+                    {sortBy === "az" && <ArrowDownAZ size={12} />}
+                    {sortBy === "za" && <ArrowUpAZ size={12} />}
+                    {SORT_LABELS[sortBy]}
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuRadioGroup value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
+                    <DropdownMenuRadioItem value="numeric" className="text-xs gap-2">
+                      <Hash size={12} /> Numeric (1, 2, 3…)
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="az" className="text-xs gap-2">
+                      <ArrowDownAZ size={12} /> A → Z
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="za" className="text-xs gap-2">
+                      <ArrowUpAZ size={12} /> Z → A
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </section>
