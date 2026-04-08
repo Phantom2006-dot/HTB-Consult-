@@ -35,9 +35,20 @@ router.post("/", async (req, res) => {
     });
 
     if (!response.ok) {
-      if (response.status === 429) return res.status(429).json({ error: "Rate limit exceeded." });
-      const text = await response.text();
-      console.error("AI API error:", response.status, text);
+      const errorText = await response.text();
+      console.error("OpenAI API error:", response.status, errorText);
+      if (response.status === 429) {
+        let detail = "Rate limit exceeded. Please try again in a moment.";
+        try {
+          const parsed = JSON.parse(errorText);
+          const code = parsed?.error?.code || "";
+          const msg = parsed?.error?.message || "";
+          if (code === "insufficient_quota" || msg.includes("quota") || msg.includes("billing")) {
+            detail = "OpenAI quota exceeded. Please add billing credits at platform.openai.com and try again.";
+          }
+        } catch {}
+        return res.status(429).json({ error: detail });
+      }
       return res.status(500).json({ error: "AI service unavailable" });
     }
 

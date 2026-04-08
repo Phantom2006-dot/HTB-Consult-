@@ -2,18 +2,18 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  MessageSquare, Send, Bot, Plus, Trash2, ArrowLeft, User, Users
+  MessageSquare, Send, Bot, Trash2, ArrowLeft, User, Users, AlertCircle, ExternalLink
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
-import { useToast } from "@/hooks/use-toast";
 import { fadeUp } from "@/lib/animations";
 import Layout from "@/components/Layout";
 
 type Msg = { role: "user" | "assistant"; content: string };
+type ChatError = { message: string; isQuota?: boolean } | null;
 
 interface Conversation {
   id: string;
@@ -85,7 +85,6 @@ const Chat = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { toast } = useToast();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConv, setActiveConv] = useState<string | null>(null);
   const [activeType, setActiveType] = useState<string>("ai");
@@ -93,6 +92,7 @@ const Chat = () => {
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [showSidebar, setShowSidebar] = useState(true);
+  const [chatError, setChatError] = useState<ChatError>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -199,7 +199,7 @@ const Chat = () => {
 
       await streamChat({
         messages: newMsgs,
-        onDelta: upsert,
+        onDelta: (chunk) => { setChatError(null); upsert(chunk); },
         onDone: async () => {
           setIsStreaming(false);
           if (assistantText && convId) {
@@ -208,7 +208,8 @@ const Chat = () => {
         },
         onError: (err) => {
           setIsStreaming(false);
-          toast({ title: "Error", description: err, variant: "destructive" });
+          const isQuota = err.toLowerCase().includes("quota") || err.toLowerCase().includes("billing");
+          setChatError({ message: err, isQuota });
         },
       });
     }
@@ -384,6 +385,32 @@ const Chat = () => {
             )}
             <div ref={bottomRef} />
           </div>
+
+          {/* Error banner */}
+          {chatError && (
+            <div className={`mx-4 mb-0 mt-2 rounded-lg border px-4 py-3 flex items-start gap-3 text-sm ${
+              chatError.isQuota
+                ? "bg-amber-500/10 border-amber-500/30 text-amber-400"
+                : "bg-destructive/10 border-destructive/30 text-destructive"
+            }`}>
+              <AlertCircle size={16} className="shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="font-medium">{chatError.isQuota ? "OpenAI quota exceeded" : "AI error"}</p>
+                <p className="text-xs opacity-80 mt-0.5">{chatError.message}</p>
+                {chatError.isQuota && (
+                  <a
+                    href="https://platform.openai.com/settings/billing"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs underline underline-offset-2 mt-1.5 opacity-90 hover:opacity-100"
+                  >
+                    Add billing credits <ExternalLink size={10} />
+                  </a>
+                )}
+              </div>
+              <button onClick={() => setChatError(null)} className="text-current opacity-50 hover:opacity-100 shrink-0 text-lg leading-none">&times;</button>
+            </div>
+          )}
 
           {/* Input */}
           <div className="px-4 py-3 border-t border-border">
