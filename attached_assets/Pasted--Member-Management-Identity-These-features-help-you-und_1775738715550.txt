@@ -1,0 +1,87 @@
+👥 Member Management & Identity
+These features help you understand who's who and manage group membership effectively.
+
+Member Tags (Custom Roles): You can now assign yourself a customizable tag in each group chat to clarify your role (e.g., "Anna's Dad," "Treasurer," or "Goalkeeper"). These tags are group-specific and different across conversations .
+
+Online Indicators: See how many people are currently active in a group chat, displayed directly below the group name. This helps you know if others are around to chat .
+
+Group Message History: When new members join, existing participants can send them the group's recent chat history (from 25 up to 100 messages). Admins can control who has permission to share this history .
+
+Admin Controls: Group admins can choose who can add or remove members, change group settings, and manage other administrative tasks .
+
+Member Limit: Group chats can support up to 1,024 members, allowing for large communities and group discussions .
+
+💬 Chat & Messaging Features
+Tools designed to make conversations more organized, expressive, and less overwhelming.
+
+Highlighted Notifications: Customize your notification preferences to receive alerts only for specific activities, such as @mentions, replies to your messages, or messages from saved contacts. This helps you stay focused without being overwhelmed by every message .
+
+Tappable Reactions: Quickly see how others have reacted to a message and tap on an existing reaction to add your own (+1) or choose a different emoji .
+
+Text Stickers: Turn any word or phrase into a sticker by typing it into the sticker search. You can also save newly created text stickers directly to your sticker pack for easy reuse .
+
+Quick Emoji Access: Easily view and select emoji reactions that others have already used on a message .
+
+Message Formatting: Supports rich text features like bold, italics, bullet points, and numbered lists for clearer communication .
+
+Media Sharing: Share high-quality HD photos and videos, as well as large files up to 2GB in size .
+
+📅 Group Planning & Coordination
+Features that turn your group chat into a powerful planning tool.
+
+Events: Create and manage events directly within group chats. Features include the ability to:
+
+Set custom early reminders for invitees .
+
+RSVP with "Going," "Maybe," or "Decline" .
+
+Allow members to invite a +1 .
+
+Pin important events to the top of the chat for visibility .
+
+Set end dates and times for longer-term events .
+
+Polls: Create polls to gather opinions, make decisions, or coordinate plans with the group .
+
+One-on-One Events: Events can now be created not only in groups but also in one-on-one conversations .
+
+🎥 Voice, Video & Calling Features
+Tools for real-time audio and video communication.
+
+Voice Chats: A less intrusive alternative to a full group call, allowing people to join and leave a live audio conversation without ringing the whole group .
+
+Group Video Calls: Host video calls with improved stability and higher quality, thanks to optimized routing and bandwidth detection .
+
+Screen Sharing: Share your screen with other participants during a call, useful for presentations or collaboration .
+
+Pinch to Zoom: During video calls, iPhone users can pinch to zoom in for a closer look at the video feed .
+
+Add Participants Mid-Call: Add new people to an ongoing one-on-one call directly from the chat view .
+
+Video Messages: Record and share short video clips (up to 60 seconds) as instant updates in the chat .
+
+🔧 Group Management & Administration
+Tools to help group admins maintain order and customize the group experience.
+
+Themes & Icons: Customize the look and feel of a group chat with different themes and group icons .
+
+Privacy Controls: Control who can add you to groups, set messages to disappear after a certain time, or send view-once media for sensitive information .
+
+Participant Management: Admins can add or remove members, promote other participants to admin roles, and manage the overall group settings .
+
+📱 Platform-Specific Features
+Features that are currently available only on specific devices.
+
+iPhone Document Scanning: iPhone users can scan, crop, and share physical documents directly from the WhatsApp attachment menu, without needing a separate scanning app .
+
+iPhone Default App: On the latest iOS versions, iPhone users can set WhatsApp as their default messaging and calling app, replacing the stock Apple apps .
+
+🔮 Important Notes on Feature Availability
+Rollout Status: Many of the features listed above (especially the newest ones from 2025 and 2026) are being rolled out "gradually" and may not be available to all users immediately .
+
+Platform Differences: While most features work on both Android and iOS, some features (like pinch-to-zoom and document scanning) are currently iPhone-specific .
+
+Future Features: Features like "Usernames & IDs" and "Guest Chats" have been announced as coming soon but are not yet widely available.
+
+This list reflects the most current WhatsApp group chat features based on updates through March 2026. For the latest announcements, you can check the official WhatsApp blog or the app's update notes.
+

@@ -45,14 +45,13 @@ function getAllProviders(): AIProvider[] {
   return providers;
 }
 
+// ── AI stream ────────────────────────────────────────────────────────────────
 router.post("/", async (req, res) => {
   const { messages } = req.body;
 
   const providers = getAllProviders();
   if (providers.length === 0) {
-    return res.status(500).json({
-      error: "No AI API key configured. Please add GROQ_API_KEY, GEMINI_API_KEY, or OPENAI_API_KEY.",
-    });
+    return res.status(500).json({ error: "No AI API key configured." });
   }
 
   const payload = [
@@ -68,25 +67,19 @@ router.post("/", async (req, res) => {
     try {
       const response = await fetch(provider.url, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${provider.key}`,
-          "Content-Type": "application/json",
-        },
+        headers: { Authorization: `Bearer ${provider.key}`, "Content-Type": "application/json" },
         body: JSON.stringify({ model: provider.model, messages: payload, stream: true }),
       });
 
       if (!response.ok) {
         const errorText = await response.text();
         logger.warn(`${provider.provider} responded with error`, { status: response.status, body: errorText.slice(0, 300) });
-
         if (response.status === 429 || response.status === 503) {
           lastError = `${provider.provider} rate limit reached`;
-          logger.warn(`Rate limited by ${provider.provider}, falling back to next provider`);
+          logger.warn(`Rate limited by ${provider.provider}, falling back`);
           continue;
         }
-
-        lastError = `${provider.provider} service unavailable (${response.status})`;
-        logger.warn(`${provider.provider} unavailable, falling back`, { status: response.status });
+        lastError = `${provider.provider} unavailable (${response.status})`;
         continue;
       }
 
@@ -114,14 +107,50 @@ router.post("/", async (req, res) => {
 
   logger.error("All AI providers exhausted", { lastError });
   if (!res.headersSent) {
-    res.status(429).json({ error: `All AI providers are currently rate-limited. Please try again in a moment.` });
+    res.status(429).json({ error: "All AI providers are currently rate-limited. Please try again in a moment." });
   }
 });
 
+// ── Ping (update last_seen_at) ────────────────────────────────────────────────
+router.post("/ping", requireAuth, async (req: AuthRequest, res) => {
+  try {
+    await pool.query("UPDATE users SET last_seen_at = now() WHERE id = $1", [req.user!.id]);
+    return res.json({ ok: true });
+  } catch {
+    return res.json({ ok: true });
+  }
+});
+
+// ── List users for starting DMs ───────────────────────────────────────────────
+router.get("/users", requireAuth, async (req: AuthRequest, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT u.id, u.full_name, u.email, u.avatar_url,
+              u.last_seen_at,
+              (u.last_seen_at > now() - interval '5 minutes') AS is_online
+       FROM users u
+       WHERE u.id != $1
+       ORDER BY u.full_name ASC`,
+      [req.user!.id]
+    );
+    return res.json(rows);
+  } catch (err: any) {
+    return res.status(500).json({ error: "Failed to fetch users" });
+  }
+});
+
+// ── Conversations CRUD ─────────────────────────────────────────────────────────
 router.get("/conversations", requireAuth, async (req: AuthRequest, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT * FROM chat_conversations WHERE user_id = $1 ORDER BY updated_at DESC",
+      `SELECT cc.*,
+              p.full_name AS participant_name,
+              p.avatar_url AS participant_avatar,
+              (p.last_seen_at > now() - interval '5 minutes') AS participant_online
+       FROM chat_conversations cc
+       LEFT JOIN users p ON p.id = cc.participant_id
+       WHERE cc.user_id = $1
+       ORDER BY cc.updated_at DESC`,
       [req.user!.id]
     );
     return res.json(rows);
@@ -133,6 +162,15 @@ router.get("/conversations", requireAuth, async (req: AuthRequest, res) => {
 router.post("/conversations", requireAuth, async (req: AuthRequest, res) => {
   const { title, type, participant_id } = req.body;
   try {
+    // For user-to-user DMs, check if one already exists
+    if ((type === "user" || type === "group") && participant_id) {
+      const existing = await pool.query(
+        "SELECT * FROM chat_conversations WHERE user_id = $1 AND participant_id = $2 AND type = $3 LIMIT 1",
+        [req.user!.id, participant_id, type]
+      );
+      if (existing.rows.length > 0) return res.json(existing.rows[0]);
+    }
+
     const { rows } = await pool.query(
       "INSERT INTO chat_conversations (user_id, title, type, participant_id) VALUES ($1,$2,$3,$4) RETURNING *",
       [req.user!.id, title || "New Chat", type || "ai", participant_id || null]
@@ -143,15 +181,29 @@ router.post("/conversations", requireAuth, async (req: AuthRequest, res) => {
   }
 });
 
+router.patch("/conversations/:id", requireAuth, async (req: AuthRequest, res) => {
+  const { title } = req.body;
+  try {
+    await pool.query(
+      "UPDATE chat_conversations SET title = $1, updated_at = now() WHERE id = $2 AND user_id = $3",
+      [title, req.params.id, req.user!.id]
+    );
+    return res.json({ success: true });
+  } catch {
+    return res.status(500).json({ error: "Failed to update title" });
+  }
+});
+
 router.delete("/conversations/:id", requireAuth, async (req: AuthRequest, res) => {
   try {
     await pool.query("DELETE FROM chat_conversations WHERE id = $1 AND user_id = $2", [req.params.id, req.user!.id]);
     return res.json({ success: true });
-  } catch (err) {
+  } catch {
     return res.status(500).json({ error: "Failed to delete conversation" });
   }
 });
 
+// ── Messages CRUD ──────────────────────────────────────────────────────────────
 router.get("/conversations/:id/messages", requireAuth, async (req: AuthRequest, res) => {
   try {
     const { rows: convRows } = await pool.query(
@@ -159,12 +211,19 @@ router.get("/conversations/:id/messages", requireAuth, async (req: AuthRequest, 
       [req.params.id, req.user!.id]
     );
     if (convRows.length === 0) return res.status(404).json({ error: "Conversation not found" });
+
     const { rows } = await pool.query(
-      "SELECT role, content, created_at FROM chat_messages WHERE conversation_id = $1 ORDER BY created_at ASC",
+      `SELECT cm.id, cm.role, cm.content, cm.created_at, cm.edited_at,
+              cm.is_deleted, cm.reactions, cm.sender_id,
+              u.full_name AS sender_name, u.avatar_url AS sender_avatar
+       FROM chat_messages cm
+       LEFT JOIN users u ON u.id = cm.sender_id
+       WHERE cm.conversation_id = $1
+       ORDER BY cm.created_at ASC`,
       [req.params.id]
     );
     return res.json(rows);
-  } catch (err) {
+  } catch {
     return res.status(500).json({ error: "Failed to fetch messages" });
   }
 });
@@ -178,17 +237,82 @@ router.post("/conversations/:id/messages", requireAuth, async (req: AuthRequest,
       [req.params.id, req.user!.id]
     );
     if (convRows.length === 0) return res.status(404).json({ error: "Conversation not found" });
+
     const { rows } = await pool.query(
-      "INSERT INTO chat_messages (conversation_id, role, content) VALUES ($1,$2,$3) RETURNING *",
-      [req.params.id, role, content]
+      `INSERT INTO chat_messages (conversation_id, role, content, sender_id)
+       VALUES ($1,$2,$3,$4) RETURNING *`,
+      [req.params.id, role, content, role === "user" ? req.user!.id : null]
     );
-    await pool.query("UPDATE chat_conversations SET updated_at = now() WHERE id = $1", [req.params.id]);
+    await pool.query(
+      "UPDATE chat_conversations SET updated_at = now(), last_message_preview = $1 WHERE id = $2",
+      [content.slice(0, 80), req.params.id]
+    );
     return res.json(rows[0]);
   } catch (err: any) {
     return res.status(500).json({ error: err.message || "Failed to save message" });
   }
 });
 
+// Edit message
+router.patch("/conversations/:convId/messages/:msgId", requireAuth, async (req: AuthRequest, res) => {
+  const { content } = req.body;
+  if (!content?.trim()) return res.status(400).json({ error: "content required" });
+  try {
+    const { rows } = await pool.query(
+      `UPDATE chat_messages SET content = $1, edited_at = now()
+       WHERE id = $2 AND sender_id = $3
+       RETURNING *`,
+      [content.trim(), req.params.msgId, req.user!.id]
+    );
+    if (rows.length === 0) return res.status(403).json({ error: "Not allowed" });
+    return res.json(rows[0]);
+  } catch {
+    return res.status(500).json({ error: "Failed to edit message" });
+  }
+});
+
+// Soft delete message
+router.delete("/conversations/:convId/messages/:msgId", requireAuth, async (req: AuthRequest, res) => {
+  try {
+    const { rows } = await pool.query(
+      `UPDATE chat_messages SET is_deleted = true, content = 'This message was deleted'
+       WHERE id = $1 AND sender_id = $2
+       RETURNING id`,
+      [req.params.msgId, req.user!.id]
+    );
+    if (rows.length === 0) return res.status(403).json({ error: "Not allowed" });
+    return res.json({ success: true });
+  } catch {
+    return res.status(500).json({ error: "Failed to delete message" });
+  }
+});
+
+// Toggle emoji reaction
+router.post("/conversations/:convId/messages/:msgId/react", requireAuth, async (req: AuthRequest, res) => {
+  const { emoji } = req.body;
+  if (!emoji) return res.status(400).json({ error: "emoji required" });
+  const userId = req.user!.id;
+  try {
+    const { rows } = await pool.query("SELECT reactions FROM chat_messages WHERE id = $1", [req.params.msgId]);
+    if (rows.length === 0) return res.status(404).json({ error: "Message not found" });
+
+    const reactions: Record<string, string[]> = rows[0].reactions || {};
+    const users = reactions[emoji] || [];
+    if (users.includes(userId)) {
+      reactions[emoji] = users.filter(u => u !== userId);
+      if (reactions[emoji].length === 0) delete reactions[emoji];
+    } else {
+      reactions[emoji] = [...users, userId];
+    }
+
+    await pool.query("UPDATE chat_messages SET reactions = $1 WHERE id = $2", [JSON.stringify(reactions), req.params.msgId]);
+    return res.json({ reactions });
+  } catch {
+    return res.status(500).json({ error: "Failed to update reaction" });
+  }
+});
+
+// ── Legacy title patch ─────────────────────────────────────────────────────────
 router.patch("/conversations/:id/title", requireAuth, async (req: AuthRequest, res) => {
   const { title } = req.body;
   try {
@@ -197,7 +321,7 @@ router.patch("/conversations/:id/title", requireAuth, async (req: AuthRequest, r
       [title, req.params.id, req.user!.id]
     );
     return res.json({ success: true });
-  } catch (err) {
+  } catch {
     return res.status(500).json({ error: "Failed to update title" });
   }
 });
