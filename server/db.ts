@@ -10,3 +10,39 @@ export const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
 });
+
+// Auto-apply any missing column migrations on startup
+export async function runMigrations() {
+  const client = await pool.connect();
+  try {
+    await client.query(`
+      ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS sender_id     UUID REFERENCES users(id) ON DELETE SET NULL;
+      ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS is_deleted    BOOLEAN DEFAULT false;
+      ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS edited_at     TIMESTAMPTZ;
+      ALTER TABLE chat_messages ADD COLUMN IF NOT EXISTS reactions     JSONB DEFAULT '{}';
+
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMPTZ DEFAULT now();
+
+      ALTER TABLE chat_conversations ADD COLUMN IF NOT EXISTS last_message_preview TEXT;
+    `);
+
+    // Handle the type constraint separately (can't use IF NOT EXISTS on constraints)
+    await client.query(`
+      DO $$
+      BEGIN
+        ALTER TABLE chat_conversations DROP CONSTRAINT IF EXISTS chat_conversations_type_check;
+        ALTER TABLE chat_conversations ADD CONSTRAINT chat_conversations_type_check
+          CHECK (type IN ('ai','user','group'));
+      EXCEPTION WHEN others THEN NULL;
+      END $$;
+    `);
+
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_chat_msgs_sender ON chat_messages(sender_id);
+      CREATE INDEX IF NOT EXISTS idx_users_last_seen   ON users(last_seen_at);
+      CREATE INDEX IF NOT EXISTS idx_chat_conv_updated ON chat_conversations(updated_at DESC);
+    `);
+  } finally {
+    client.release();
+  }
+}

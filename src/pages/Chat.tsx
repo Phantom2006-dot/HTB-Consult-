@@ -857,9 +857,12 @@ function ConvItem({ conv, active, onSelect, onDelete, showAvatar }: {
   showAvatar?: boolean;
 }) {
   return (
-    <button
+    <div
       onClick={onSelect}
-      className={`w-full flex items-center gap-3 px-4 py-2.5 text-left group transition-colors ${
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => e.key === "Enter" && onSelect()}
+      className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer group transition-colors ${
         active
           ? "bg-primary/10 dark:bg-primary/20"
           : "hover:bg-gray-50 dark:hover:bg-gray-800"
@@ -886,7 +889,7 @@ function ConvItem({ conv, active, onSelect, onDelete, showAvatar }: {
       >
         <Trash2 size={13} />
       </button>
-    </button>
+    </div>
   );
 }
 

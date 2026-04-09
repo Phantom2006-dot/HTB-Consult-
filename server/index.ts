@@ -5,7 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 import { logger } from "./lib/logger.js";
-import { pool } from "./db.js";
+import { pool, runMigrations } from "./db.js";
 import authRoutes from "./routes/auth.js";
 import coursesRoutes from "./routes/courses.js";
 import mentorsRoutes from "./routes/mentors.js";
@@ -41,14 +41,16 @@ for (const v of OPTIONAL_VARS) {
   logger.info(`ENV ${v}: ${process.env[v] ? "SET" : "not set"}`);
 }
 
-// ── DB connectivity test ─────────────────────────────────────────────────────
+// ── DB connectivity + auto-migration ─────────────────────────────────────────
 pool.connect()
   .then(client => {
     logger.info("Database: connected successfully");
     client.release();
+    return runMigrations();
   })
+  .then(() => logger.info("Database: migrations applied"))
   .catch(err => {
-    logger.error("Database: connection FAILED", { error: err.message });
+    logger.error("Database: startup error", { error: err.message });
   });
 
 // ── CORS ─────────────────────────────────────────────────────────────────────
