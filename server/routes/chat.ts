@@ -13,95 +13,101 @@ const SYSTEM_PROMPT = `You are the HTB Consults AI Assistant — a helpful, prof
 
 Be concise, encouraging, and professional. Use markdown formatting for clarity. If asked about pricing or bookings, direct users to the Services or Courses pages.`;
 
-function getAIProvider(): { url: string; key: string; model: string; provider: string } | null {
+type AIProvider = { url: string; key: string; model: string; provider: string };
+
+function getAllProviders(): AIProvider[] {
+  const providers: AIProvider[] = [];
   if (process.env.GROQ_API_KEY) {
-    return {
+    providers.push({
       url: "https://api.groq.com/openai/v1/chat/completions",
       key: process.env.GROQ_API_KEY,
       model: "llama-3.1-8b-instant",
       provider: "Groq",
-    };
+    });
   }
   if (process.env.GEMINI_API_KEY) {
-    return {
+    providers.push({
       url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
       key: process.env.GEMINI_API_KEY,
       model: "gemini-1.5-flash",
       provider: "Google Gemini",
-    };
+    });
   }
   if (process.env.OPENAI_API_KEY) {
-    return {
+    providers.push({
       url: "https://api.openai.com/v1/chat/completions",
       key: process.env.OPENAI_API_KEY,
       model: "gpt-4o-mini",
       provider: "OpenAI",
-    };
+    });
   }
-  return null;
+  return providers;
 }
 
 router.post("/", async (req, res) => {
   const { messages } = req.body;
 
-  const provider = getAIProvider();
-  if (!provider) {
+  const providers = getAllProviders();
+  if (providers.length === 0) {
     return res.status(500).json({
       error: "No AI API key configured. Please add GROQ_API_KEY, GEMINI_API_KEY, or OPENAI_API_KEY.",
     });
   }
 
-  try {
-    const response = await fetch(provider.url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${provider.key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: provider.model,
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          ...messages.map((m: any) => ({ role: m.role, content: m.content })),
-        ],
-        stream: true,
-      }),
-    });
+  const payload = [
+    { role: "system", content: SYSTEM_PROMPT },
+    ...messages.map((m: any) => ({ role: m.role, content: m.content })),
+  ];
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`${provider.provider} API error:`, response.status, errorText);
+  let lastError = "AI service unavailable";
 
-      if (response.status === 429) {
-        let detail = `${provider.provider} rate limit reached. Please try again in a moment.`;
-        try {
-          const parsed = JSON.parse(errorText);
-          const code = parsed?.error?.code || "";
-          const msg = (parsed?.error?.message || "").toLowerCase();
-          if (code === "insufficient_quota" || msg.includes("quota") || msg.includes("billing") || msg.includes("exceeded your current quota")) {
-            detail = `${provider.provider} quota exceeded — your API key has no remaining credits. Please top up at the provider dashboard.`;
-          }
-        } catch {}
-        return res.status(429).json({ error: detail });
+  for (const provider of providers) {
+    try {
+      const response = await fetch(provider.url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${provider.key}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ model: provider.model, messages: payload, stream: true }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`${provider.provider} API error:`, response.status, errorText);
+
+        if (response.status === 429 || response.status === 503) {
+          lastError = `${provider.provider} rate limit reached`;
+          console.log(`Falling back from ${provider.provider}...`);
+          continue;
+        }
+
+        lastError = `${provider.provider} service unavailable (${response.status})`;
+        continue;
       }
 
-      return res.status(500).json({ error: `${provider.provider} service unavailable` });
-    }
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
 
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
-
-    const reader = response.body!.getReader();
-    const decoder = new TextDecoder();
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      res.write(decoder.decode(value, { stream: true }));
+      const reader = response.body!.getReader();
+      const decoder = new TextDecoder();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        res.write(decoder.decode(value, { stream: true }));
+      }
+      res.end();
+      return;
+    } catch (err: any) {
+      console.error(`${provider.provider} fetch error:`, err.message);
+      lastError = err.message || "Network error";
+      continue;
     }
-    res.end();
-  } catch (err: any) {
-    if (!res.headersSent) res.status(500).json({ error: err.message || "Unknown error" });
+  }
+
+  if (!res.headersSent) {
+    res.status(429).json({ error: `All AI providers are currently rate-limited. Please try again in a moment.` });
   }
 });
 
