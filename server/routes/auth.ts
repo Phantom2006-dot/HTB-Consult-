@@ -4,6 +4,7 @@ import crypto from "crypto";
 import { pool } from "../db.js";
 import { requireAuth, signToken, type AuthRequest } from "../middleware/auth.js";
 import { sendEmail, buildResetEmailHtml } from "../lib/email.js";
+import { logger } from "../lib/logger.js";
 
 const router = Router();
 
@@ -27,10 +28,14 @@ router.post("/register", async (req, res) => {
   if (password.length < 6) return res.status(400).json({ error: "Password must be at least 6 characters" });
 
   const isMentorSignup = requestedRole === "mentor";
+  logger.info("Register attempt", { email: email.toLowerCase(), role: isMentorSignup ? "mentor" : "student" });
 
   try {
     const existing = await pool.query("SELECT id FROM users WHERE email = $1", [email.toLowerCase()]);
-    if (existing.rows.length > 0) return res.status(400).json({ error: "Email already registered" });
+    if (existing.rows.length > 0) {
+      logger.warn("Register failed: email already exists", { email: email.toLowerCase() });
+      return res.status(400).json({ error: "Email already registered" });
+    }
 
     const password_hash = await bcrypt.hash(password, 12);
     const { rows } = await pool.query(
@@ -53,10 +58,11 @@ router.post("/register", async (req, res) => {
       );
     }
 
+    logger.info("Register success", { email: user.email, role: assignedRole });
     const token = signToken({ id: user.id, email: user.email, role: assignedRole });
     return res.json({ token, user: { ...user, role: assignedRole } });
   } catch (err: any) {
-    console.error(err);
+    logger.error("Register error", { error: err.message });
     return res.status(500).json({ error: "Registration failed" });
   }
 });
@@ -65,14 +71,24 @@ router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: "Email and password required" });
 
+  logger.info("Login attempt", { email: email.toLowerCase() });
   try {
     const { rows: userRows } = await pool.query("SELECT * FROM users WHERE email = $1", [email.toLowerCase()]);
-    if (userRows.length === 0) return res.status(401).json({ error: "Invalid email or password" });
+    if (userRows.length === 0) {
+      logger.warn("Login failed: user not found", { email: email.toLowerCase() });
+      return res.status(401).json({ error: "Invalid email or password" });
+    }
 
     const user = userRows[0];
     const valid = await bcrypt.compare(password, user.password_hash);
-    if (!valid) return res.status(401).json({ error: "Invalid email or password" });
-    if (user.is_blocked) return res.status(403).json({ error: "Your account has been suspended. Please contact support." });
+    if (!valid) {
+      logger.warn("Login failed: wrong password", { email: email.toLowerCase() });
+      return res.status(401).json({ error: "Invalid email or password" });
+    }
+    if (user.is_blocked) {
+      logger.warn("Login blocked: account suspended", { email: email.toLowerCase() });
+      return res.status(403).json({ error: "Your account has been suspended. Please contact support." });
+    }
 
     const { rows: roleRows } = await pool.query(
       "SELECT role FROM user_roles WHERE user_id = $1 ORDER BY CASE role WHEN 'admin' THEN 0 WHEN 'instructor' THEN 1 WHEN 'mentor' THEN 2 ELSE 3 END LIMIT 1",
@@ -80,13 +96,14 @@ router.post("/login", async (req, res) => {
     );
     const role = roleRows[0]?.role || "student";
 
+    logger.info("Login success", { email: user.email, role });
     const token = signToken({ id: user.id, email: user.email, role });
     return res.json({
       token,
       user: { id: user.id, email: user.email, full_name: user.full_name, bio: user.bio, avatar_url: user.avatar_url, role },
     });
   } catch (err: any) {
-    console.error(err);
+    logger.error("Login error", { error: err.message });
     return res.status(500).json({ error: "Login failed" });
   }
 });

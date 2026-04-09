@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { pool } from "../db.js";
 import { requireAuth, type AuthRequest } from "../middleware/auth.js";
+import { logger } from "../lib/logger.js";
 
 const router = Router();
 
@@ -60,8 +61,10 @@ router.post("/", async (req, res) => {
   ];
 
   let lastError = "AI service unavailable";
+  logger.info("AI chat request", { messageCount: messages.length, providers: providers.map(p => p.provider) });
 
   for (const provider of providers) {
+    logger.info(`Trying AI provider: ${provider.provider}`, { model: provider.model });
     try {
       const response = await fetch(provider.url, {
         method: "POST",
@@ -74,18 +77,20 @@ router.post("/", async (req, res) => {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error(`${provider.provider} API error:`, response.status, errorText);
+        logger.warn(`${provider.provider} responded with error`, { status: response.status, body: errorText.slice(0, 300) });
 
         if (response.status === 429 || response.status === 503) {
           lastError = `${provider.provider} rate limit reached`;
-          console.log(`Falling back from ${provider.provider}...`);
+          logger.warn(`Rate limited by ${provider.provider}, falling back to next provider`);
           continue;
         }
 
         lastError = `${provider.provider} service unavailable (${response.status})`;
+        logger.warn(`${provider.provider} unavailable, falling back`, { status: response.status });
         continue;
       }
 
+      logger.info(`Streaming response from ${provider.provider}`);
       res.setHeader("Content-Type", "text/event-stream");
       res.setHeader("Cache-Control", "no-cache");
       res.setHeader("Connection", "keep-alive");
@@ -98,14 +103,16 @@ router.post("/", async (req, res) => {
         res.write(decoder.decode(value, { stream: true }));
       }
       res.end();
+      logger.info(`AI response complete via ${provider.provider}`);
       return;
     } catch (err: any) {
-      console.error(`${provider.provider} fetch error:`, err.message);
+      logger.error(`${provider.provider} fetch failed`, { error: err.message });
       lastError = err.message || "Network error";
       continue;
     }
   }
 
+  logger.error("All AI providers exhausted", { lastError });
   if (!res.headersSent) {
     res.status(429).json({ error: `All AI providers are currently rate-limited. Please try again in a moment.` });
   }
