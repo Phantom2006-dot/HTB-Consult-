@@ -44,7 +44,7 @@ const About = () => {
             {stats.map((stat, i) => (
               <motion.div key={stat.label} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp} className="text-center">
                 <p className="text-3xl md:text-4xl font-bold text-gradient-gold">{stat.value}</p>
-                <p className="text-sm text-secondary-foreground/60 mt-1">{stat.label}</p>
+                <p className="text-sm text-foreground/70 mt-1">{stat.label}</p>
               </motion.div>
             ))}
           </div>
@@ -93,7 +93,7 @@ const About = () => {
         <div className="container mx-auto px-4 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-14">
             <motion.h2 variants={fadeUp} custom={0} className="text-3xl font-serif font-bold text-secondary-foreground">Our Approach</motion.h2>
-            <motion.p variants={fadeUp} custom={1} className="text-secondary-foreground/70 mt-3 max-w-2xl mx-auto">
+            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground mt-3 max-w-2xl mx-auto">
               We believe every business challenge presents an opportunity for growth. Our approach combines strategic insight, practical execution, and capability development.
             </motion.p>
           </motion.div>
@@ -109,8 +109,8 @@ const About = () => {
                     <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-4">
                       <item.icon className="text-primary" size={24} />
                     </div>
-                    <h3 className="font-serif text-lg font-semibold text-secondary-foreground mb-2">{item.title}</h3>
-                    <p className="text-sm text-secondary-foreground/60">{item.desc}</p>
+                    <h3 className="font-serif text-lg font-semibold text-foreground mb-2">{item.title}</h3>
+                    <p className="text-sm text-muted-foreground">{item.desc}</p>
                   </CardContent>
                 </Card>
               </motion.div>
