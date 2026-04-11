@@ -117,11 +117,15 @@ async function streamChat({
 }
 
 // ── Avatar component ──────────────────────────────────────────────────────────
-function Avatar({ url, name, email, size = 8, online }: { url?: string | null; name?: string | null; email?: string; size?: number; online?: boolean }) {
+function Avatar({ url, name, email, size = 8, online, isBot }: { url?: string | null; name?: string | null; email?: string; size?: number; online?: boolean; isBot?: boolean }) {
   const sz = `w-${size} h-${size}`;
   return (
     <div className={`relative shrink-0`}>
-      {url ? (
+      {isBot ? (
+        <div className={`${sz} rounded-full bg-primary/10 flex items-center justify-center`}>
+          <Bot size={size * 2} className="text-primary" />
+        </div>
+      ) : url ? (
         <img src={url} alt={name || ""} className={`${sz} rounded-full object-cover`} />
       ) : (
         <div className={`${sz} rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold text-xs`}>
@@ -154,13 +158,15 @@ function EmojiPicker({ onPick, onClose }: { onPick: (e: string) => void; onClose
 
 // ── Message Bubble ────────────────────────────────────────────────────────────
 function MessageBubble({
-  msg, isOwn, isAI, currentUserId,
+  msg, isOwn, isAI, currentUserId, currentUserAvatar, currentUserName,
   onEdit, onDelete, onReact,
 }: {
   msg: ChatMessage;
   isOwn: boolean;
   isAI: boolean;
   currentUserId: string;
+  currentUserAvatar?: string | null;
+  currentUserName?: string | null;
   onEdit: (id: string, content: string) => void;
   onDelete: (id: string) => void;
   onReact: (id: string, emoji: string) => void;
@@ -195,7 +201,11 @@ function MessageBubble({
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => { setHovering(false); setShowPicker(false); }}
     >
-      {!isOwn && (
+      {isOwn ? (
+        <Avatar url={currentUserAvatar} name={currentUserName} size={7} />
+      ) : isAI ? (
+        <Avatar isBot size={7} />
+      ) : (
         <Avatar url={msg.sender_avatar} name={msg.sender_name} size={7} />
       )}
 
@@ -527,6 +537,7 @@ const Chat = () => {
       created_at: new Date().toISOString(),
       sender_id: user.id,
       sender_name: user.full_name,
+      sender_avatar: user.avatar_url,
     };
     const newMsgs = [...messages, userMsg];
     setMessages(newMsgs);
@@ -779,6 +790,8 @@ const Chat = () => {
                 isOwn={msg.sender_id === user.id || (msg.role === "user" && !msg.sender_id)}
                 isAI={isAIConv}
                 currentUserId={user.id}
+                currentUserAvatar={user.avatar_url}
+                currentUserName={user.full_name}
                 onEdit={handleEditMessage}
                 onDelete={handleDeleteMessage}
                 onReact={handleReact}
