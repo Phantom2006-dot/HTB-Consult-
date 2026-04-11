@@ -3,12 +3,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import SidebarLayout from "./SidebarLayout";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import WhatsAppButton from "./WhatsAppButton";
 
 const PublicLayout = ({ children }: { children: ReactNode }) => (
   <div className="min-h-screen flex flex-col bg-background">
     <Navbar />
     <main className="flex-1">{children}</main>
     <Footer />
+    <WhatsAppButton />
   </div>
 );
 

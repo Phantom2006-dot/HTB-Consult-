@@ -17,6 +17,7 @@ import {
 import BackButton from "@/components/BackButton";
 import ScrollToTop from "@/components/ScrollToTop";
 import KeyboardShortcutHint from "@/components/KeyboardShortcutHint";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 const sidebarLinks = [
   { icon: Home, label: "Dashboard", path: "/dashboard" },
@@ -207,6 +208,7 @@ const SidebarLayout = ({ children }: { children: ReactNode }) => {
         <main className="flex-1">{children}</main>
         <ScrollToTop scrollRef={mainRef as React.RefObject<HTMLElement>} />
         <KeyboardShortcutHint />
+        <WhatsAppButton />
       </div>
     </div>
   );
