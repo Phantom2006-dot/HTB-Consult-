@@ -93,7 +93,7 @@ const About = () => {
         <div className="container mx-auto px-4 lg:px-8">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-14">
             <motion.h2 variants={fadeUp} custom={0} className="text-3xl font-serif font-bold text-secondary-foreground">Our Approach</motion.h2>
-            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground mt-3 max-w-2xl mx-auto">
+            <motion.p variants={fadeUp} custom={1} className="text-secondary-foreground/70 mt-3 max-w-2xl mx-auto">
               We believe every business challenge presents an opportunity for growth. Our approach combines strategic insight, practical execution, and capability development.
             </motion.p>
           </motion.div>

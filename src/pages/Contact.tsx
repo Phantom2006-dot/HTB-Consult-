@@ -140,11 +140,11 @@ const Contact = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} custom={1} variants={fadeUp}>
             <Accordion type="single" collapsible className="space-y-2">
               {faqs.map((faq, i) => (
-                <AccordionItem key={i} value={`faq-${i}`} className="border border-border rounded-lg px-4 bg-card">
+                <AccordionItem key={i} value={`faq-${i}`} className="border border-secondary-foreground/20 rounded-lg px-4 bg-white">
                   <AccordionTrigger className="text-sm font-medium text-secondary-foreground hover:no-underline">
                     {faq.q}
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-secondary-foreground/60">
+                  <AccordionContent className="text-sm text-secondary-foreground/70">
                     {faq.a}
                   </AccordionContent>
                 </AccordionItem>

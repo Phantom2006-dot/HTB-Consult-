@@ -102,7 +102,7 @@ const Services = () => {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-14">
             <motion.p variants={fadeUp} custom={0} className="text-primary font-medium tracking-widest uppercase text-sm mb-2">HTB Consult Academy</motion.p>
             <motion.h2 variants={fadeUp} custom={1} className="text-3xl font-serif font-bold text-secondary-foreground">Practical Training for Professional Growth</motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-muted-foreground mt-3 max-w-2xl mx-auto">
+            <motion.p variants={fadeUp} custom={2} className="text-secondary-foreground/70 mt-3 max-w-2xl mx-auto">
               HTB Consult Academy equips professionals and organisations with practical skills in business analysis, project delivery, digital transformation, and professional development. Our programmes combine structured learning with real world insight.
             </motion.p>
           </motion.div>
