@@ -18,6 +18,7 @@ import BackButton from "@/components/BackButton";
 import ScrollToTop from "@/components/ScrollToTop";
 import KeyboardShortcutHint from "@/components/KeyboardShortcutHint";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { useUnreadCounts } from "@/hooks/use-unread-counts";
 
 const sidebarLinks = [
   { icon: Home, label: "Dashboard", path: "/dashboard" },
@@ -46,6 +47,7 @@ const SidebarLayout = ({ children }: { children: ReactNode }) => {
 
   const displayName = user?.full_name || user?.email?.split("@")[0] || "User";
   const avatarInitial = displayName.charAt(0).toUpperCase();
+  const { data: unread } = useUnreadCounts();
 
   return (
     <div className="min-h-screen flex bg-background">
@@ -160,14 +162,23 @@ const SidebarLayout = ({ children }: { children: ReactNode }) => {
             </div>
 
             <div className="flex items-center gap-3">
-              <Link to="/notifications" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link to="/notifications" className="relative text-muted-foreground hover:text-foreground transition-colors">
                 <Bell size={20} />
+                {(unread?.notifications ?? 0) > 0 && (
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-background" />
+                )}
               </Link>
-              <Link to="/emails" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link to="/emails" className="relative text-muted-foreground hover:text-foreground transition-colors">
                 <Mail size={20} />
+                {(unread?.emails ?? 0) > 0 && (
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-background" />
+                )}
               </Link>
-              <Link to="/messages" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link to="/messages" className="relative text-muted-foreground hover:text-foreground transition-colors">
                 <MessageSquare size={20} />
+                {(unread?.messages ?? 0) > 0 && (
+                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-background" />
+                )}
               </Link>
               {user && (
                 <DropdownMenu>

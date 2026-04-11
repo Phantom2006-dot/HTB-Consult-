@@ -109,4 +109,50 @@ router.get("/", requireAuth, async (req: AuthRequest, res) => {
   }
 });
 
+// ── Unread counts for badge indicators ────────────────────────────────────────
+router.get("/unread-count", requireAuth, async (req: AuthRequest, res) => {
+  const userId = req.user!.id;
+  try {
+    const [emailsResult, messagesResult, notificationsResult] = await Promise.all([
+      // Unread inbox emails
+      pool.query(
+        `SELECT COUNT(*) FROM emails
+         WHERE user_id = $1 AND is_read = false AND folder = 'inbox' AND is_draft = false`,
+        [userId]
+      ),
+      // User-to-user conversations updated since the user's last_seen_at
+      pool.query(
+        `SELECT COUNT(*) FROM chat_conversations cc
+         WHERE cc.user_id = $1
+           AND cc.type = 'user'
+           AND cc.updated_at > (SELECT COALESCE(last_seen_at, now() - interval '1 day') FROM users WHERE id = $1)
+           AND EXISTS (
+             SELECT 1 FROM chat_messages cm
+             WHERE cm.conversation_id = cc.id
+               AND cm.sender_id != $1
+               AND cm.is_deleted = false
+               AND cm.created_at > (SELECT COALESCE(last_seen_at, now() - interval '1 day') FROM users WHERE id = $1)
+           )`,
+        [userId]
+      ),
+      // Pending bookings (awaiting confirmation) in the last 30 days
+      pool.query(
+        `SELECT COUNT(*) FROM bookings
+         WHERE student_id = $1
+           AND status = 'pending'
+           AND created_at > now() - interval '30 days'`,
+        [userId]
+      ),
+    ]);
+
+    return res.json({
+      emails: parseInt(emailsResult.rows[0].count, 10),
+      messages: parseInt(messagesResult.rows[0].count, 10),
+      notifications: parseInt(notificationsResult.rows[0].count, 10),
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || "Failed to fetch unread counts" });
+  }
+});
+
 export default router;
