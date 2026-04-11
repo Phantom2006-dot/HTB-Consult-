@@ -8,7 +8,7 @@ router.get("/", requireAuth, async (req: AuthRequest, res) => {
   try {
     const userId = req.user!.id;
 
-    const [enrollments, bookings, articles] = await Promise.all([
+    const [enrollments, bookings, articles, systemNotifs] = await Promise.all([
       pool.query(
         `SELECT e.enrolled_at AS created_at, e.completed, e.progress,
                 c.title AS course_title, c.id AS course_id
@@ -37,6 +37,14 @@ router.get("/", requireAuth, async (req: AuthRequest, res) => {
          WHERE a.published = true
          ORDER BY a.created_at DESC
          LIMIT 5`
+      ),
+      pool.query(
+        `SELECT id, type, title, body, link, is_read, created_at
+         FROM user_notifications
+         WHERE user_id = $1
+         ORDER BY created_at DESC
+         LIMIT 10`,
+        [userId]
       ),
     ]);
 
@@ -101,6 +109,19 @@ router.get("/", requireAuth, async (req: AuthRequest, res) => {
       });
     }
 
+    for (const n of systemNotifs.rows) {
+      notifications.push({
+        id: `notif-${n.id}`,
+        type: n.type,
+        title: n.title,
+        desc: n.body,
+        time: n.created_at,
+        link: n.link || null,
+        is_read: n.is_read,
+        persistent_id: n.id,
+      });
+    }
+
     notifications.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
 
     return res.json(notifications.slice(0, 20));
@@ -113,7 +134,7 @@ router.get("/", requireAuth, async (req: AuthRequest, res) => {
 router.get("/unread-count", requireAuth, async (req: AuthRequest, res) => {
   const userId = req.user!.id;
   try {
-    const [emailsResult, messagesResult, notificationsResult] = await Promise.all([
+    const [emailsResult, messagesResult, notificationsResult, systemNotifsResult] = await Promise.all([
       // Unread inbox emails
       pool.query(
         `SELECT COUNT(*) FROM emails
@@ -143,12 +164,18 @@ router.get("/unread-count", requireAuth, async (req: AuthRequest, res) => {
            AND created_at > now() - interval '30 days'`,
         [userId]
       ),
+      // Unread persistent notifications (role grants etc.)
+      pool.query(
+        `SELECT COUNT(*) FROM user_notifications
+         WHERE user_id = $1 AND is_read = false`,
+        [userId]
+      ),
     ]);
 
     return res.json({
       emails: parseInt(emailsResult.rows[0].count, 10),
       messages: parseInt(messagesResult.rows[0].count, 10),
-      notifications: parseInt(notificationsResult.rows[0].count, 10),
+      notifications: parseInt(notificationsResult.rows[0].count, 10) + parseInt(systemNotifsResult.rows[0].count, 10),
     });
   } catch (err: any) {
     return res.status(500).json({ error: err.message || "Failed to fetch unread counts" });

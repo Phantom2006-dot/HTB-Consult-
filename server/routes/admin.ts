@@ -61,10 +61,38 @@ router.patch("/users/:id/role", requireAdmin, async (req, res) => {
     if (grant === false) {
       await pool.query("DELETE FROM user_roles WHERE user_id = $1 AND role = $2", [req.params.id, role]);
     } else {
-      await pool.query(
+      const { rowCount } = await pool.query(
         "INSERT INTO user_roles (user_id, role) VALUES ($1, $2) ON CONFLICT (user_id, role) DO NOTHING",
         [req.params.id, role]
       );
+
+      // Only notify if the role was actually newly granted (not a duplicate)
+      if (rowCount && rowCount > 0) {
+        const { rows: userRows } = await pool.query(
+          "SELECT id, full_name, email FROM users WHERE id = $1",
+          [req.params.id]
+        );
+        const target = userRows[0];
+        if (target) {
+          const roleLabel = role === "admin" ? "Administrator" : role === "mentor" ? "Mentor" : role;
+          const title = `You've been granted ${roleLabel} access`;
+          const body = `Hi ${target.full_name || "there"}, your account has been upgraded to ${roleLabel} on HTB Consults Academy. You now have access to ${role === "admin" ? "the admin dashboard and all management tools" : "mentor features and session management"}.`;
+
+          // In-app notification
+          await pool.query(
+            `INSERT INTO user_notifications (user_id, type, title, body, link)
+             VALUES ($1, 'success', $2, $3, $4)`,
+            [req.params.id, title, body, role === "admin" ? "/admin" : "/dashboard"]
+          );
+
+          // Inbox email
+          await pool.query(
+            `INSERT INTO emails (user_id, recipient_id, subject, body, folder, is_read, is_draft)
+             VALUES ($1, $1, $2, $3, 'inbox', false, false)`,
+            [req.params.id, title, body]
+          );
+        }
+      }
     }
     return res.json({ success: true });
   } catch (err) {
