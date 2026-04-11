@@ -118,17 +118,19 @@ async function streamChat({
 
 // ── Avatar component ──────────────────────────────────────────────────────────
 function Avatar({ url, name, email, size = 8, online, isBot }: { url?: string | null; name?: string | null; email?: string; size?: number; online?: boolean; isBot?: boolean }) {
-  const sz = `w-${size} h-${size}`;
+  const px = size * 4;
+  const style = { width: px, height: px, minWidth: px, minHeight: px };
+  const fontSize = px < 28 ? 10 : 12;
   return (
-    <div className={`relative shrink-0`}>
+    <div className="relative shrink-0" style={style}>
       {isBot ? (
-        <div className={`${sz} rounded-full bg-primary/10 flex items-center justify-center`}>
-          <Bot size={size * 2} className="text-primary" />
+        <div className="w-full h-full rounded-full bg-primary/10 flex items-center justify-center">
+          <Bot size={px * 0.5} className="text-primary" />
         </div>
       ) : url ? (
-        <img src={url} alt={name || ""} className={`${sz} rounded-full object-cover`} />
+        <img src={url} alt={name || ""} className="w-full h-full rounded-full object-cover" />
       ) : (
-        <div className={`${sz} rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold text-xs`}>
+        <div className="w-full h-full rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold" style={{ fontSize }}>
           {initials(name, email)}
         </div>
       )}
