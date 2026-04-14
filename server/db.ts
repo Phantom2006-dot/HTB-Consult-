@@ -43,6 +43,11 @@ export async function runMigrations() {
       CREATE INDEX IF NOT EXISTS idx_chat_conv_updated ON chat_conversations(updated_at DESC);
     `);
 
+    // Course locking
+    await client.query(`
+      ALTER TABLE courses ADD COLUMN IF NOT EXISTS is_locked BOOLEAN DEFAULT false;
+    `);
+
     // Persistent in-app notifications table
     await client.query(`
       CREATE TABLE IF NOT EXISTS user_notifications (

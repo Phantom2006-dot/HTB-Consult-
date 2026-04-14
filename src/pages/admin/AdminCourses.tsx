@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Plus, Pencil, Trash2, Eye, EyeOff, X, Presentation } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, X, Presentation, Lock, LockOpen } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -100,6 +100,17 @@ const AdminCourses = () => {
       qc.invalidateQueries({ queryKey: ["admin-courses"] });
       qc.invalidateQueries({ queryKey: ["courses"] });
     },
+  });
+
+  const toggleLock = useMutation({
+    mutationFn: ({ id, is_locked }: { id: string; is_locked: boolean }) =>
+      api.patch(`/api/admin/courses/${id}/lock`, { is_locked }),
+    onSuccess: (_data, { is_locked }) => {
+      qc.invalidateQueries({ queryKey: ["admin-courses"] });
+      qc.invalidateQueries({ queryKey: ["courses"] });
+      toast({ title: is_locked ? "Course locked" : "Course unlocked", description: is_locked ? "Students will see a locked notice." : "Students can access this course again." });
+    },
+    onError: () => toast({ title: "Error", description: "Failed to update lock status.", variant: "destructive" }),
   });
 
   const openEdit = (course: any) => {
@@ -262,8 +273,19 @@ const AdminCourses = () => {
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => togglePublish.mutate({ id: course.id, published: !course.published })}>
+                    {/* Publish toggle */}
+                    <Button size="icon" variant="ghost" className="h-8 w-8" title={course.published ? "Unpublish" : "Publish"} onClick={() => togglePublish.mutate({ id: course.id, published: !course.published })}>
                       {course.published ? <EyeOff size={14} /> : <Eye size={14} />}
+                    </Button>
+                    {/* Lock toggle */}
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      title={course.is_locked ? "Unlock course" : "Lock course"}
+                      className={`h-8 w-8 ${course.is_locked ? "text-amber-500 hover:text-amber-600 hover:bg-amber-500/10" : "text-muted-foreground hover:text-amber-500 hover:bg-amber-500/10"}`}
+                      onClick={() => toggleLock.mutate({ id: course.id, is_locked: !course.is_locked })}
+                    >
+                      {course.is_locked ? <Lock size={14} /> : <LockOpen size={14} />}
                     </Button>
                     <Link to={`/admin/courses/${course.id}/resources`}>
                       <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-primary" title="Manage resources">
