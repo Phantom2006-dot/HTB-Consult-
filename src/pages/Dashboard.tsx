@@ -1,11 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   BookOpen, Clock, Star,
   BarChart3, GraduationCap, Award, Users, Briefcase,
   Play, Layers, Globe, Target, FileText, TrendingUp, Cpu, FolderOpen,
-  Newspaper, ArrowRight
+  Newspaper, ArrowRight, Lock, X, Bell
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -57,6 +57,7 @@ function formatDate(d: string) {
 const Dashboard = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [lockedCourse, setLockedCourse] = useState<{ title: string; category: string } | null>(null);
 
   const { data: profile } = useQuery({
     queryKey: ["profile", user?.id],
@@ -235,27 +236,42 @@ const Dashboard = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {featuredCourses.map((course: any) => (
-                <Link key={course.id} to={`/course/${course.id}`}>
-                  <Card className="bg-card border-border hover:border-primary/50 transition-colors cursor-pointer group h-full">
+                <div
+                  key={course.id}
+                  className="cursor-pointer"
+                  onClick={() => course.is_locked
+                    ? setLockedCourse({ title: course.title, category: course.category })
+                    : navigate(`/course/${course.id}`)
+                  }
+                >
+                  <Card className={`bg-card border-border transition-colors h-full group ${course.is_locked ? "opacity-75" : "hover:border-primary/50 cursor-pointer"}`}>
                     <CardContent className="p-4">
-                      <div className="h-32 bg-muted rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                      <div className="h-32 bg-muted rounded-lg mb-3 flex items-center justify-center overflow-hidden relative">
                         {course.thumbnail_url ? (
-                          <img src={course.thumbnail_url} alt={course.title} className="w-full h-full object-cover rounded-lg" />
+                          <img src={course.thumbnail_url} alt={course.title} className={`w-full h-full object-cover rounded-lg ${course.is_locked ? "grayscale" : ""}`} />
                         ) : (
                           <BookOpen size={32} className="text-muted-foreground group-hover:text-primary transition-colors" />
+                        )}
+                        {course.is_locked && (
+                          <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+                            <Lock size={20} className="text-amber-400" />
+                          </div>
                         )}
                       </div>
                       <h3 className="font-sans font-semibold text-sm text-foreground mb-2 line-clamp-1">{course.title}</h3>
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1"><Clock size={12} /> {course.total_duration || "—"}</span>
-                          <span className="flex items-center gap-1"><Star size={12} className="text-accent" /> {course.rating || 0}/5</span>
+                          {course.is_locked
+                            ? <span className="flex items-center gap-1 text-amber-500"><Lock size={11} /> Locked</span>
+                            : <span className="flex items-center gap-1"><Star size={12} className="text-accent" /> {course.rating || 0}/5</span>
+                          }
                         </div>
                         <span className="text-sm font-bold text-primary">{course.price > 0 ? `£${course.price}` : "Free"}</span>
                       </div>
                     </CardContent>
                   </Card>
-                </Link>
+                </div>
               ))}
             </div>
           )}
@@ -313,30 +329,99 @@ const Dashboard = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {enrolledCourses.map((item: any) => (
-                <Link key={item.id} to={`/course/${item.id}`}>
-                  <Card className="bg-card border-border hover:border-primary/30 transition-colors">
+                <div
+                  key={item.id}
+                  className="cursor-pointer"
+                  onClick={() => item.is_locked
+                    ? setLockedCourse({ title: item.title, category: item.category })
+                    : navigate(`/course/${item.id}`)
+                  }
+                >
+                  <Card className={`border-border transition-colors ${item.is_locked ? "bg-card opacity-75" : "bg-card hover:border-primary/30"}`}>
                     <CardContent className="p-4 flex items-center gap-4">
-                      <div className="w-20 h-20 bg-muted rounded-lg shrink-0 flex items-center justify-center overflow-hidden">
+                      <div className="w-20 h-20 bg-muted rounded-lg shrink-0 flex items-center justify-center overflow-hidden relative">
                         {item.thumbnail_url ? (
-                          <img src={item.thumbnail_url} alt={item.title} className="w-full h-full object-cover rounded-lg" />
+                          <img src={item.thumbnail_url} alt={item.title} className={`w-full h-full object-cover rounded-lg ${item.is_locked ? "grayscale" : ""}`} />
                         ) : (
                           <Play size={28} className="text-muted-foreground" />
                         )}
+                        {item.is_locked && (
+                          <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+                            <Lock size={16} className="text-amber-400" />
+                          </div>
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-sans font-semibold text-sm text-foreground line-clamp-1">{item.title}</h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-sans font-semibold text-sm text-foreground line-clamp-1">{item.title}</h3>
+                          {item.is_locked && <Lock size={12} className="text-amber-500 shrink-0" />}
+                        </div>
                         <p className="text-xs text-muted-foreground mb-3">{item.category}</p>
-                        <Progress value={item.progress} className="h-2" />
-                        <p className="text-xs text-muted-foreground mt-1">{item.progress}% complete</p>
+                        {item.is_locked ? (
+                          <p className="text-xs text-amber-500 font-medium flex items-center gap-1"><Lock size={11} /> Currently locked</p>
+                        ) : (
+                          <>
+                            <Progress value={item.progress} className="h-2" />
+                            <p className="text-xs text-muted-foreground mt-1">{item.progress}% complete</p>
+                          </>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
-                </Link>
+                </div>
               ))}
             </div>
           )}
         </motion.section>
       </div>
+
+      {/* Locked Course Modal */}
+      <AnimatePresence>
+        {lockedCourse && (
+          <motion.div className="fixed inset-0 z-50 flex items-center justify-center p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setLockedCourse(null)} />
+            <motion.div
+              className="relative bg-card border border-amber-500/30 rounded-2xl shadow-2xl max-w-md w-full p-8 text-center"
+              initial={{ scale: 0.85, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.85, opacity: 0, y: 20 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            >
+              <button onClick={() => setLockedCourse(null)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors">
+                <X size={18} />
+              </button>
+              <div className="flex justify-center mb-6">
+                <div className="relative">
+                  <div className="w-20 h-20 rounded-full bg-amber-500/10 border-2 border-amber-500/30 flex items-center justify-center">
+                    <Lock size={36} className="text-amber-500" />
+                  </div>
+                  <motion.div
+                    className="absolute inset-0 rounded-full border-2 border-amber-500/20"
+                    animate={{ scale: [1, 1.3, 1], opacity: [0.6, 0, 0.6] }}
+                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  />
+                </div>
+              </div>
+              <Badge variant="outline" className="text-[10px] border-amber-500/40 text-amber-500 mb-3">
+                {lockedCourse.category}
+              </Badge>
+              <h2 className="text-xl font-serif font-bold text-foreground mb-2">This Course is Currently Locked</h2>
+              <p className="text-sm text-muted-foreground font-medium mb-1">"{lockedCourse.title}"</p>
+              <p className="text-sm text-muted-foreground leading-relaxed mt-3 mb-6">
+                Our team is preparing this course for you. It will be available again soon — please check back later or explore our other courses.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Button variant="outline" className="gap-2 border-border text-sm" onClick={() => setLockedCourse(null)}>
+                  <Bell size={14} /> Noted, I'll check back
+                </Button>
+                <Button className="bg-gradient-gold hover:opacity-90 text-sm gap-2" onClick={() => { setLockedCourse(null); navigate("/courses"); }}>
+                  <BookOpen size={14} /> Browse Other Courses
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Layout>
   );
 };

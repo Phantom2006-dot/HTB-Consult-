@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import {
   Clock, Star, Users, BookOpen, Play, CheckCircle2, Award,
   Bookmark, ExternalLink, Video, Download, Presentation, FileText,
-  FileType, FileSpreadsheet, File
+  FileType, FileSpreadsheet, File, Lock
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -94,6 +94,57 @@ const CourseDetail = () => {
 
   const { course, modules } = data;
   const totalLessons = modules.reduce((acc, m) => acc + (m.lessons?.length || 0), 0);
+
+  // ── Locked course gate ────────────────────────────────────────────────────
+  if ((course as any).is_locked) {
+    return (
+      <SidebarLayout>
+        <div className="min-h-[80vh] flex items-center justify-center px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92, y: 24 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ type: "spring", stiffness: 260, damping: 22 }}
+            className="bg-card border border-amber-500/30 rounded-2xl shadow-2xl max-w-md w-full p-10 text-center"
+          >
+            {/* Pulsing lock */}
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <div className="w-20 h-20 rounded-full bg-amber-500/10 border-2 border-amber-500/30 flex items-center justify-center">
+                  <Lock size={36} className="text-amber-500" />
+                </div>
+                <motion.div
+                  className="absolute inset-0 rounded-full border-2 border-amber-500/20"
+                  animate={{ scale: [1, 1.35, 1], opacity: [0.5, 0, 0.5] }}
+                  transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+                />
+              </div>
+            </div>
+
+            <Badge variant="outline" className="text-[10px] border-amber-500/40 text-amber-500 mb-3">
+              {course.category}
+            </Badge>
+
+            <h1 className="text-xl font-serif font-bold text-foreground mb-2">
+              This Course is Currently Locked
+            </h1>
+            <p className="text-sm font-medium text-muted-foreground mb-1">"{course.title}"</p>
+            <p className="text-sm text-muted-foreground leading-relaxed mt-3 mb-8">
+              Our team is preparing this course for you. It will be available again soon — please check back later or explore our other courses in the meantime.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button variant="outline" className="gap-2 border-border" onClick={() => navigate(-1)}>
+                ← Go Back
+              </Button>
+              <Button className="bg-gradient-gold hover:opacity-90 gap-2" onClick={() => navigate("/courses")}>
+                <BookOpen size={14} /> Browse Courses
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+      </SidebarLayout>
+    );
+  }
 
   return (
     <SidebarLayout>
