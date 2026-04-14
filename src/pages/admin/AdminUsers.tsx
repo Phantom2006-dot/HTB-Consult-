@@ -16,7 +16,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Search, ShieldOff, ShieldCheck, ShieldPlus, ShieldMinus } from "lucide-react";
+import { Search, ShieldOff, ShieldCheck, ShieldPlus, ShieldMinus, ShieldAlert } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const AdminUsers = () => {
   const { toast } = useToast();
@@ -152,28 +153,50 @@ const AdminUsers = () => {
 
                   {/* Make Admin / Remove Admin — don't show for self */}
                   {profile.id !== currentUser?.id && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className={`shrink-0 text-xs gap-1.5 h-8 ${
-                        (profile.roles || []).includes("admin")
-                          ? "text-amber-500 hover:text-amber-600 hover:bg-amber-500/10"
-                          : "text-muted-foreground hover:text-primary hover:bg-primary/10"
-                      }`}
-                      onClick={() =>
-                        setConfirmRole({
-                          id: profile.id,
-                          name: profile.full_name || profile.email,
-                          grant: !(profile.roles || []).includes("admin"),
-                        })
-                      }
-                    >
-                      {(profile.roles || []).includes("admin") ? (
-                        <><ShieldMinus size={13} /> Remove Admin</>
-                      ) : (
-                        <><ShieldPlus size={13} /> Make Admin</>
-                      )}
-                    </Button>
+                    profile.is_founding_admin && (profile.roles || []).includes("admin") ? (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="shrink-0">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-xs gap-1.5 h-8 text-muted-foreground/40 cursor-not-allowed"
+                                disabled
+                              >
+                                <ShieldAlert size={13} /> Founding Admin
+                              </Button>
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="left" className="text-xs max-w-[200px] text-center">
+                            This is the original admin and cannot have their access removed.
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className={`shrink-0 text-xs gap-1.5 h-8 ${
+                          (profile.roles || []).includes("admin")
+                            ? "text-amber-500 hover:text-amber-600 hover:bg-amber-500/10"
+                            : "text-muted-foreground hover:text-primary hover:bg-primary/10"
+                        }`}
+                        onClick={() =>
+                          setConfirmRole({
+                            id: profile.id,
+                            name: profile.full_name || profile.email,
+                            grant: !(profile.roles || []).includes("admin"),
+                          })
+                        }
+                      >
+                        {(profile.roles || []).includes("admin") ? (
+                          <><ShieldMinus size={13} /> Remove Admin</>
+                        ) : (
+                          <><ShieldPlus size={13} /> Make Admin</>
+                        )}
+                      </Button>
+                    )
                   )}
 
                   {/* Block / Unblock button — don't show for admins */}

@@ -32,10 +32,16 @@ router.get("/users", requireAdmin, async (_req, res) => {
     const { rows: users } = await pool.query(
       "SELECT id, email, full_name, bio, avatar_url, created_at, is_blocked FROM users ORDER BY created_at DESC"
     );
-    const { rows: roles } = await pool.query("SELECT user_id, role FROM user_roles");
+    const { rows: roles } = await pool.query("SELECT user_id, role FROM user_roles ORDER BY created_at ASC");
+
+    // The founding admin is the user who received the admin role first
+    const firstAdminRow = roles.find((r) => r.role === "admin");
+    const foundingAdminId = firstAdminRow?.user_id ?? null;
+
     const usersWithRoles = users.map((u) => ({
       ...u,
       roles: roles.filter((r) => r.user_id === u.id).map((r) => r.role),
+      is_founding_admin: u.id === foundingAdminId,
     }));
     return res.json(usersWithRoles);
   } catch (err) {
@@ -59,6 +65,15 @@ router.patch("/users/:id/role", requireAdmin, async (req, res) => {
   if (!role) return res.status(400).json({ error: "role required" });
   try {
     if (grant === false) {
+      // Guard: never allow removal of the founding admin's admin role
+      if (role === "admin") {
+        const { rows: firstAdmin } = await pool.query(
+          "SELECT user_id FROM user_roles WHERE role = 'admin' ORDER BY created_at ASC LIMIT 1"
+        );
+        if (firstAdmin[0]?.user_id === req.params.id) {
+          return res.status(403).json({ error: "The founding admin's access cannot be removed." });
+        }
+      }
       await pool.query("DELETE FROM user_roles WHERE user_id = $1 AND role = $2", [req.params.id, role]);
     } else {
       const { rowCount } = await pool.query(
