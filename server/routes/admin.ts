@@ -173,6 +173,21 @@ router.post("/courses", requireAdmin, async (req, res) => {
   }
 });
 
+router.patch("/courses/:id/lock", requireAdmin, async (req, res) => {
+  const { is_locked } = req.body;
+  if (typeof is_locked !== "boolean") return res.status(400).json({ error: "is_locked (boolean) required" });
+  try {
+    const { rows } = await pool.query(
+      "UPDATE courses SET is_locked = $1, updated_at = now() WHERE id = $2 RETURNING *",
+      [is_locked, req.params.id]
+    );
+    if (rows.length === 0) return res.status(404).json({ error: "Course not found" });
+    return res.json(rows[0]);
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || "Failed to update course lock status" });
+  }
+});
+
 router.patch("/courses/:id", requireAdmin, async (req, res) => {
   try {
     const { rows: current } = await pool.query("SELECT * FROM courses WHERE id = $1", [req.params.id]);
