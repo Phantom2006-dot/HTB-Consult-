@@ -100,10 +100,10 @@ router.patch("/users/:id/role", requireAdmin, async (req, res) => {
             [req.params.id, title, body, role === "admin" ? "/admin" : "/dashboard"]
           );
 
-          // Inbox email
+          // Inbox email (sender_id is null for system-generated notifications)
           await pool.query(
-            `INSERT INTO emails (user_id, recipient_id, subject, body, folder, is_read, is_draft)
-             VALUES ($1, $1, $2, $3, 'inbox', false, false)`,
+            `INSERT INTO emails (user_id, sender_id, recipient_id, subject, body, folder, is_read, is_draft)
+             VALUES ($1, NULL, $1, $2, $3, 'inbox', false, false)`,
             [req.params.id, title, body]
           );
         }
