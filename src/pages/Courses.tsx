@@ -169,7 +169,7 @@ const Courses = () => {
               ))
             ) : (
               filtered.map((course, i) => {
-                const isLocked = !!(course as any).is_locked;
+                const isLocked = !!course.is_locked;
                 return (
                   <motion.div key={course.id} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i % 6} variants={fadeUp}>
                     <Card className={`bg-card border-border transition-all duration-300 h-full flex flex-col ${isLocked ? "opacity-80" : "hover:border-primary/40 hover:shadow-gold"}`}>

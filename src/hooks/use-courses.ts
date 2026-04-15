@@ -16,6 +16,7 @@ export interface Course {
   live_class_url: string | null;
   course_type: string;
   published: boolean;
+  is_locked: boolean;
   created_at: string;
 }
 

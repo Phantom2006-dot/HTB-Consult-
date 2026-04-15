@@ -97,8 +97,8 @@ const AdminCourses = () => {
     mutationFn: ({ id, published }: { id: string; published: boolean }) =>
       api.patch(`/api/admin/courses/${id}`, { published }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["admin-courses"] });
-      qc.invalidateQueries({ queryKey: ["courses"] });
+      qc.refetchQueries({ queryKey: ["admin-courses"] });
+      qc.refetchQueries({ queryKey: ["courses"] });
     },
   });
 
@@ -106,8 +106,8 @@ const AdminCourses = () => {
     mutationFn: ({ id, is_locked }: { id: string; is_locked: boolean }) =>
       api.patch(`/api/admin/courses/${id}/lock`, { is_locked }),
     onSuccess: (_data, { is_locked }) => {
-      qc.invalidateQueries({ queryKey: ["admin-courses"] });
-      qc.invalidateQueries({ queryKey: ["courses"] });
+      qc.refetchQueries({ queryKey: ["admin-courses"] });
+      qc.refetchQueries({ queryKey: ["courses"] });
       toast({ title: is_locked ? "Course locked" : "Course unlocked", description: is_locked ? "Students will see a locked notice." : "Students can access this course again." });
     },
     onError: () => toast({ title: "Error", description: "Failed to update lock status.", variant: "destructive" }),
