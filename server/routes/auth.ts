@@ -163,6 +163,9 @@ router.post("/resend-verification", async (req, res) => {
   }
 });
 
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCKOUT_MINUTES = 15;
+
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: "Email and password required" });
@@ -176,15 +179,46 @@ router.post("/login", async (req, res) => {
     }
 
     const user = userRows[0];
-    const valid = await bcrypt.compare(password, user.password_hash);
-    if (!valid) {
-      logger.warn("Login failed: wrong password", { email: email.toLowerCase() });
-      return res.status(401).json({ error: "Invalid email or password" });
+
+    // Account lockout check
+    if (user.locked_until && new Date(user.locked_until) > new Date()) {
+      const minutesLeft = Math.ceil((new Date(user.locked_until).getTime() - Date.now()) / 60000);
+      logger.warn("Login blocked: account locked", { email: user.email, minutesLeft });
+      return res.status(429).json({
+        error: `Too many failed attempts. Account is locked for ${minutesLeft} more minute${minutesLeft !== 1 ? "s" : ""}. Please try again later.`,
+      });
     }
+
     if (user.is_blocked) {
       logger.warn("Login blocked: account suspended", { email: email.toLowerCase() });
       return res.status(403).json({ error: "Your account has been suspended. Please contact support." });
     }
+
+    const valid = await bcrypt.compare(password, user.password_hash);
+    if (!valid) {
+      const newAttempts = (user.failed_login_attempts || 0) + 1;
+      const shouldLock = newAttempts >= MAX_FAILED_ATTEMPTS;
+      const lockedUntil = shouldLock ? new Date(Date.now() + LOCKOUT_MINUTES * 60 * 1000) : null;
+
+      await pool.query(
+        "UPDATE users SET failed_login_attempts = $1, locked_until = $2 WHERE id = $3",
+        [newAttempts, lockedUntil, user.id]
+      );
+
+      logger.warn("Login failed: wrong password", { email: user.email, attempts: newAttempts, locked: shouldLock });
+
+      if (shouldLock) {
+        return res.status(429).json({
+          error: `Too many failed attempts. Your account has been locked for ${LOCKOUT_MINUTES} minutes.`,
+        });
+      }
+
+      const remaining = MAX_FAILED_ATTEMPTS - newAttempts;
+      return res.status(401).json({
+        error: `Invalid email or password. ${remaining} attempt${remaining !== 1 ? "s" : ""} remaining before lockout.`,
+      });
+    }
+
     if (!user.email_verified) {
       logger.warn("Login blocked: email not verified", { email: email.toLowerCase() });
       return res.status(403).json({
@@ -193,6 +227,12 @@ router.post("/login", async (req, res) => {
         email: user.email,
       });
     }
+
+    // Successful login — reset lockout counters
+    await pool.query(
+      "UPDATE users SET failed_login_attempts = 0, locked_until = NULL WHERE id = $1",
+      [user.id]
+    );
 
     const { rows: roleRows } = await pool.query(
       "SELECT role FROM user_roles WHERE user_id = $1 ORDER BY CASE role WHEN 'admin' THEN 0 WHEN 'instructor' THEN 1 WHEN 'mentor' THEN 2 ELSE 3 END LIMIT 1",

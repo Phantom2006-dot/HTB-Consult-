@@ -1,6 +1,8 @@
 import "dotenv/config";
 import express, { type Request, type Response, type NextFunction } from "express";
 import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -56,12 +58,40 @@ pool.connect()
     logger.error("Database: startup error", { error: err.message });
   });
 
+// ── Security headers ──────────────────────────────────────────────────────────
+app.use(helmet({
+  crossOriginEmbedderPolicy: false,
+  contentSecurityPolicy: false,
+}));
+
 // ── CORS ─────────────────────────────────────────────────────────────────────
 app.use(cors({
   origin: (_origin, callback) => callback(null, true),
   credentials: true,
 }));
 app.use(express.json({ limit: "10mb" }));
+
+// ── Rate limiters ─────────────────────────────────────────────────────────────
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests from this IP. Please wait 15 minutes and try again." },
+  skip: (req) => process.env.NODE_ENV === "development",
+});
+
+const globalLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests. Please slow down." },
+  skip: (req) => process.env.NODE_ENV === "development",
+});
+
+app.use("/api/auth", authLimiter);
+app.use("/api", globalLimiter);
 
 // ── Request logger ────────────────────────────────────────────────────────────
 app.use((req: Request, res: Response, next: NextFunction) => {
