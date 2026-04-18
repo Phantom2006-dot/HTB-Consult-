@@ -49,6 +49,23 @@ router.get("/users", requireAdmin, async (_req, res) => {
   }
 });
 
+router.delete("/users/:id", requireAdmin, async (req, res) => {
+  try {
+    // Guard: never allow deletion of the founding admin
+    const { rows: firstAdmin } = await pool.query(
+      "SELECT user_id FROM user_roles WHERE role = 'admin' ORDER BY created_at ASC LIMIT 1"
+    );
+    if (firstAdmin[0]?.user_id === req.params.id) {
+      return res.status(403).json({ error: "The founding admin account cannot be deleted." });
+    }
+    const { rowCount } = await pool.query("DELETE FROM users WHERE id = $1", [req.params.id]);
+    if (!rowCount) return res.status(404).json({ error: "User not found." });
+    return res.json({ success: true });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to delete user." });
+  }
+});
+
 router.patch("/users/:id/block", requireAdmin, async (req, res) => {
   const { blocked } = req.body;
   if (typeof blocked !== "boolean") return res.status(400).json({ error: "blocked (boolean) required" });

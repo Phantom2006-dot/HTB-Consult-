@@ -16,7 +16,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Search, ShieldOff, ShieldCheck, ShieldPlus, ShieldMinus, ShieldAlert, MailCheck, MailX } from "lucide-react";
+import { Search, ShieldOff, ShieldCheck, ShieldPlus, ShieldMinus, ShieldAlert, MailCheck, MailX, Trash2 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const AdminUsers = () => {
@@ -26,6 +26,7 @@ const AdminUsers = () => {
   const [search, setSearch] = useState("");
   const [confirmUser, setConfirmUser] = useState<{ id: string; name: string; blocked: boolean } | null>(null);
   const [confirmRole, setConfirmRole] = useState<{ id: string; name: string; grant: boolean } | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ id: string; name: string } | null>(null);
 
   const { data: profiles, isLoading } = useQuery({
     queryKey: ["admin-profiles"],
@@ -67,6 +68,19 @@ const AdminUsers = () => {
     onError: (err: any) => {
       toast({ title: "Action failed", description: err.message, variant: "destructive" });
       setConfirmRole(null);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => api.delete(`/api/admin/users/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-profiles"] });
+      toast({ title: "Account deleted", description: "The user and all their data have been permanently removed." });
+      setConfirmDelete(null);
+    },
+    onError: (err: any) => {
+      toast({ title: "Delete failed", description: err.message, variant: "destructive" });
+      setConfirmDelete(null);
     },
   });
 
@@ -243,6 +257,20 @@ const AdminUsers = () => {
                       )}
                     </Button>
                   )}
+
+                  {/* Delete — don't show for self or founding admin */}
+                  {profile.id !== currentUser?.id && !profile.is_founding_admin && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="shrink-0 text-xs gap-1.5 h-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      onClick={() =>
+                        setConfirmDelete({ id: profile.id, name: profile.full_name || profile.email })
+                      }
+                    >
+                      <Trash2 size={13} /> Delete
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ))
@@ -273,6 +301,28 @@ const AdminUsers = () => {
               {roleMutation.isPending
                 ? "Updating…"
                 : confirmRole?.grant ? "Yes, Grant Admin" : "Yes, Remove Admin"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Confirm delete dialog */}
+      <AlertDialog open={!!confirmDelete} onOpenChange={(o) => { if (!o) setConfirmDelete(null); }}>
+        <AlertDialogContent className="bg-card border-border">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-serif">Delete account permanently?</AlertDialogTitle>
+            <AlertDialogDescription className="text-muted-foreground">
+              This will permanently delete <strong>"{confirmDelete?.name}"</strong> and all their data — enrollments, messages, certificates, and bookings. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-border">Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive hover:bg-destructive/90"
+              onClick={() => confirmDelete && deleteMutation.mutate(confirmDelete.id)}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? "Deleting…" : "Yes, Delete Account"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
