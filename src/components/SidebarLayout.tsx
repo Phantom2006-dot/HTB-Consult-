@@ -26,7 +26,7 @@ const sidebarLinks = [
   { icon: BookOpen, label: "Courses", path: "/courses" },
   { icon: GraduationCap, label: "My Learning", path: "/my-learning" },
   { icon: Bookmark, label: "Saved", path: "/saved" },
-  { icon: Users, label: "Mentors", path: "/mentors" },
+  { icon: Users, label: "Book a Mentor", path: "/mentors" },
   { icon: Newspaper, label: "Blog", path: "/blog" },
 ];
 

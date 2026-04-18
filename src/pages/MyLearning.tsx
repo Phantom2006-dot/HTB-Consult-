@@ -13,6 +13,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { fadeUp } from "@/lib/animations";
 import SidebarLayout from "@/components/SidebarLayout";
 import { useEnrollments, useUpdateProgress } from "@/hooks/use-enrollments";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 import { toast } from "sonner";
 
 const MyLearning = () => {
@@ -20,6 +22,12 @@ const MyLearning = () => {
   const navigate = useNavigate();
   const { data: enrollments, isLoading } = useEnrollments();
   const { mutate: updateProgress, isPending: isUpdating } = useUpdateProgress();
+
+  const { data: certificates = [] } = useQuery<{ course_id: string; verification_code: string; issued_at: string; course_title: string }[]>({
+    queryKey: ["my-certificates"],
+    queryFn: () => api.get("/api/certificates/my"),
+    enabled: !!user,
+  });
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth");
@@ -41,11 +49,12 @@ const MyLearning = () => {
   const inProgress = allEnrollments.filter((e: any) => !e.completed);
   const completed = allEnrollments.filter((e: any) => e.completed);
 
+  const certByCourseId = new Map(certificates.map((c) => [c.course_id, c]));
+
   const stats = [
     { icon: BookOpen, label: "Enrolled", value: String(allEnrollments.length) },
     { icon: CheckCircle2, label: "Completed", value: String(completed.length) },
     { icon: Clock, label: "In Progress", value: String(inProgress.length) },
-    { icon: Trophy, label: "Certificates", value: String(completed.length) },
   ];
 
   const handleProgress = (courseId: string, progress: number, label: string) => {
@@ -67,7 +76,7 @@ const MyLearning = () => {
         </motion.div>
 
         {/* Stats */}
-        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={1} className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={1} className="grid grid-cols-3 gap-3">
           {stats.map((s) => (
             <Card key={s.label} className="border-border bg-card">
               <CardContent className="p-4 flex items-center gap-3">
@@ -169,6 +178,7 @@ const MyLearning = () => {
                 completed.map((enrollment: any) => {
                   const course = enrollment.courses;
                   if (!course) return null;
+                  const cert = certByCourseId.get(course.id);
                   return (
                     <Card key={enrollment.id} className="border-border bg-card">
                       <CardContent className="p-4 flex flex-col sm:flex-row items-center gap-4">
@@ -177,12 +187,26 @@ const MyLearning = () => {
                         </div>
                         <div className="flex-1 min-w-0 space-y-1">
                           <h3 className="font-semibold text-sm text-foreground">{course.title}</h3>
-                          <p className="text-[11px] text-muted-foreground">Completed {new Date(enrollment.completed_at).toLocaleDateString()}</p>
+                          <p className="text-[11px] text-muted-foreground">
+                            Completed {new Date(enrollment.completed_at).toLocaleDateString()}
+                          </p>
+                          {cert && (
+                            <p className="text-[11px] text-green-600 font-medium flex items-center gap-1">
+                              <Award size={11} /> Certificate issued {new Date(cert.issued_at).toLocaleDateString()}
+                            </p>
+                          )}
+                          {!cert && (
+                            <p className="text-[11px] text-muted-foreground italic">
+                              Certificate pending admin approval
+                            </p>
+                          )}
                         </div>
                         <div className="flex flex-col gap-2 shrink-0">
-                          <Button size="sm" variant="outline" className="gap-1.5 text-xs">
-                            <Award size={12} /> View Certificate
-                          </Button>
+                          {cert && (
+                            <Button size="sm" variant="outline" className="gap-1.5 text-xs">
+                              <Award size={12} /> View Certificate
+                            </Button>
+                          )}
                           <button
                             onClick={() => handleProgress(course.id, 50, "50% (Halfway)")}
                             disabled={isUpdating}
