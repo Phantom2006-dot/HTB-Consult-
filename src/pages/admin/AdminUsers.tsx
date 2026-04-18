@@ -16,7 +16,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Search, ShieldOff, ShieldCheck, ShieldPlus, ShieldMinus, ShieldAlert } from "lucide-react";
+import { Search, ShieldOff, ShieldCheck, ShieldPlus, ShieldMinus, ShieldAlert, MailCheck, MailX } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const AdminUsers = () => {
@@ -133,7 +133,30 @@ const AdminUsers = () => {
                         <Badge variant="destructive" className="text-[10px] px-1.5 py-0">Blocked</Badge>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">{profile.email}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <p className="text-xs text-muted-foreground">{profile.email}</p>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full border ${
+                              profile.email_verified
+                                ? "border-green-500/30 bg-green-500/10 text-green-500"
+                                : "border-amber-500/30 bg-amber-500/10 text-amber-500"
+                            }`}>
+                              {profile.email_verified
+                                ? <><MailCheck size={10} /> Verified</>
+                                : <><MailX size={10} /> Unverified</>
+                              }
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent side="top" className="text-xs">
+                            {profile.email_verified
+                              ? "Email address has been verified"
+                              : "User has not yet verified their email"}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
                   </div>
 
                   {/* Roles */}

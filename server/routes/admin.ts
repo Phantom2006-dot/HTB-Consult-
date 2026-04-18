@@ -30,7 +30,7 @@ router.get("/stats", requireAdmin, async (_req, res) => {
 router.get("/users", requireAdmin, async (_req, res) => {
   try {
     const { rows: users } = await pool.query(
-      "SELECT id, email, full_name, bio, avatar_url, created_at, is_blocked FROM users ORDER BY created_at DESC"
+      "SELECT id, email, full_name, bio, avatar_url, created_at, is_blocked, email_verified FROM users ORDER BY created_at DESC"
     );
     const { rows: roles } = await pool.query("SELECT user_id, role FROM user_roles ORDER BY created_at ASC");
 
