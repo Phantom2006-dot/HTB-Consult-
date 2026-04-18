@@ -19,8 +19,7 @@ async function sendVerificationEmail(userId: string, email: string, fullName: st
     [userId, rawToken, expiresAt]
   );
 
-  const frontendUrl = (process.env.FRONTEND_URL || "").replace(/\/$/, "");
-  const verifyUrl = `${frontendUrl}/verify-email?token=${rawToken}`;
+  const verifyUrl = `https://academy.htbconsults.com/verify-email?token=${rawToken}`;
 
   await sendEmail({
     to: email,
