@@ -8,20 +8,6 @@ import { logger } from "../lib/logger.js";
 
 const router = Router();
 
-async function ensureResetTable() {
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS password_reset_tokens (
-      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-      user_id     UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      token       TEXT NOT NULL UNIQUE,
-      expires_at  TIMESTAMPTZ NOT NULL,
-      used        BOOLEAN NOT NULL DEFAULT false,
-      created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
-    )
-  `);
-}
-ensureResetTable().catch(console.error);
-
 router.post("/register", async (req, res) => {
   const { email, password, full_name, role: requestedRole } = req.body;
   if (!email || !password) return res.status(400).json({ error: "Email and password required" });

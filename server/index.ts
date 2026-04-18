@@ -6,6 +6,7 @@ import { fileURLToPath } from "url";
 
 import { logger } from "./lib/logger.js";
 import { pool, runMigrations } from "./db.js";
+import { initSchema } from "./schema.js";
 import authRoutes from "./routes/auth.js";
 import coursesRoutes from "./routes/courses.js";
 import mentorsRoutes from "./routes/mentors.js";
@@ -46,9 +47,10 @@ pool.connect()
   .then(client => {
     logger.info("Database: connected successfully");
     client.release();
-    return runMigrations();
+    return initSchema();
   })
-  .then(() => logger.info("Database: migrations applied"))
+  .then(() => runMigrations())
+  .then(() => logger.info("Database: schema and migrations applied"))
   .catch(err => {
     logger.error("Database: startup error", { error: err.message });
   });

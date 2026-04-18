@@ -57,7 +57,7 @@ Optional (for AI chat and email):
 
 ## Database
 
-Schema is defined in `schema.sql`. Applied to Replit's built-in PostgreSQL.
+Schema is defined in `server/schema.ts` and auto-applied on server startup via `initSchema()`. Uses Replit's built-in PostgreSQL (connection via `DATABASE_URL`).
 
 Tables: `users`, `user_roles`, `categories`, `courses`, `modules`, `lessons`, `enrollments`, `bookmarks`, `mentors`, `availability_slots`, `bookings`, `chat_conversations`, `chat_messages`, `emails`, `certificates`, `articles`, `article_reads`
 

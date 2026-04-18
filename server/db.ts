@@ -48,20 +48,6 @@ export async function runMigrations() {
       ALTER TABLE courses ADD COLUMN IF NOT EXISTS is_locked BOOLEAN DEFAULT false;
     `);
 
-    // Persistent in-app notifications table
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS user_notifications (
-        id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        type       TEXT NOT NULL DEFAULT 'info',
-        title      TEXT NOT NULL,
-        body       TEXT NOT NULL DEFAULT '',
-        link       TEXT,
-        is_read    BOOLEAN DEFAULT false,
-        created_at TIMESTAMPTZ DEFAULT now()
-      );
-      CREATE INDEX IF NOT EXISTS idx_user_notifs_user ON user_notifications(user_id, created_at DESC);
-    `);
   } finally {
     client.release();
   }
