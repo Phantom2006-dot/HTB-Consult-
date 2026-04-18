@@ -293,7 +293,15 @@ const Dashboard = () => {
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
-              {(categoriesData || []).filter((c: any) => c.name !== "General").map((cat: any) => {
+              {(categoriesData || []).filter((c: any) => c.name !== "General").sort((a: any, b: any) => {
+                const priority = ["Business Analysis", "Business Strategy"];
+                const ai = priority.indexOf(a.name);
+                const bi = priority.indexOf(b.name);
+                if (ai !== -1 && bi !== -1) return ai - bi;
+                if (ai !== -1) return -1;
+                if (bi !== -1) return 1;
+                return 0;
+              }).map((cat: any) => {
                 const Icon = CATEGORY_ICONS[cat.name] || FolderOpen;
                 return (
                   <Link key={cat.id} to={`/courses?category=${encodeURIComponent(cat.name)}`}>
