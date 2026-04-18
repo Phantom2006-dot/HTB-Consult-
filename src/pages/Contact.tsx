@@ -107,7 +107,7 @@ const Contact = () => {
               <motion.h2 variants={fadeUp} custom={0} className="text-2xl font-serif font-bold text-foreground mb-6">Contact Information</motion.h2>
               {[
                 { icon: Mail, label: "Email", value: "info@htbconsults.com" },
-                { icon: Phone, label: "Phone", value: "+44 (0) 123 456 7890" },
+                { icon: Phone, label: "Phone", value: "+44 7862 056300" },
                 { icon: MapPin, label: "Address", value: "London, United Kingdom" },
               ].map((item, i) => (
                 <motion.div key={item.label} variants={fadeUp} custom={i + 1}>
