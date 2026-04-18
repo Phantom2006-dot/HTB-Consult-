@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { ArrowLeft, Clock, User, CheckCircle2, Newspaper } from "lucide-react";
+import { ArrowLeft, Clock, User, CheckCircle2, Newspaper, Link2, Twitter, Linkedin, MessageCircle, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/api";
@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { fadeUp } from "@/lib/animations";
 import SidebarLayout from "@/components/SidebarLayout";
 import ReactMarkdown from "react-markdown";
+import { toast } from "sonner";
 
 interface Article {
   id: string;
@@ -28,6 +29,64 @@ interface Article {
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function ShareBar({ title, url }: { title: string; url: string }) {
+  const [copied, setCopied] = useState(false);
+  const encoded = encodeURIComponent(url);
+  const encodedTitle = encodeURIComponent(title);
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      toast.success("Link copied to clipboard!");
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error("Could not copy link");
+    }
+  };
+
+  const btnClass =
+    "flex items-center justify-center w-8 h-8 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:border-primary/50 hover:bg-primary/5 transition-all duration-150";
+
+  return (
+    <div className="flex items-center gap-2 flex-wrap">
+      <span className="text-xs text-muted-foreground font-medium flex items-center gap-1">
+        <Share2 size={12} /> Share:
+      </span>
+      <button onClick={copyLink} className={`${btnClass} ${copied ? "border-green-500 text-green-500" : ""}`} title="Copy link">
+        {copied ? <CheckCircle2 size={14} /> : <Link2 size={14} />}
+      </button>
+      <a
+        href={`https://twitter.com/intent/tweet?url=${encoded}&text=${encodedTitle}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={btnClass}
+        title="Share on X (Twitter)"
+      >
+        <Twitter size={14} />
+      </a>
+      <a
+        href={`https://www.linkedin.com/sharing/share-offsite/?url=${encoded}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={btnClass}
+        title="Share on LinkedIn"
+      >
+        <Linkedin size={14} />
+      </a>
+      <a
+        href={`https://wa.me/?text=${encodedTitle}%20${encoded}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={btnClass}
+        title="Share on WhatsApp"
+      >
+        <MessageCircle size={14} />
+      </a>
+    </div>
+  );
 }
 
 const ArticleReader = () => {
@@ -102,6 +161,7 @@ const ArticleReader = () => {
   }
 
   const alreadyRead = readStatus?.read || readRecorded;
+  const articleUrl = `${window.location.origin}/blog/${article.slug}`;
 
   return (
     <SidebarLayout>
@@ -147,20 +207,23 @@ const ArticleReader = () => {
             <p className="text-base text-muted-foreground italic border-l-2 border-primary/40 pl-4 mb-6 leading-relaxed">{article.excerpt}</p>
           )}
 
-          <div className="flex items-center gap-3 mb-8 pb-6 border-b border-border">
-            {article.author_avatar ? (
-              <img src={article.author_avatar} alt={article.author_name || ""} className="w-10 h-10 rounded-full object-cover" />
-            ) : (
-              <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                <User size={16} className="text-muted-foreground" />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 pb-6 border-b border-border">
+            <div className="flex items-center gap-3">
+              {article.author_avatar ? (
+                <img src={article.author_avatar} alt={article.author_name || ""} className="w-10 h-10 rounded-full object-cover" />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                  <User size={16} className="text-muted-foreground" />
+                </div>
+              )}
+              <div>
+                <p className="text-sm font-medium text-foreground">{article.author_name || "HTB Team"}</p>
+                <p className="text-xs text-muted-foreground capitalize">
+                  {article.author_role === "admin" ? "HTB Consult Team" : "Mentor"}
+                </p>
               </div>
-            )}
-            <div>
-              <p className="text-sm font-medium text-foreground">{article.author_name || "HTB Team"}</p>
-              <p className="text-xs text-muted-foreground capitalize">
-                {article.author_role === "admin" ? "HTB Consult Team" : "Mentor"}
-              </p>
             </div>
+            <ShareBar title={article.title} url={articleUrl} />
           </div>
 
           <div className="prose prose-invert prose-sm max-w-none
@@ -184,8 +247,14 @@ const ArticleReader = () => {
 
           <div id="article-end" className="h-4 mt-8" />
 
+          {/* Bottom share bar */}
+          <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <p className="text-sm font-medium text-foreground">Found this helpful? Share it!</p>
+            <ShareBar title={article.title} url={articleUrl} />
+          </div>
+
           {article.author_bio && (
-            <div className="mt-10 pt-6 border-t border-border">
+            <div className="mt-8 pt-6 border-t border-border">
               <div className="flex items-center gap-3 mb-3">
                 {article.author_avatar ? (
                   <img src={article.author_avatar} alt={article.author_name || ""} className="w-10 h-10 rounded-full object-cover" />
