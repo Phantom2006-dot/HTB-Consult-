@@ -75,7 +75,7 @@ const Index = () => {
   return (
     <Layout>
       {/* ── Hero ── */}
-      <section className="relative overflow-hidden min-h-[92vh] flex items-center">
+      <section className="relative overflow-hidden min-h-[92vh] flex items-center -mt-[72px] pt-[72px]">
         {/* Background */}
         <div className="absolute inset-0 bg-gradient-green" />
         <div
