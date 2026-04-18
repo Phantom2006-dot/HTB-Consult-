@@ -130,18 +130,45 @@ router.get("/", requireAuth, async (req: AuthRequest, res) => {
   }
 });
 
+// ── Mark all notifications as seen ────────────────────────────────────────────
+router.post("/mark-seen", requireAuth, async (req: AuthRequest, res) => {
+  try {
+    await pool.query(
+      `UPDATE users SET last_notifications_viewed_at = now() WHERE id = $1`,
+      [req.user!.id]
+    );
+    // Also mark persistent user_notifications as read
+    await pool.query(
+      `UPDATE user_notifications SET is_read = true WHERE user_id = $1 AND is_read = false`,
+      [req.user!.id]
+    );
+    return res.json({ ok: true });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || "Failed to mark seen" });
+  }
+});
+
 // ── Unread counts for badge indicators ────────────────────────────────────────
 router.get("/unread-count", requireAuth, async (req: AuthRequest, res) => {
   const userId = req.user!.id;
   try {
-    const [emailsResult, messagesResult, notificationsResult, systemNotifsResult] = await Promise.all([
+    // Fetch the user's last_notifications_viewed_at once
+    const userRow = await pool.query(
+      `SELECT last_notifications_viewed_at FROM users WHERE id = $1`,
+      [userId]
+    );
+    const lastViewed: Date | null = userRow.rows[0]?.last_notifications_viewed_at ?? null;
+    // If never viewed, use 30 days ago as baseline so we don't flood with ancient items
+    const since = lastViewed ?? new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+    const [emailsResult, messagesResult, enrollResult, bookingResult, articleResult, systemNotifsResult] = await Promise.all([
       // Unread inbox emails
       pool.query(
         `SELECT COUNT(*) FROM emails
          WHERE user_id = $1 AND is_read = false AND folder = 'inbox' AND is_draft = false`,
         [userId]
       ),
-      // User-to-user conversations updated since the user's last_seen_at
+      // Unread user-to-user messages
       pool.query(
         `SELECT COUNT(*) FROM chat_conversations cc
          WHERE cc.user_id = $1
@@ -156,15 +183,25 @@ router.get("/unread-count", requireAuth, async (req: AuthRequest, res) => {
            )`,
         [userId]
       ),
-      // Pending bookings (awaiting confirmation) in the last 30 days
+      // New enrollments since last viewed
+      pool.query(
+        `SELECT COUNT(*) FROM enrollments
+         WHERE user_id = $1 AND enrolled_at > $2`,
+        [userId, since]
+      ),
+      // New bookings since last viewed
       pool.query(
         `SELECT COUNT(*) FROM bookings
-         WHERE student_id = $1
-           AND status = 'pending'
-           AND created_at > now() - interval '30 days'`,
-        [userId]
+         WHERE student_id = $1 AND created_at > $2`,
+        [userId, since]
       ),
-      // Unread persistent notifications (role grants etc.)
+      // New published articles since last viewed
+      pool.query(
+        `SELECT COUNT(*) FROM articles
+         WHERE published = true AND created_at > $1`,
+        [since]
+      ),
+      // Unread persistent system notifications
       pool.query(
         `SELECT COUNT(*) FROM user_notifications
          WHERE user_id = $1 AND is_read = false`,
@@ -172,10 +209,16 @@ router.get("/unread-count", requireAuth, async (req: AuthRequest, res) => {
       ),
     ]);
 
+    const notifCount =
+      parseInt(enrollResult.rows[0].count, 10) +
+      parseInt(bookingResult.rows[0].count, 10) +
+      parseInt(articleResult.rows[0].count, 10) +
+      parseInt(systemNotifsResult.rows[0].count, 10);
+
     return res.json({
       emails: parseInt(emailsResult.rows[0].count, 10),
       messages: parseInt(messagesResult.rows[0].count, 10),
-      notifications: parseInt(notificationsResult.rows[0].count, 10) + parseInt(systemNotifsResult.rows[0].count, 10),
+      notifications: notifCount,
     });
   } catch (err: any) {
     return res.status(500).json({ error: err.message || "Failed to fetch unread counts" });

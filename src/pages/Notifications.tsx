@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fadeUp } from "@/lib/animations";
 import SidebarLayout from "@/components/SidebarLayout";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
@@ -32,10 +32,19 @@ function timeAgo(dateStr: string) {
 const Notifications = () => {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth");
   }, [user, loading, navigate]);
+
+  // Mark all as seen when the page is opened
+  useEffect(() => {
+    if (!user) return;
+    api.post("/api/notifications/mark-seen").then(() => {
+      queryClient.invalidateQueries({ queryKey: ["unread-counts"] });
+    }).catch(() => {});
+  }, [user, queryClient]);
 
   const { data: notifications, isLoading } = useQuery({
     queryKey: ["notifications"],

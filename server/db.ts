@@ -48,6 +48,11 @@ export async function runMigrations() {
       ALTER TABLE courses ADD COLUMN IF NOT EXISTS is_locked BOOLEAN DEFAULT false;
     `);
 
+    // Notification read-tracking
+    await client.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS last_notifications_viewed_at TIMESTAMPTZ;
+    `);
+
     // Email verification — mark existing users as already verified so they aren't locked out
     await client.query(`
       ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT false;
