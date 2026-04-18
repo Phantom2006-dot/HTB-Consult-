@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft, Mail, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,12 +26,16 @@ const Auth = () => {
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "", confirm: "" });
   const [forgotEmail, setForgotEmail] = useState("");
+  const [verificationSent, setVerificationSent] = useState(false);
+  const [verificationEmail, setVerificationEmail] = useState("");
 
   useEffect(() => {
     if (!authLoading && user) {
       navigate("/dashboard");
     }
   }, [user, authLoading, navigate]);
+
+  const [unverifiedEmail, setUnverifiedEmail] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,6 +44,7 @@ const Auth = () => {
       return;
     }
     setLoading(true);
+    setUnverifiedEmail("");
     try {
       const result = await api.post<{ token: string; user: any }>("/api/auth/login", {
         email: loginData.email,
@@ -50,7 +55,11 @@ const Auth = () => {
       toast({ title: "Welcome back!" });
       navigate(loginMode === "mentor" ? "/mentor-dashboard" : "/dashboard");
     } catch (err: any) {
-      toast({ title: "Login failed", description: err.message, variant: "destructive" });
+      if (err.message?.toLowerCase().includes("verify your email")) {
+        setUnverifiedEmail(loginData.email);
+      } else {
+        toast({ title: "Login failed", description: err.message, variant: "destructive" });
+      }
     } finally {
       setLoading(false);
     }
@@ -72,21 +81,14 @@ const Auth = () => {
     }
     setLoading(true);
     try {
-      const result = await api.post<{ token: string; user: any }>("/api/auth/register", {
+      await api.post<{ requiresVerification: boolean; message: string }>("/api/auth/register", {
         email: signupData.email,
         password: signupData.password,
         full_name: signupData.name,
         role: signupRole,
       });
-      setToken(result.token);
-      setUser(result.user);
-      toast({
-        title: "Account created!",
-        description: signupRole === "mentor"
-          ? "Welcome! Complete your mentor profile to get started."
-          : "Welcome to HTB Consult Academy.",
-      });
-      navigate(signupRole === "mentor" ? "/mentor-dashboard" : "/dashboard");
+      setVerificationEmail(signupData.email);
+      setVerificationSent(true);
     } catch (err: any) {
       toast({ title: "Sign up failed", description: err.message, variant: "destructive" });
     } finally {
@@ -162,6 +164,21 @@ const Auth = () => {
                   <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Welcome Back</h2>
                   <p className="text-sm text-muted-foreground mb-4">Sign in to access your account.</p>
 
+                  {unverifiedEmail && (
+                    <div className="bg-primary/10 border border-primary/30 rounded-lg px-4 py-3 text-sm">
+                      <p className="text-foreground font-medium mb-1">Email not verified</p>
+                      <p className="text-muted-foreground text-xs mb-2">
+                        Please verify <strong>{unverifiedEmail}</strong> before logging in.
+                      </p>
+                      <Link
+                        to={`/verify-email`}
+                        className="inline-flex items-center gap-1.5 text-xs text-primary font-medium hover:underline"
+                      >
+                        <RefreshCw size={12} /> Resend verification email
+                      </Link>
+                    </div>
+                  )}
+
                   {/* Student / Mentor toggle */}
                   <div className="flex rounded-lg bg-muted p-1 mb-2">
                     <button
@@ -216,7 +233,29 @@ const Auth = () => {
                 </form>
               )}
 
-              {tab === "signup" && (
+              {tab === "signup" && verificationSent && (
+                <div className="text-center py-4">
+                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                    <Mail className="text-primary" size={28} />
+                  </div>
+                  <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Check Your Email</h2>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    We've sent a verification link to <strong className="text-foreground">{verificationEmail}</strong>.
+                  </p>
+                  <p className="text-xs text-muted-foreground mb-6">
+                    Click the link in the email to activate your account. It expires in 24 hours. Check your spam folder if you don't see it.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => { setVerificationSent(false); setTab("login"); }}
+                    className="text-xs text-primary hover:underline"
+                  >
+                    Back to Login
+                  </button>
+                </div>
+              )}
+
+              {tab === "signup" && !verificationSent && (
                 <form onSubmit={handleSignup} className="space-y-4">
                   <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Create Account</h2>
                   <p className="text-sm text-muted-foreground mb-4">Join HTB Consults and start your learning journey.</p>

@@ -8,16 +8,25 @@ export async function initSchema() {
 
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
-        id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        email         TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL,
-        full_name     TEXT,
-        avatar_url    TEXT,
-        bio           TEXT,
-        is_blocked    BOOLEAN NOT NULL DEFAULT false,
-        last_seen_at  TIMESTAMPTZ DEFAULT now(),
-        created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
-        updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+        id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        email           TEXT NOT NULL UNIQUE,
+        password_hash   TEXT NOT NULL,
+        full_name       TEXT,
+        avatar_url      TEXT,
+        bio             TEXT,
+        is_blocked      BOOLEAN NOT NULL DEFAULT false,
+        email_verified  BOOLEAN NOT NULL DEFAULT false,
+        last_seen_at    TIMESTAMPTZ DEFAULT now(),
+        created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at      TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+
+      CREATE TABLE IF NOT EXISTS email_verification_tokens (
+        id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        token      TEXT NOT NULL UNIQUE,
+        expires_at TIMESTAMPTZ NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       );
 
       CREATE TABLE IF NOT EXISTS user_roles (

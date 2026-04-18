@@ -3,10 +3,32 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { pool } from "../db.js";
 import { requireAuth, signToken, type AuthRequest } from "../middleware/auth.js";
-import { sendEmail, buildResetEmailHtml } from "../lib/email.js";
+import { sendEmail, buildResetEmailHtml, buildVerificationEmailHtml } from "../lib/email.js";
 import { logger } from "../lib/logger.js";
 
 const router = Router();
+
+async function sendVerificationEmail(userId: string, email: string, fullName: string) {
+  await pool.query("DELETE FROM email_verification_tokens WHERE user_id = $1", [userId]);
+
+  const rawToken = crypto.randomBytes(32).toString("hex");
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+  await pool.query(
+    "INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)",
+    [userId, rawToken, expiresAt]
+  );
+
+  const frontendUrl = (process.env.FRONTEND_URL || "").replace(/\/$/, "");
+  const verifyUrl = `${frontendUrl}/verify-email?token=${rawToken}`;
+
+  await sendEmail({
+    to: email,
+    subject: "Verify your HTB Consult Academy email address",
+    html: buildVerificationEmailHtml(verifyUrl, fullName),
+    text: `Hi ${fullName || "there"},\n\nWelcome to HTB Consult Academy! Please verify your email address by visiting the link below (expires in 24 hours):\n\n${verifyUrl}\n\nIf you didn't create an account, you can safely ignore this email.\n\nHTB Consult Academy`,
+  });
+}
 
 router.post("/register", async (req, res) => {
   const { email, password, full_name, role: requestedRole } = req.body;
@@ -25,7 +47,7 @@ router.post("/register", async (req, res) => {
 
     const password_hash = await bcrypt.hash(password, 12);
     const { rows } = await pool.query(
-      "INSERT INTO users (email, password_hash, full_name) VALUES ($1, $2, $3) RETURNING id, email, full_name, bio, avatar_url",
+      "INSERT INTO users (email, password_hash, full_name, email_verified) VALUES ($1, $2, $3, false) RETURNING id, email, full_name",
       [email.toLowerCase(), password_hash, full_name || null]
     );
     const user = rows[0];
@@ -44,12 +66,100 @@ router.post("/register", async (req, res) => {
       );
     }
 
-    logger.info("Register success", { email: user.email, role: assignedRole });
-    const token = signToken({ id: user.id, email: user.email, role: assignedRole });
-    return res.json({ token, user: { ...user, role: assignedRole } });
+    await sendVerificationEmail(user.id, user.email, user.full_name || "");
+
+    logger.info("Register success — verification email sent", { email: user.email, role: assignedRole });
+    return res.status(201).json({
+      requiresVerification: true,
+      message: "Account created. Please check your email and click the verification link to activate your account.",
+    });
   } catch (err: any) {
     logger.error("Register error", { error: err.message });
     return res.status(500).json({ error: "Registration failed" });
+  }
+});
+
+router.get("/verify-email", async (req, res) => {
+  const { token } = req.query;
+  if (!token || typeof token !== "string") {
+    return res.status(400).json({ error: "Verification token is required" });
+  }
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT t.id, t.user_id, t.expires_at, u.email, u.full_name, u.email_verified
+       FROM email_verification_tokens t
+       JOIN users u ON u.id = t.user_id
+       WHERE t.token = $1`,
+      [token]
+    );
+
+    if (rows.length === 0) {
+      return res.status(400).json({ error: "Invalid or expired verification link. Please request a new one." });
+    }
+
+    const record = rows[0];
+
+    if (record.email_verified) {
+      await pool.query("DELETE FROM email_verification_tokens WHERE user_id = $1", [record.user_id]);
+      return res.json({ message: "Your email is already verified. You can log in." });
+    }
+
+    if (new Date(record.expires_at) < new Date()) {
+      await pool.query("DELETE FROM email_verification_tokens WHERE id = $1", [record.id]);
+      return res.status(400).json({ error: "This verification link has expired. Please request a new one." });
+    }
+
+    await pool.query("UPDATE users SET email_verified = true, updated_at = now() WHERE id = $1", [record.user_id]);
+    await pool.query("DELETE FROM email_verification_tokens WHERE user_id = $1", [record.user_id]);
+
+    const { rows: roleRows } = await pool.query(
+      "SELECT role FROM user_roles WHERE user_id = $1 ORDER BY CASE role WHEN 'admin' THEN 0 WHEN 'instructor' THEN 1 WHEN 'mentor' THEN 2 ELSE 3 END LIMIT 1",
+      [record.user_id]
+    );
+    const role = roleRows[0]?.role || "student";
+
+    const authToken = signToken({ id: record.user_id, email: record.email, role });
+
+    logger.info("Email verified", { email: record.email });
+    return res.json({
+      message: "Email verified successfully! Welcome to HTB Consult Academy.",
+      token: authToken,
+      user: { id: record.user_id, email: record.email, full_name: record.full_name, role },
+    });
+  } catch (err: any) {
+    logger.error("Verify email error", { error: err.message });
+    return res.status(500).json({ error: "Failed to verify email" });
+  }
+});
+
+router.post("/resend-verification", async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ error: "Email is required" });
+
+  try {
+    const { rows } = await pool.query(
+      "SELECT id, email, full_name, email_verified FROM users WHERE email = $1",
+      [email.toLowerCase()]
+    );
+
+    if (rows.length === 0) {
+      return res.json({ message: "If that email is registered and unverified, a new link has been sent." });
+    }
+
+    const user = rows[0];
+
+    if (user.email_verified) {
+      return res.status(400).json({ error: "This account is already verified. Please log in." });
+    }
+
+    await sendVerificationEmail(user.id, user.email, user.full_name || "");
+
+    logger.info("Resent verification email", { email: user.email });
+    return res.json({ message: "A new verification email has been sent. Please check your inbox." });
+  } catch (err: any) {
+    logger.error("Resend verification error", { error: err.message });
+    return res.status(500).json({ error: "Failed to resend verification email" });
   }
 });
 
@@ -74,6 +184,14 @@ router.post("/login", async (req, res) => {
     if (user.is_blocked) {
       logger.warn("Login blocked: account suspended", { email: email.toLowerCase() });
       return res.status(403).json({ error: "Your account has been suspended. Please contact support." });
+    }
+    if (!user.email_verified) {
+      logger.warn("Login blocked: email not verified", { email: email.toLowerCase() });
+      return res.status(403).json({
+        error: "Please verify your email address before logging in. Check your inbox for the verification link.",
+        requiresVerification: true,
+        email: user.email,
+      });
     }
 
     const { rows: roleRows } = await pool.query(

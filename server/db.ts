@@ -48,6 +48,20 @@ export async function runMigrations() {
       ALTER TABLE courses ADD COLUMN IF NOT EXISTS is_locked BOOLEAN DEFAULT false;
     `);
 
+    // Email verification — mark existing users as already verified so they aren't locked out
+    await client.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT false;
+      UPDATE users SET email_verified = true WHERE email_verified = false;
+
+      CREATE TABLE IF NOT EXISTS email_verification_tokens (
+        id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        token      TEXT NOT NULL UNIQUE,
+        expires_at TIMESTAMPTZ NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+    `);
+
   } finally {
     client.release();
   }
