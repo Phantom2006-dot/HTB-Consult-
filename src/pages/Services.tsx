@@ -104,10 +104,10 @@ const accentClasses = {
 // the reference design and cards never overlap the central image.
 // dot{X,Y} are percentages within the square diagram container.
 // place dictates where the card sits relative to the dot.
-type Place = "right" | "left" | "below-right" | "below-left" | "top-right";
+type Place = "right" | "left" | "below-right" | "below-left" | "above";
 // Dots are aligned on the dashed ring (radius 38% from centre).
 const NODE_POSITIONS: { dotX: number; dotY: number; place: Place }[] = [
-  { dotX: 50,   dotY: 12,   place: "top-right"  }, // 01 top
+  { dotX: 50,   dotY: 12,   place: "above"      }, // 01 top — card sits above
   { dotX: 80,   dotY: 30,   place: "right"      }, // 02 upper-right
   { dotX: 80,   dotY: 68,   place: "right"      }, // 03 lower-right
   { dotX: 60,   dotY: 87,   place: "below-right"}, // 04 bottom-right
@@ -186,8 +186,10 @@ const Services = () => {
               </motion.div>
             </div>
 
-            {/* Right: circular diagram */}
-            <CircleDiagram />
+            {/* Right: circular diagram (lg and up only) */}
+            <div className="hidden lg:block">
+              <CircleDiagram />
+            </div>
           </div>
         </div>
       </section>
@@ -320,11 +322,11 @@ const CircleDiagram = () => {
               transform: "translateY(-50%)",
             };
             break;
-          case "top-right":
+          case "above":
             cardStyle = {
-              left: "calc(100% + 14px)",
-              top: "50%",
-              transform: "translateY(-50%)",
+              left: "50%",
+              bottom: "calc(100% + 14px)",
+              transform: "translateX(-50%)",
             };
             break;
           case "below-right":
