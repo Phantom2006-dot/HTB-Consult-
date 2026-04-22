@@ -66,34 +66,40 @@ const About = () => {
   return (
     <Layout>
       {/* Header */}
-      <section className="py-16 lg:py-24 bg-gradient-green relative overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 50% 50%, hsl(30, 100%, 46%) 0%, transparent 50%)",
-          }}
-        />
+      <section className="relative py-20 lg:py-28 overflow-hidden bg-[hsl(163,40%,8%)]">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1573164713988-8665fc963095?w=1920&q=80&auto=format&fit=crop"
+            alt=""
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-[hsl(163,36%,8%)]/93 backdrop-blur-[3px]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(163,40%,8%)]/90 via-[hsl(163,40%,8%)]/60 to-[hsl(163,40%,8%)]/30" />
+          <div className="absolute inset-0 grid-pattern opacity-15" />
+        </div>
+        <div className="absolute top-1/4 right-0 w-[400px] h-[400px] rounded-full bg-primary/8 blur-[100px]" />
+
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <motion.div initial="hidden" animate="visible" className="max-w-3xl">
             <motion.p
               variants={fadeUp}
               custom={0}
-              className="text-primary font-medium tracking-widest uppercase text-sm mb-2"
+              className="text-primary font-semibold tracking-[0.2em] uppercase text-xs mb-3 text-shadow"
             >
               About Us
             </motion.p>
             <motion.h1
               variants={fadeUp}
               custom={1}
-              className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4"
+              className="text-4xl md:text-5xl font-serif font-bold text-white mb-4 text-shadow-lg"
             >
-              Practical Learning for Individuals and Organisations
+              Practical Learning for{" "}
+              <span className="text-gradient-gold">Individuals and Organisations</span>
             </motion.h1>
             <motion.p
               variants={fadeUp}
               custom={2}
-              className="text-lg text-muted-foreground leading-relaxed"
+              className="text-lg text-white/85 leading-relaxed text-shadow"
             >
               HTB Consult Academy is a learning platform designed to equip both individual
               professionals and organisations with practical skills that can be applied in real
@@ -102,7 +108,7 @@ const About = () => {
             <motion.p
               variants={fadeUp}
               custom={3}
-              className="text-base text-muted-foreground leading-relaxed mt-3"
+              className="text-base text-white/75 leading-relaxed mt-3 text-shadow"
             >
               We focus on moving beyond theory, helping learners and teams build the confidence to
               solve problems, deliver projects, and contribute effectively in their roles.

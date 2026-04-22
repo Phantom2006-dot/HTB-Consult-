@@ -91,9 +91,18 @@ const Services = () => {
     <Layout>
       {/* Hero */}
       <section className="relative py-20 lg:py-28 overflow-hidden bg-[hsl(163,40%,8%)]">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=1920&q=80&auto=format&fit=crop"
+            alt=""
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-[hsl(163,36%,8%)]/93 backdrop-blur-[3px]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(163,40%,8%)]/90 via-[hsl(163,40%,8%)]/60 to-[hsl(163,40%,8%)]/30" />
+          <div className="absolute inset-0 grid-pattern opacity-15" />
+        </div>
         <div className="absolute top-1/4 right-0 w-[500px] h-[500px] rounded-full bg-primary/8 blur-[120px]" />
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-amber-500/8 blur-[100px]" />
-        <div className="absolute inset-0 grid-pattern opacity-10" />
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <motion.div initial="hidden" animate="visible" className="max-w-3xl">

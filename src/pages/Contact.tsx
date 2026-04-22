@@ -41,15 +41,26 @@ const Contact = () => {
   return (
     <Layout>
       {/* Header */}
-      <section className="py-16 lg:py-24 bg-gradient-green relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 80% 80%, hsl(30, 100%, 46%) 0%, transparent 50%)" }} />
+      <section className="relative py-20 lg:py-28 overflow-hidden bg-[hsl(163,40%,8%)]">
+        <div className="absolute inset-0">
+          <img
+            src="https://images.unsplash.com/photo-1423666639041-f56000c27a9a?w=1920&q=80&auto=format&fit=crop"
+            alt=""
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-[hsl(163,36%,8%)]/93 backdrop-blur-[3px]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(163,40%,8%)]/90 via-[hsl(163,40%,8%)]/60 to-[hsl(163,40%,8%)]/30" />
+          <div className="absolute inset-0 grid-pattern opacity-15" />
+        </div>
+        <div className="absolute top-1/4 right-0 w-[400px] h-[400px] rounded-full bg-primary/8 blur-[100px]" />
+
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
-          <motion.div initial="hidden" animate="visible">
-            <motion.p variants={fadeUp} custom={0} className="text-primary font-medium tracking-widest uppercase text-sm mb-2">Get In Touch</motion.p>
-            <motion.h1 variants={fadeUp} custom={1} className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
-              Contact Us
+          <motion.div initial="hidden" animate="visible" className="max-w-3xl">
+            <motion.p variants={fadeUp} custom={0} className="text-primary font-semibold tracking-[0.2em] uppercase text-xs mb-3 text-shadow">Get In Touch</motion.p>
+            <motion.h1 variants={fadeUp} custom={1} className="text-4xl md:text-5xl font-serif font-bold text-white mb-4 text-shadow-lg">
+              Contact <span className="text-gradient-gold">Us</span>
             </motion.h1>
-            <motion.p variants={fadeUp} custom={2} className="text-lg text-muted-foreground max-w-2xl">
+            <motion.p variants={fadeUp} custom={2} className="text-lg text-white/85 max-w-2xl leading-relaxed text-shadow">
               Have a question or ready to start your training journey? We'd love to hear from you.
             </motion.p>
           </motion.div>
