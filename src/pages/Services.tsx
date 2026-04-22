@@ -106,13 +106,14 @@ const accentClasses = {
 // place dictates where the card sits relative to the dot.
 type Place = "right" | "left" | "below-right" | "below-left" | "above";
 // Dots are aligned on the dashed ring (radius 38% from centre).
+// Each (x, y) satisfies (x-50)^2 + (y-50)^2 ≈ 38^2 so the dot sits on the ring.
 const NODE_POSITIONS: { dotX: number; dotY: number; place: Place }[] = [
-  { dotX: 50,   dotY: 12,   place: "above"      }, // 01 top — card sits above
-  { dotX: 80,   dotY: 30,   place: "right"      }, // 02 upper-right
-  { dotX: 80,   dotY: 68,   place: "right"      }, // 03 lower-right
-  { dotX: 60,   dotY: 87,   place: "below-right"}, // 04 bottom-right
-  { dotX: 40,   dotY: 87,   place: "below-left" }, // 05 bottom-left
-  { dotX: 14,   dotY: 38,   place: "left"       }, // 06 upper-left
+  { dotX: 50,   dotY: 12,   place: "above"      }, // 01 top         (θ=0°)
+  { dotX: 82.9, dotY: 31,   place: "right"      }, // 02 upper-right (θ=60°)
+  { dotX: 82.9, dotY: 69,   place: "right"      }, // 03 lower-right (θ=120°)
+  { dotX: 63,   dotY: 85.7, place: "below-right"}, // 04 bottom-right(θ=160°)
+  { dotX: 37,   dotY: 85.7, place: "below-left" }, // 05 bottom-left (θ=200°)
+  { dotX: 14.3, dotY: 37,   place: "left"       }, // 06 upper-left  (θ=290°)
 ];
 
 const Services = () => {
