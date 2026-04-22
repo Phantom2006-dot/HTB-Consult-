@@ -66,8 +66,8 @@ const whyReasons = [
 ];
 
 const testimonials = [
-  { name: "Sarah K.", role: "Project Manager, Deloitte", text: "HTB Consult transformed my career. The training was practical, relevant, and immediately applicable." },
-  { name: "James O.", role: "Business Analyst, HSBC", text: "The mentoring programme gave me the confidence and skills to transition into business analysis seamlessly." },
+  { name: "Sarah K.", role: "Project Manager", text: "HTB Consult transformed my career. The training was practical, relevant, and immediately applicable." },
+  { name: "James O.", role: "Business Analyst", text: "The mentoring programme gave me the confidence and skills to transition into business analysis seamlessly." },
   { name: "Amara T.", role: "Senior Consultant", text: "Their CV review service helped me land three interviews within two weeks. Highly recommended!" },
 ];
 
