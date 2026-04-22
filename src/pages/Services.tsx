@@ -1,151 +1,249 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FileText, Users, Calendar, ArrowRight, CheckCircle, TrendingUp, Target, Settings, BarChart3, BookOpen } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  Puzzle,
+  BarChart3,
+  Users,
+  Target,
+  Rocket,
+  Sparkles,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/components/Layout";
 import { fadeUp } from "@/lib/animations";
 
-const consultingServices = [
+const steps = [
   {
-    icon: TrendingUp,
-    title: "Strategic Growth & Sustainability",
-    items: [
-      "Market Opportunity Alignment — Positioning organisations to compete effectively by identifying emerging opportunities.",
-      "Performance Monitoring — Tracking KPIs to measure progress and support continuous improvement.",
-      "Financial & Operational Strategy — Developing structured strategies that support stability, scalability, and sustainable growth.",
-    ],
+    n: "01",
+    icon: BookOpen,
+    accent: "primary",
+    title: "Structured Learning with Clear Direction",
+    short: "Structured Learning",
+    desc: "Each programme follows a clear path, starting from core principles and building into practical application. You will understand not just what to do, but why it matters.",
+    cardDesc: "Clear, step-by-step learning from fundamentals to real-world application.",
   },
   {
-    icon: FileText,
-    title: "Bid Writing & Tender Support",
-    items: [
-      "Tailored Bid Strategies — Aligning submissions with client expectations and competitive positioning.",
-      "Expert Proposal Development — Crafting persuasive proposals designed to maximise success.",
-      "Regulatory and Tender Compliance — Ensuring every submission meets procurement requirements.",
-      "Post-Bid Performance Review — Analysing outcomes to improve future submissions.",
-    ],
+    n: "02",
+    icon: Puzzle,
+    accent: "amber",
+    title: "Real World Application",
+    short: "Real-World Application",
+    desc: "Our training is grounded in real consulting scenarios. You will work through practical examples such as analysing business problems, defining requirements, improving processes, and supporting project delivery.",
+    cardDesc: "Work on practical scenarios and real business challenges.",
   },
   {
-    icon: Settings,
-    title: "Business Process Optimisation",
-    items: [
-      "Workflow Analysis and Automation — Identifying inefficiencies and introducing streamlined processes.",
-      "Operational Cost Optimisation — Improving resource utilisation for stronger returns.",
-      "Technology and Systems Integration — Leveraging digital tools to improve efficiency and collaboration.",
-      "Data Driven Process Improvement — Using structured analysis for informed decision making.",
-    ],
+    n: "03",
+    icon: BarChart3,
+    accent: "primary",
+    title: "Practical Skills that Reflect Industry Needs",
+    short: "Build Practical Skills",
+    desc: "We focus on skills that are directly relevant in today's work environment — business analysis, requirements gathering, project delivery, process improvement, and stakeholder engagement.",
+    cardDesc: "Develop in-demand skills that are relevant in today's workplace.",
+  },
+  {
+    n: "04",
+    icon: Users,
+    accent: "amber",
+    title: "Guided Learning and Support",
+    short: "Get Guided Support",
+    desc: "You are not left to figure things out alone. Our programmes are designed to guide you through each stage, helping you build confidence and clarity as you progress.",
+    cardDesc: "Get expert guidance and support at every step of your learning journey.",
+  },
+  {
+    n: "05",
+    icon: Target,
+    accent: "primary",
+    title: "Career and Professional Development",
+    short: "Grow Professionally",
+    desc: "Beyond technical skills, we support your overall growth through professional mentoring, CV and career positioning support, and insight into how to present your value in the market.",
+    cardDesc: "Access mentoring, career guidance, and CV positioning support.",
+  },
+  {
+    n: "06",
+    icon: Rocket,
+    accent: "amber",
+    title: "Built for Immediate Impact",
+    short: "Apply What You Learn",
+    desc: "Everything you learn is designed to be applied. The goal is simple — to help you move from learning to doing, with clarity and confidence.",
+    cardDesc: "Use your skills with confidence and create real impact.",
   },
 ];
 
-const trainingServices = [
-  { icon: BookOpen, title: "Foundational Business Analysis Training", desc: "Equipping professionals with the core principles, tools, and techniques needed to analyse business needs, gather requirements, and support effective project delivery." },
-  { icon: Target, title: "Project Management Foundations", desc: "Providing practical understanding of project planning, stakeholder coordination, and structured delivery approaches." },
-  { icon: Users, title: "Professional Mentoring", desc: "Supporting individuals through guided mentoring focused on career development, industry insight, and practical professional growth." },
-  { icon: FileText, title: "CV Review & Career Positioning", desc: "Helping professionals present their experience effectively through structured CV reviews and guidance aligned with industry expectations." },
-];
+const accentClasses = {
+  primary: {
+    bg: "bg-primary/15",
+    border: "border-primary/30",
+    text: "text-primary",
+    ring: "bg-primary",
+  },
+  amber: {
+    bg: "bg-amber-500/15",
+    border: "border-amber-500/30",
+    text: "text-amber-400",
+    ring: "bg-amber-500",
+  },
+};
 
 const Services = () => {
   return (
     <Layout>
-      {/* Header */}
-      <section className="py-16 lg:py-24 bg-gradient-green relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 20% 80%, hsl(30, 100%, 46%) 0%, transparent 50%)" }} />
+      {/* Hero */}
+      <section className="relative py-20 lg:py-28 overflow-hidden bg-[hsl(163,40%,8%)]">
+        <div className="absolute top-1/4 right-0 w-[500px] h-[500px] rounded-full bg-primary/8 blur-[120px]" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-amber-500/8 blur-[100px]" />
+        <div className="absolute inset-0 grid-pattern opacity-10" />
+
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
-          <motion.div initial="hidden" animate="visible">
-            <motion.p variants={fadeUp} custom={0} className="text-primary font-medium tracking-widest uppercase text-sm mb-2">Our Services</motion.p>
-            <motion.h1 variants={fadeUp} custom={1} className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-4">
-              Strategic Growth & Sustainability Solutions
+          <motion.div initial="hidden" animate="visible" className="max-w-3xl">
+            <motion.div
+              variants={fadeUp}
+              custom={0}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass border border-amber-500/30 mb-5"
+            >
+              <Sparkles size={13} className="text-amber-400" />
+              <span className="text-amber-400 font-semibold tracking-[0.2em] uppercase text-xs">
+                How It Works
+              </span>
+            </motion.div>
+            <motion.h1
+              variants={fadeUp}
+              custom={1}
+              className="text-4xl md:text-6xl font-serif font-bold text-white leading-tight mb-3 text-shadow-lg"
+            >
+              Learn. Apply.
+              <br />
+              <span className="text-gradient-gold">Grow. Succeed.</span>
             </motion.h1>
-            <motion.p variants={fadeUp} custom={2} className="text-lg text-muted-foreground max-w-2xl">
-              Beyond operational improvement, we help organisations scale through sustainable growth strategies that strengthen long-term performance and market competitiveness.
+            <motion.p
+              variants={fadeUp}
+              custom={2}
+              className="text-lg text-white/70 leading-relaxed mt-6 max-w-2xl"
+            >
+              At HTB Consult Academy, our training is built on real consulting experience and
+              designed to give you practical skills you can apply immediately. We do not focus on
+              theory alone — every programme reflects how work is done in real business
+              environments.
             </motion.p>
           </motion.div>
         </div>
       </section>
 
-      {/* Consulting Services */}
-      <section className="py-16 lg:py-24">
-        <div className="container mx-auto px-4 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-14">
-            <motion.p variants={fadeUp} custom={0} className="text-primary font-medium tracking-widest uppercase text-sm mb-2">Consulting</motion.p>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl font-serif font-bold text-foreground">Our Consulting Services</motion.h2>
-          </motion.div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {consultingServices.map((service, i) => (
-              <motion.div key={service.title} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp}>
-                <Card className="bg-card border-border h-full">
-                  <CardContent className="p-6">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                      <service.icon className="text-primary" size={24} />
+      {/* Six steps grid */}
+      <section className="py-16 lg:py-24 bg-[hsl(163,40%,8%)] relative">
+        <div className="absolute inset-0 dot-pattern opacity-10" />
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {steps.map((step, i) => {
+              const accent = accentClasses[step.accent as keyof typeof accentClasses];
+              const Icon = step.icon;
+              return (
+                <motion.div
+                  key={step.n}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  custom={i}
+                  variants={fadeUp}
+                  className="relative"
+                >
+                  <div className="glass rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 p-6 h-full card-lift">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div
+                        className={`w-12 h-12 rounded-xl ${accent.bg} ${accent.border} border flex items-center justify-center shrink-0`}
+                      >
+                        <Icon size={22} className={accent.text} />
+                      </div>
+                      <div className="flex-1">
+                        <p className={`text-xs font-bold tracking-widest ${accent.text} mb-1`}>
+                          {step.n}
+                        </p>
+                        <h3 className="font-serif text-lg font-semibold text-white leading-snug">
+                          {step.short}
+                        </h3>
+                      </div>
                     </div>
-                    <h3 className="font-serif text-xl font-semibold text-foreground mb-4">{service.title}</h3>
-                    <ul className="space-y-3">
-                      {service.items.map((item) => (
-                        <li key={item} className="flex items-start gap-2 text-sm text-muted-foreground">
-                          <CheckCircle size={14} className="text-primary shrink-0 mt-0.5" />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            ))}
+                    <p className="text-sm text-white/60 leading-relaxed">{step.cardDesc}</p>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* Training & Academy */}
-      <section className="py-16 lg:py-24 bg-secondary">
-        <div className="container mx-auto px-4 lg:px-8">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-14">
-            <motion.p variants={fadeUp} custom={0} className="text-primary font-medium tracking-widest uppercase text-sm mb-2">HTB Consult Academy</motion.p>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl font-serif font-bold text-secondary-foreground">Practical Training for Professional Growth</motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-secondary-foreground/70 mt-3 max-w-2xl mx-auto">
-              HTB Consult Academy equips professionals and organisations with practical skills in business analysis, project delivery, digital transformation, and professional development. Our programmes combine structured learning with real world insight.
-            </motion.p>
-          </motion.div>
-          <div className="grid md:grid-cols-2 gap-6">
-            {trainingServices.map((service, i) => (
-              <motion.div key={service.title} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp}>
-                <Card className="bg-card border-border h-full">
-                  <CardContent className="p-6 flex gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <service.icon className="text-primary" size={24} />
-                    </div>
-                    <div>
-                      <h3 className="font-serif text-lg font-semibold text-foreground mb-2">{service.title}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{service.desc}</p>
-                    </div>
-                  </CardContent>
-                </Card>
+      {/* Detailed sections */}
+      <section className="py-16 lg:py-20 bg-[hsl(163,40%,6%)] relative">
+        <div className="container mx-auto px-4 lg:px-8 max-w-4xl space-y-10">
+          {steps.map((step, i) => {
+            const accent = accentClasses[step.accent as keyof typeof accentClasses];
+            const Icon = step.icon;
+            return (
+              <motion.div
+                key={step.n}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                custom={i % 3}
+                variants={fadeUp}
+                className="flex gap-5 items-start"
+              >
+                <div
+                  className={`w-14 h-14 rounded-2xl ${accent.bg} ${accent.border} border flex items-center justify-center shrink-0`}
+                >
+                  <Icon size={24} className={accent.text} />
+                </div>
+                <div className="flex-1">
+                  <p className={`text-xs font-bold tracking-widest ${accent.text} mb-1`}>
+                    {step.n}
+                  </p>
+                  <h3 className="font-serif text-xl md:text-2xl font-semibold text-white mb-2">
+                    {step.title}
+                  </h3>
+                  <p className="text-white/70 leading-relaxed">{step.desc}</p>
+                </div>
               </motion.div>
-            ))}
-          </div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={5} className="text-center mt-10">
-            <Button asChild className="bg-gradient-gold hover:opacity-90">
-              <Link to="/courses">Explore Courses <ArrowRight className="ml-1" size={16} /></Link>
-            </Button>
-          </motion.div>
+            );
+          })}
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-16 lg:py-24">
-        <div className="container mx-auto px-4 lg:px-8 text-center">
+      <section className="py-16 lg:py-24 bg-[hsl(163,40%,8%)]">
+        <div className="container mx-auto px-4 lg:px-8 text-center max-w-2xl">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <motion.h2 variants={fadeUp} custom={0} className="text-3xl font-serif font-bold text-foreground mb-4">
-              Ready to Strengthen Your Organisation?
+            <motion.h2
+              variants={fadeUp}
+              custom={0}
+              className="text-3xl md:text-4xl font-serif font-bold text-white mb-4"
+            >
+              Ready to move from learning to doing?
             </motion.h2>
-            <motion.p variants={fadeUp} custom={1} className="text-muted-foreground max-w-xl mx-auto mb-8">
-              Get in touch to discuss how we can help your organisation grow, improve performance, and achieve sustainable success.
+            <motion.p
+              variants={fadeUp}
+              custom={1}
+              className="text-white/70 mb-8 leading-relaxed"
+            >
+              Explore our programmes and start building practical skills you can apply with
+              clarity and confidence.
             </motion.p>
-            <motion.div variants={fadeUp} custom={2} className="flex justify-center gap-4 flex-wrap">
+            <motion.div
+              variants={fadeUp}
+              custom={2}
+              className="flex justify-center gap-4 flex-wrap"
+            >
               <Button size="lg" asChild className="bg-gradient-gold hover:opacity-90">
-                <Link to="/contact">Get in Touch <ArrowRight className="ml-2" size={18} /></Link>
+                <Link to="/courses">
+                  Explore Courses <ArrowRight className="ml-2" size={18} />
+                </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild className="border-primary/30 hover:bg-primary/10">
+              <Button
+                size="lg"
+                variant="outline"
+                asChild
+                className="border-white/20 text-white hover:bg-white/5"
+              >
                 <Link to="/about">Learn About Us</Link>
               </Button>
             </motion.div>

@@ -114,19 +114,20 @@ const Explore = () => {
             alt=""
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-[hsl(163,36%,10%)]/88" />
+          <div className="absolute inset-0 bg-[hsl(163,36%,10%)]/92 backdrop-blur-[2px]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(163,40%,8%)]/80 via-[hsl(163,40%,8%)]/40 to-transparent" />
           <div className="absolute inset-0 grid-pattern opacity-25" />
         </div>
         <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-primary/8 blur-[80px]" />
         <div className="absolute bottom-0 left-1/3 w-48 h-48 rounded-full bg-blue-500/8 blur-[60px]" />
         <div className="relative z-10 px-4 lg:px-8 py-8">
           <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center backdrop-blur-md">
               <Compass size={18} className="text-primary" />
             </div>
             <div>
-              <h1 className="text-xl lg:text-2xl font-serif font-bold text-white">Explore</h1>
-              <p className="text-xs text-white/45">Discover courses, categories and mentors</p>
+              <h1 className="text-xl lg:text-2xl font-serif font-bold text-white text-shadow-lg">Explore</h1>
+              <p className="text-xs text-white/80 text-shadow">Discover courses, categories and mentors</p>
             </div>
           </motion.div>
         </div>

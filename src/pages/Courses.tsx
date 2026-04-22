@@ -66,27 +66,28 @@ const Courses = () => {
             alt=""
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-[hsl(163,36%,8%)]/88" />
+          <div className="absolute inset-0 bg-[hsl(163,36%,8%)]/93 backdrop-blur-[3px]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(163,40%,8%)]/90 via-[hsl(163,40%,8%)]/60 to-[hsl(163,40%,8%)]/30" />
           <div className="absolute inset-0 grid-pattern opacity-20" />
         </div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full bg-primary/6 blur-[100px]" />
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <motion.div initial="hidden" animate="visible">
-            <motion.div variants={fadeUp} custom={0} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass border border-primary/20 mb-4">
+            <motion.div variants={fadeUp} custom={0} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass border border-primary/30 mb-4 backdrop-blur-md">
               <GraduationCap size={13} className="text-primary" />
               <span className="text-primary font-semibold tracking-[0.2em] uppercase text-xs">HTB Consult Academy</span>
             </motion.div>
             <motion.h1 variants={fadeUp} custom={1} className="text-4xl md:text-5xl font-serif font-bold text-white mb-4 text-shadow-lg">
               Practical Training for <em className="text-gradient-gold not-italic">Professional Growth</em>
             </motion.h1>
-            <motion.p variants={fadeUp} custom={2} className="text-lg text-white/50 max-w-2xl leading-relaxed">
+            <motion.p variants={fadeUp} custom={2} className="text-lg text-white/85 max-w-2xl leading-relaxed text-shadow">
               Practical skills training in business analysis, project delivery, digital transformation, and professional development — built from real consulting experience.
             </motion.p>
             {!isLoading && courses && (
               <motion.div variants={fadeUp} custom={3} className="flex items-center gap-2 mt-5">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass border border-white/10">
-                  <BookOpen size={13} className="text-white/40" />
-                  <span className="text-xs text-white/40">{courses.length} courses available</span>
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full glass border border-white/15 backdrop-blur-md">
+                  <BookOpen size={13} className="text-white/70" />
+                  <span className="text-xs text-white/85">{courses.length} courses available</span>
                 </div>
               </motion.div>
             )}

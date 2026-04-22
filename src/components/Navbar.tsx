@@ -8,7 +8,7 @@ import htbLogo from "@/assets/htb-logo.png";
 const navLinks = [
   { label: "Home", path: "/" },
   { label: "Courses", path: "/courses" },
-  { label: "Services", path: "/services" },
+  { label: "How It Works", path: "/services" },
   { label: "About", path: "/about" },
   { label: "Contact", path: "/contact" },
 ];
