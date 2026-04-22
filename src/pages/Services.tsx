@@ -385,9 +385,9 @@ const CircleDiagram = () => {
               </div>
             </div>
 
-            {/* Icon dot on ring */}
+            {/* Icon dot — sits centred on the dashed orbit ring */}
             <div
-              className={`relative w-11 h-11 rounded-full ${accent.nodeBg} flex items-center justify-center shadow-lg ring-4 ring-[hsl(163,40%,7%)]`}
+              className={`relative w-11 h-11 rounded-full ${accent.nodeBg} flex items-center justify-center shadow-lg`}
             >
               <Icon size={18} className="text-white" />
             </div>
