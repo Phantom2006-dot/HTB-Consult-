@@ -121,6 +121,16 @@ const Services = () => {
     <Layout>
       {/* Hero with circular how-it-works diagram */}
       <section className="relative overflow-hidden bg-[hsl(163,40%,7%)] py-16 lg:py-24">
+        {/* Background photo + overlays */}
+        <div className="absolute inset-0">
+          <img
+            src="/how-it-works-hero.jpg"
+            alt=""
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-[hsl(163,40%,7%)]/92 backdrop-blur-[3px]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(163,40%,6%)]/95 via-[hsl(163,40%,7%)]/75 to-[hsl(163,40%,7%)]/55" />
+        </div>
         <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-primary/8 blur-[120px]" />
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-amber-500/8 blur-[100px]" />
         <div className="absolute inset-0 grid-pattern opacity-[0.07]" />
