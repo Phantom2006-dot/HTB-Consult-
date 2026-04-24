@@ -206,7 +206,7 @@ const Services = () => {
       </section>
 
       {/* Detailed sections */}
-      <section className="py-16 lg:py-20 bg-[hsl(163,40%,5%)] relative">
+      <section className="py-16 lg:py-20 bg-[hsl(163,30%,12%)] relative">
         <div className="container mx-auto px-4 lg:px-8 max-w-4xl space-y-10">
           {steps.map((step, i) => {
             const accent = accentClasses[step.accent as keyof typeof accentClasses];
@@ -242,7 +242,7 @@ const Services = () => {
       </section>
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-[hsl(163,40%,7%)]">
+      <section className="py-16 lg:py-24 bg-[hsl(163,32%,10%)]">
         <div className="container mx-auto px-4 lg:px-8 text-center max-w-2xl">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}>
             <motion.h2

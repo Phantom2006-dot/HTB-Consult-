@@ -396,7 +396,8 @@ const Index = () => {
             alt=""
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-[hsl(163,36%,8%)]/96 via-[hsl(220,40%,8%)]/90 to-[hsl(163,36%,8%)]/96" />
+          <div className="absolute inset-0 bg-[hsl(163,36%,7%)]/85 backdrop-blur-[2px]" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[hsl(163,36%,6%)]/90 via-[hsl(163,36%,8%)]/80 to-[hsl(163,36%,6%)]/90" />
           <div className="absolute inset-0 grid-pattern opacity-20" />
         </div>
         {/* Animated glows */}
@@ -412,7 +413,7 @@ const Index = () => {
             <motion.h2 variants={fadeUp} custom={1} className="text-4xl md:text-5xl lg:text-6xl font-serif font-normal text-white mb-6 leading-tight max-w-3xl mx-auto text-shadow-lg">
               Build the Skills That <em className="text-gradient-gold not-italic">Drive Results</em>
             </motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-white/55 max-w-xl mx-auto mb-10 leading-[1.9] text-sm lg:text-base">
+            <motion.p variants={fadeUp} custom={2} className="text-white/80 max-w-xl mx-auto mb-10 leading-[1.9] text-sm lg:text-base text-shadow">
               Develop the knowledge and capabilities required to succeed in today's evolving business landscape.
             </motion.p>
             <motion.div variants={fadeUp} custom={3} className="flex justify-center gap-4 flex-wrap">
