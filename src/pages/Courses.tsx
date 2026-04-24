@@ -59,7 +59,7 @@ const Courses = () => {
   return (
     <Layout>
       {/* Hero Header */}
-      <section className="relative py-20 lg:py-28 overflow-hidden -mt-[72px] pt-[72px]">
+      <section className="relative py-20 lg:py-28 overflow-hidden -mt-[72px] pt-[140px] lg:pt-[160px]">
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1920&q=80&auto=format&fit=crop"
