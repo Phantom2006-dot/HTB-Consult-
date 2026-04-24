@@ -97,17 +97,17 @@ const Courses = () => {
       </section>
 
       {/* Sticky filter bar */}
-      <section className="bg-[hsl(163,36%,14%)]/95 backdrop-blur-md border-b border-white/5 sticky top-0 z-20">
+      <section className="bg-secondary/95 backdrop-blur-md border-b border-secondary-foreground/10 sticky top-0 z-20">
         <div className="container mx-auto px-4 lg:px-8">
           <div className="flex items-center gap-2 py-3">
-            <SlidersHorizontal size={14} className="text-white/30 shrink-0" />
+            <SlidersHorizontal size={14} className="text-secondary-foreground/40 shrink-0" />
             <div className="flex items-center gap-2 flex-1 overflow-x-auto min-w-0" style={{ scrollbarWidth: "none" }}>
               <button
                 onClick={() => setActiveCategory("All")}
                 className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
                   activeCategory === "All"
                     ? "bg-primary text-white glow-gold"
-                    : "glass border border-white/10 text-white/50 hover:text-white hover:border-white/20"
+                    : "bg-white border border-secondary-foreground/10 text-secondary-foreground/70 hover:text-secondary-foreground hover:border-primary/40"
                 }`}
               >
                 All ({courses?.length ?? 0})
@@ -119,7 +119,7 @@ const Courses = () => {
                   className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all whitespace-nowrap ${
                     activeCategory === cat
                       ? "bg-primary text-white"
-                      : "glass border border-white/10 text-white/50 hover:text-white hover:border-white/20"
+                      : "bg-white border border-secondary-foreground/10 text-secondary-foreground/70 hover:text-secondary-foreground hover:border-primary/40"
                   }`}
                 >
                   {cat} ({count})
@@ -129,7 +129,7 @@ const Courses = () => {
             <div className="shrink-0 ml-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium glass border border-white/10 text-white/50 hover:text-white hover:border-white/20 transition-all whitespace-nowrap">
+                  <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-white border border-secondary-foreground/10 text-secondary-foreground/70 hover:text-secondary-foreground hover:border-primary/40 transition-all whitespace-nowrap">
                     {sortBy === "numeric" && <Hash size={12} />}
                     {sortBy === "az" && <ArrowDownAZ size={12} />}
                     {sortBy === "za" && <ArrowUpAZ size={12} />}
@@ -150,23 +150,21 @@ const Courses = () => {
       </section>
 
       {/* Course Grid */}
-      <section className="py-12 lg:py-16 relative">
-        <div className="absolute inset-0 bg-[hsl(163,36%,14%)]" />
-        <div className="absolute inset-0 dot-pattern opacity-20" />
+      <section className="py-12 lg:py-16 relative bg-secondary">
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
           {!isLoading && filtered.length === 0 && (
             <div className="text-center py-16">
-              <div className="w-16 h-16 rounded-2xl glass border border-white/10 flex items-center justify-center mx-auto mb-4">
-                <BookOpen size={28} className="text-white/20" />
+              <div className="w-16 h-16 rounded-2xl bg-white border border-secondary-foreground/10 flex items-center justify-center mx-auto mb-4">
+                <BookOpen size={28} className="text-secondary-foreground/30" />
               </div>
-              <p className="text-white/40 mb-2">No courses in this category yet.</p>
+              <p className="text-secondary-foreground/60 mb-2">No courses in this category yet.</p>
               <button onClick={() => setActiveCategory("All")} className="text-primary text-sm hover:underline">View all courses</button>
             </div>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {isLoading ? (
               Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="glass rounded-xl border border-white/8 overflow-hidden">
+                <div key={i} className="bg-card rounded-xl border border-white/8 overflow-hidden">
                   <Skeleton className="h-44 w-full rounded-none" />
                   <div className="p-5 space-y-3">
                     <Skeleton className="h-5 w-24" />
@@ -180,7 +178,7 @@ const Courses = () => {
                 const isLocked = !!course.is_locked;
                 return (
                   <motion.div key={course.id} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i % 6} variants={fadeUp} className="card-lift">
-                    <div className={`glass rounded-xl border overflow-hidden h-full flex flex-col transition-all duration-300 ${isLocked ? "border-white/5 opacity-75" : "border-white/8 hover:border-primary/30 hover:shadow-[0_20px_60px_-15px_rgba(234,119,0,0.2)]"}`}>
+                    <div className={`bg-card rounded-xl border overflow-hidden h-full flex flex-col transition-all duration-300 ${isLocked ? "border-white/5 opacity-75" : "border-white/8 hover:border-primary/40 hover:shadow-[0_20px_60px_-15px_rgba(234,119,0,0.25)]"}`}>
                       {/* Thumbnail */}
                       <div className="h-44 bg-muted overflow-hidden shrink-0 relative">
                         {(course as any).thumbnail_url ? (
