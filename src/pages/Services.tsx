@@ -123,14 +123,23 @@ const Services = () => {
     <Layout>
       {/* Hero with circular how-it-works diagram */}
       <section className="relative overflow-hidden bg-[#0a2419] pt-14 pb-24 lg:pt-20 lg:pb-32">
-        {/* Subtle radial gradient + ambient glows */}
-        <div
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            background:
-              "radial-gradient(circle at 30% 20%, #0f3d2e 0%, #07251c 60%, #041a14 100%)",
-          }}
-        />
+        {/* Background image (training classroom) with dark green wash */}
+        <div className="absolute inset-0 pointer-events-none">
+          <img
+            src="/how-it-works-bg.jpg"
+            alt=""
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-[#0a2419]/93 backdrop-blur-[3px]" />
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(circle at 30% 20%, rgba(15,61,46,0.85) 0%, rgba(7,37,28,0.92) 60%, rgba(4,26,20,0.96) 100%)",
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0a2419]/85 via-[#0a2419]/55 to-[#0a2419]/35" />
+        </div>
         <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-primary/8 blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-amber-500/[0.06] blur-[100px] pointer-events-none" />
 
