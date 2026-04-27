@@ -138,6 +138,21 @@
   to { transform: translateX(400%); }
 }
 
+@keyframes orbit-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.orbit-spin {
+  animation: orbit-spin 80s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes orbit-spin-reverse {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
 @layer utilities {
   .font-display {
     font-family: 'DM Serif Display', Georgia, serif;

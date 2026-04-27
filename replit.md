@@ -78,3 +78,7 @@ Build and serve statically:
 npm run build  # Builds frontend to dist/public, compiles server to dist/
 npm start      # Runs compiled server serving static frontend
 ```
+
+## Pages of note
+
+- `/services` ("How It Works") — pixel-tuned hero with dark green radial background, left column of 6 dark feature cards, right column with a CSS-animated rotating dashed orbit (`.orbit-spin` class in `src/index.css`), centered HTB workspace photo at `public/how-it-works-center.jpg`, and 6 numbered white step cards orbiting it. Cards positioned via `NODE_POSITIONS` percentages and `Place` enum (`above`/`right`/`left`/`below-right`/`below-left`). Uses Framer Motion for entry animations; mobile (<lg) falls back to `MobileSteps` stacked layout.

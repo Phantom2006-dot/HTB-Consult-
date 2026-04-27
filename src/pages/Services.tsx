@@ -107,36 +107,35 @@ const accentClasses = {
 type Place = "right" | "left" | "below-right" | "below-left" | "above";
 // Dots are aligned on the dashed ring (radius 38% from centre).
 // Each (x, y) satisfies (x-50)^2 + (y-50)^2 ≈ 38^2 so the dot sits on the ring.
+// Dots sit on the dashed orbit ring (radius 42% from centre). Each (x, y)
+// satisfies (x-50)^2 + (y-50)^2 ≈ 42^2.
 const NODE_POSITIONS: { dotX: number; dotY: number; place: Place }[] = [
-  { dotX: 50,   dotY: 12,   place: "above"      }, // 01 top         (θ=0°)
-  { dotX: 82.9, dotY: 31,   place: "right"      }, // 02 upper-right (θ=60°)
-  { dotX: 82.9, dotY: 69,   place: "right"      }, // 03 lower-right (θ=120°)
-  { dotX: 63,   dotY: 85.7, place: "below-right"}, // 04 bottom-right(θ=160°)
-  { dotX: 37,   dotY: 85.7, place: "below-left" }, // 05 bottom-left (θ=200°)
-  { dotX: 14.3, dotY: 37,   place: "left"       }, // 06 upper-left  (θ=290°)
+  { dotX: 50, dotY: 8,  place: "above"       }, // 01 top
+  { dotX: 85, dotY: 30, place: "right"       }, // 02 upper-right
+  { dotX: 85, dotY: 70, place: "right"       }, // 03 lower-right
+  { dotX: 50, dotY: 92, place: "below-right" }, // 04 bottom-centre (below-right anchor)
+  { dotX: 15, dotY: 70, place: "left"        }, // 05 lower-left
+  { dotX: 15, dotY: 30, place: "left"        }, // 06 upper-left
 ];
 
 const Services = () => {
   return (
     <Layout>
       {/* Hero with circular how-it-works diagram */}
-      <section className="relative overflow-hidden bg-[hsl(163,40%,7%)] py-16 lg:py-24">
-        {/* Background photo + overlays */}
-        <div className="absolute inset-0">
-          <img
-            src="/how-it-works-hero.jpg"
-            alt=""
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-[hsl(163,40%,7%)]/92 backdrop-blur-[3px]" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(163,40%,6%)]/95 via-[hsl(163,40%,7%)]/75 to-[hsl(163,40%,7%)]/55" />
-        </div>
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-primary/8 blur-[120px]" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-amber-500/8 blur-[100px]" />
-        <div className="absolute inset-0 grid-pattern opacity-[0.07]" />
+      <section className="relative overflow-hidden bg-[#0a2419] pt-14 pb-24 lg:pt-20 lg:pb-32">
+        {/* Subtle radial gradient + ambient glows */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(circle at 30% 20%, #0f3d2e 0%, #07251c 60%, #041a14 100%)",
+          }}
+        />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-primary/8 blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-amber-500/[0.06] blur-[100px] pointer-events-none" />
 
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
-          <div className="grid lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.4fr)] gap-10 lg:gap-10 items-center">
+          <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] gap-10 lg:gap-8 items-center">
             {/* Left: text + vertical cards */}
             <div>
               <motion.div initial="hidden" animate="visible">
@@ -150,7 +149,7 @@ const Services = () => {
                 <motion.h1
                   variants={fadeUp}
                   custom={1}
-                  className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-white leading-[1.05] mb-3"
+                  className="text-4xl md:text-5xl lg:text-[3.4rem] font-serif font-bold text-white leading-[1.05] mb-3"
                 >
                   Learn. Apply.
                   <br />
@@ -160,35 +159,32 @@ const Services = () => {
                 <motion.p
                   variants={fadeUp}
                   custom={2}
-                  className="text-base text-white/70 leading-relaxed max-w-md mt-5 mb-8"
+                  className="text-[15px] text-white/70 leading-relaxed max-w-md mt-5 mb-7"
                 >
                   Our training is built on real consulting experience and designed to give you
                   practical skills you can apply immediately.
                 </motion.p>
 
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {steps.map((step, i) => {
-                    const accent = accentClasses[step.accent as keyof typeof accentClasses];
                     const Icon = step.icon;
                     return (
                       <motion.div
                         key={`left-${step.n}`}
                         initial="hidden"
                         animate="visible"
-                        custom={3 + i * 0.5}
+                        custom={3 + i * 0.4}
                         variants={fadeUp}
-                        className="glass border border-white/10 rounded-xl p-3.5 flex items-start gap-3.5 hover:border-white/20 transition-colors"
+                        className="rounded-xl bg-[#0f2f25]/90 border border-white/[0.06] p-3.5 flex items-start gap-3.5 hover:border-white/15 hover:bg-[#123a2d]/90 transition-colors"
                       >
-                        <div
-                          className={`w-10 h-10 rounded-lg ${accent.bg} ${accent.border} border flex items-center justify-center shrink-0`}
-                        >
-                          <Icon size={18} className={accent.text} />
+                        <div className="w-10 h-10 rounded-lg bg-[#145c44] flex items-center justify-center shrink-0">
+                          <Icon size={18} className="text-white" />
                         </div>
                         <div className="min-w-0">
-                          <h3 className="font-semibold text-white text-sm leading-snug mb-0.5">
+                          <h3 className="font-semibold text-white text-[13.5px] leading-snug mb-0.5">
                             {step.short}
                           </h3>
-                          <p className="text-xs text-white/55 leading-relaxed">{step.cardDesc}</p>
+                          <p className="text-[12px] text-white/55 leading-relaxed">{step.cardDesc}</p>
                         </div>
                       </motion.div>
                     );
@@ -200,6 +196,11 @@ const Services = () => {
             {/* Right: circular diagram (lg and up only) */}
             <div className="hidden lg:block">
               <CircleDiagram />
+            </div>
+
+            {/* Right: mobile stacked steps fallback */}
+            <div className="lg:hidden">
+              <MobileSteps />
             </div>
           </div>
         </div>
@@ -287,26 +288,36 @@ const Services = () => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Circular diagram component
+// Circular diagram component (desktop)
 // ─────────────────────────────────────────────────────────────────────────────
 const CircleDiagram = () => {
-  // Container is square; the dashed circle radius is a fraction of its size.
+  // Container is square. The dashed orbit lives at inset-[8%], i.e. ring
+  // radius ≈ 42% of container half-width.
   // Cards are positioned absolutely around the dashed circle.
   return (
-    <div className="relative mx-auto w-[88%] max-w-[440px] aspect-square">
-      {/* Dashed orbit ring (radius ≈ 38% of container) */}
-      <div className="absolute inset-[12%] rounded-full border-2 border-dashed border-white/15" />
+    <div className="relative mx-auto w-full max-w-[380px] xl:max-w-[420px] aspect-square">
+      {/* Rotating dashed orbit ring (CSS animation, sits below cards) */}
+      <div
+        className="absolute inset-[8%] rounded-full border-2 border-dashed border-white/20 orbit-spin pointer-events-none z-0"
+        style={{
+          boxShadow: "0 0 40px rgba(34,197,94,0.10)",
+        }}
+      />
 
       {/* Center image */}
-      <div className="absolute inset-[24%] rounded-full overflow-hidden border-4 border-white/10 shadow-[0_30px_80px_-15px_rgba(0,0,0,0.6)]">
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="absolute inset-[22%] rounded-full overflow-hidden border-4 border-white/10 shadow-[0_30px_80px_-15px_rgba(0,0,0,0.6)] z-10"
+      >
         <img
-          src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=900&q=80&auto=format&fit=crop"
-          alt="Workspace with laptop, books and coffee mug"
+          src="/how-it-works-center.jpg"
+          alt="HTB Consult Academy workspace with laptop, books and coffee mug"
           className="w-full h-full object-cover"
         />
-        {/* Soft inner vignette */}
         <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-white/10 shadow-[inset_0_0_60px_rgba(0,0,0,0.4)] pointer-events-none" />
-      </div>
+      </motion.div>
 
       {/* 6 satellite nodes */}
       {steps.map((step, i) => {
@@ -321,14 +332,14 @@ const CircleDiagram = () => {
         switch (pos.place) {
           case "right":
             cardStyle = {
-              left: "calc(100% + 14px)",
+              left: "calc(100% + 16px)",
               top: "50%",
               transform: "translateY(-50%)",
             };
             break;
           case "left":
             cardStyle = {
-              right: "calc(100% + 14px)",
+              right: "calc(100% + 16px)",
               top: "50%",
               transform: "translateY(-50%)",
             };
@@ -336,20 +347,20 @@ const CircleDiagram = () => {
           case "above":
             cardStyle = {
               left: "50%",
-              bottom: "calc(100% + 14px)",
+              bottom: "calc(100% + 16px)",
               transform: "translateX(-50%)",
             };
             break;
           case "below-right":
             cardStyle = {
-              left: "50%",
-              top: "calc(100% + 14px)",
+              left: "calc(50% - 12px)",
+              top: "calc(100% + 16px)",
             };
             break;
           case "below-left":
             cardStyle = {
-              right: "50%",
-              top: "calc(100% + 14px)",
+              right: "calc(50% - 12px)",
+              top: "calc(100% + 16px)",
             };
             break;
         }
@@ -357,36 +368,36 @@ const CircleDiagram = () => {
         return (
           <motion.div
             key={`node-${step.n}`}
-            initial={{ opacity: 0, scale: 0.85 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.1 + i * 0.08 }}
-            className="absolute"
+            initial={{ opacity: 0, scale: 0.7 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, delay: 0.1 + i * 0.05, ease: "easeOut" }}
+            className="absolute z-20"
             style={{
               left: `${pos.dotX}%`,
               top: `${pos.dotY}%`,
-              transform: "translate(-50%, -50%)",
+              x: "-50%",
+              y: "-50%",
             }}
           >
             {/* Card */}
             <div className="absolute" style={cardStyle}>
-              <div className="w-[155px] sm:w-[170px] rounded-xl bg-white shadow-[0_10px_30px_-10px_rgba(0,0,0,0.45)] border border-black/5 p-3">
+              <div className="w-[140px] xl:w-[150px] rounded-2xl bg-white shadow-[0_15px_35px_-12px_rgba(0,0,0,0.45)] border border-black/[0.04] px-3 py-2.5">
                 <p
-                  className={`text-[11px] font-bold tracking-wider mb-1 ${accent.text} ${
+                  className={`text-[12px] font-bold tracking-wider mb-1 ${accent.text} ${
                     rightAlign ? "text-right" : ""
                   }`}
                 >
                   {step.n}
                 </p>
                 <h4
-                  className={`text-[13px] font-bold text-[hsl(163,40%,12%)] leading-snug mb-1 ${
+                  className={`text-[14px] font-bold text-[hsl(163,40%,12%)] leading-snug mb-1 ${
                     rightAlign ? "text-right" : ""
                   }`}
                 >
                   {step.nodeTitle}
                 </h4>
                 <p
-                  className={`text-[11px] text-slate-600 leading-snug ${
+                  className={`text-[11.5px] text-slate-600 leading-snug ${
                     rightAlign ? "text-right" : ""
                   }`}
                 >
@@ -396,10 +407,51 @@ const CircleDiagram = () => {
             </div>
 
             {/* Icon dot — sits centred on the dashed orbit ring */}
+            <motion.div
+              whileHover={{ scale: 1.08 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className={`relative w-12 h-12 rounded-full ${accent.nodeBg} flex items-center justify-center shadow-[0_8px_20px_-4px_rgba(0,0,0,0.5)] ring-4 ring-[#0a2419]`}
+            >
+              <Icon size={20} className="text-white" />
+            </motion.div>
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mobile fallback: stacked numbered cards (mirrors the circular diagram steps)
+// ─────────────────────────────────────────────────────────────────────────────
+const MobileSteps = () => {
+  return (
+    <div className="space-y-3 mt-4">
+      {steps.map((step, i) => {
+        const accent = accentClasses[step.accent as keyof typeof accentClasses];
+        const Icon = step.icon;
+        return (
+          <motion.div
+            key={`mobile-${step.n}`}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.4, delay: i * 0.06 }}
+            className="rounded-2xl bg-white shadow-[0_10px_25px_-10px_rgba(0,0,0,0.4)] p-4 flex items-start gap-3.5"
+          >
             <div
-              className={`relative w-11 h-11 rounded-full ${accent.nodeBg} flex items-center justify-center shadow-lg`}
+              className={`w-11 h-11 rounded-full ${accent.nodeBg} flex items-center justify-center shrink-0 shadow-md`}
             >
               <Icon size={18} className="text-white" />
+            </div>
+            <div className="min-w-0">
+              <p className={`text-[11px] font-bold tracking-wider ${accent.text} mb-0.5`}>
+                {step.n}
+              </p>
+              <h4 className="text-[14px] font-bold text-[hsl(163,40%,12%)] leading-snug mb-1">
+                {step.nodeTitle}
+              </h4>
+              <p className="text-[12px] text-slate-600 leading-snug">{step.nodeDesc}</p>
             </div>
           </motion.div>
         );
