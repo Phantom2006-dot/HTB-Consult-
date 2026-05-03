@@ -51,7 +51,6 @@ externalPort = 3000
 [userenv]
 
 [userenv.shared]
-JWT_SECRET = "htb-consults-jwt-secret-2025-replit"
 SERVER_PORT = "3001"
 NODE_ENV = "development"
 VITE_CLOUDINARY_CLOUD_NAME = "di2u0n1qj"
