@@ -6,13 +6,15 @@ const router = Router();
 
 router.get("/stats", requireAdmin, async (_req, res) => {
   try {
-    const [courses, mentors, enrollments, users, revenue, completed] = await Promise.all([
+    const [courses, mentors, enrollments, users, revenue, completed, bookings, articles] = await Promise.all([
       pool.query("SELECT COUNT(*) FROM courses WHERE published = true"),
       pool.query("SELECT COUNT(*) FROM mentors WHERE published = true"),
       pool.query("SELECT COUNT(*) FROM enrollments"),
       pool.query("SELECT COUNT(*) FROM users"),
       pool.query("SELECT COALESCE(SUM(c.price), 0) AS total FROM enrollments e JOIN courses c ON c.id = e.course_id"),
       pool.query("SELECT COUNT(*) FROM enrollments WHERE completed = true"),
+      pool.query("SELECT COUNT(*) FROM bookings WHERE status = 'confirmed'"),
+      pool.query("SELECT COUNT(*) FROM articles WHERE published = true"),
     ]);
     return res.json({
       courses: parseInt(courses.rows[0].count),
@@ -21,9 +23,115 @@ router.get("/stats", requireAdmin, async (_req, res) => {
       users: parseInt(users.rows[0].count),
       revenue: parseFloat(revenue.rows[0].total),
       completed: parseInt(completed.rows[0].count),
+      bookings: parseInt(bookings.rows[0].count),
+      articles: parseInt(articles.rows[0].count),
     });
   } catch (err) {
     return res.status(500).json({ error: "Failed to fetch stats" });
+  }
+});
+
+router.get("/analytics", requireAdmin, async (_req, res) => {
+  try {
+    const [userGrowth, enrollmentTrend, revenueTrend, bookingTrend, topCourses, roleBreakdown, recentUsers] = await Promise.all([
+      pool.query(`
+        SELECT
+          TO_CHAR(DATE_TRUNC('week', created_at), 'Mon DD') AS week,
+          COUNT(*) AS count
+        FROM users
+        WHERE created_at >= NOW() - INTERVAL '12 weeks'
+        GROUP BY DATE_TRUNC('week', created_at)
+        ORDER BY DATE_TRUNC('week', created_at)
+      `),
+      pool.query(`
+        SELECT
+          TO_CHAR(DATE_TRUNC('week', enrolled_at), 'Mon DD') AS week,
+          COUNT(*) AS count
+        FROM enrollments
+        WHERE enrolled_at >= NOW() - INTERVAL '12 weeks'
+        GROUP BY DATE_TRUNC('week', enrolled_at)
+        ORDER BY DATE_TRUNC('week', enrolled_at)
+      `),
+      pool.query(`
+        SELECT
+          TO_CHAR(DATE_TRUNC('week', e.enrolled_at), 'Mon DD') AS week,
+          COALESCE(SUM(c.price), 0) AS revenue
+        FROM enrollments e
+        JOIN courses c ON c.id = e.course_id
+        WHERE e.enrolled_at >= NOW() - INTERVAL '12 weeks'
+        GROUP BY DATE_TRUNC('week', e.enrolled_at)
+        ORDER BY DATE_TRUNC('week', e.enrolled_at)
+      `),
+      pool.query(`
+        SELECT
+          TO_CHAR(DATE_TRUNC('week', created_at), 'Mon DD') AS week,
+          COUNT(*) AS count
+        FROM bookings
+        WHERE created_at >= NOW() - INTERVAL '12 weeks'
+        GROUP BY DATE_TRUNC('week', created_at)
+        ORDER BY DATE_TRUNC('week', created_at)
+      `),
+      pool.query(`
+        SELECT c.title, c.category, COUNT(e.id) AS enrollments,
+               COALESCE(SUM(c.price), 0) AS revenue
+        FROM courses c
+        LEFT JOIN enrollments e ON e.course_id = c.id
+        WHERE c.published = true
+        GROUP BY c.id, c.title, c.category
+        ORDER BY enrollments DESC
+        LIMIT 5
+      `),
+      pool.query(`
+        SELECT r.role, COUNT(*) AS count
+        FROM user_roles r
+        GROUP BY r.role
+        ORDER BY count DESC
+      `),
+      pool.query(`
+        SELECT u.id, u.full_name, u.email, u.avatar_url, u.created_at,
+               ARRAY_AGG(r.role) FILTER (WHERE r.role IS NOT NULL) AS roles
+        FROM users u
+        LEFT JOIN user_roles r ON r.user_id = u.id
+        GROUP BY u.id, u.full_name, u.email, u.avatar_url, u.created_at
+        ORDER BY u.created_at DESC
+        LIMIT 8
+      `),
+    ]);
+
+    return res.json({
+      userGrowth: userGrowth.rows,
+      enrollmentTrend: enrollmentTrend.rows,
+      revenueTrend: revenueTrend.rows,
+      bookingTrend: bookingTrend.rows,
+      topCourses: topCourses.rows,
+      roleBreakdown: roleBreakdown.rows,
+      recentUsers: recentUsers.rows,
+    });
+  } catch (err: any) {
+    return res.status(500).json({ error: "Failed to fetch analytics" });
+  }
+});
+
+router.get("/mentors/:id", requireAdmin, async (req, res) => {
+  try {
+    const { rows: mentorRows } = await pool.query("SELECT * FROM mentors WHERE id = $1", [req.params.id]);
+    if (mentorRows.length === 0) return res.status(404).json({ error: "Mentor not found" });
+    const { rows: slots } = await pool.query(
+      "SELECT * FROM availability_slots WHERE mentor_id = $1 ORDER BY day_of_week, start_time",
+      [req.params.id]
+    );
+    const { rows: bookings } = await pool.query(
+      `SELECT b.*, u.full_name AS student_name, u.email AS student_email, u.avatar_url AS student_avatar
+       FROM bookings b
+       JOIN users u ON u.id = b.student_id
+       WHERE b.mentor_id = $1
+       ORDER BY b.session_date DESC, b.start_time DESC
+       LIMIT 20`,
+      [req.params.id]
+    );
+    return res.json({ mentor: mentorRows[0], slots, bookings });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to fetch mentor details" });
   }
 });
 

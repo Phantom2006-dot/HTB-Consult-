@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, BookOpen, Users, GraduationCap, FolderOpen,
@@ -25,6 +25,12 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
   const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
   const isMobile = useIsMobile();
 
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth");
+    }
+  }, [authLoading, user, navigate]);
+
   if (authLoading || adminLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -33,10 +39,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
     );
   }
 
-  if (!user) {
-    navigate("/auth");
-    return null;
-  }
+  if (!user) return null;
 
   if (!isAdmin) {
     return (
@@ -70,7 +73,8 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
 
       <nav className="flex-1 p-2 space-y-0.5">
         {adminLinks.map((link) => {
-          const isActive = location.pathname === link.path;
+          const isActive = location.pathname === link.path ||
+            (link.path !== "/admin" && location.pathname.startsWith(link.path));
           return (
             <Link
               key={link.path}

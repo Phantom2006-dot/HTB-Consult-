@@ -108,22 +108,32 @@ const MentorProfile = () => {
     return availableDayNumbers.includes(date.getDay());
   };
 
+  const availableDayNames = [...new Set(slots.map(s => dayNames[s.day_of_week]))];
+
   return (
     <SidebarLayout>
       <div className="px-4 lg:px-8 py-6 max-w-5xl mx-auto space-y-8">
         {/* Header */}
         <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-start gap-4">
-              <div className="w-20 h-20 rounded-full bg-primary/15 text-primary flex items-center justify-center text-2xl font-bold shrink-0">
-                {getInitials(mentor.name)}
-              </div>
+            <div className="flex items-start gap-5">
+              {mentor.avatar_url ? (
+                <img
+                  src={mentor.avatar_url}
+                  alt={mentor.name}
+                  className="w-20 h-20 rounded-full object-cover shrink-0 ring-2 ring-border"
+                />
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-primary/15 text-primary flex items-center justify-center text-2xl font-bold shrink-0 ring-2 ring-border">
+                  {getInitials(mentor.name)}
+                </div>
+              )}
               <div className="space-y-2">
                 <h1 className="text-2xl font-serif font-bold text-foreground">{mentor.name}</h1>
                 <p className="text-sm text-muted-foreground">{mentor.title}</p>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
-                  <span className="flex items-center gap-1"><Star size={14} className="text-primary fill-primary" /> {mentor.rating}</span>
-                  <span className="flex items-center gap-1"><Briefcase size={14} /> {mentor.years_experience} years</span>
+                  <span className="flex items-center gap-1"><Star size={14} className="text-amber-500 fill-amber-500" /> {parseFloat(mentor.rating || 0).toFixed(1)}</span>
+                  <span className="flex items-center gap-1"><Briefcase size={14} /> {mentor.years_experience} yrs exp</span>
                   <span className="flex items-center gap-1"><Users size={14} /> {mentor.total_sessions} sessions</span>
                 </div>
               </div>
@@ -134,9 +144,28 @@ const MentorProfile = () => {
           <Card className="border-border bg-card">
             <CardContent className="p-5 space-y-3">
               <h3 className="font-semibold text-sm text-foreground">Session Info</h3>
-              <div className="text-sm text-muted-foreground space-y-1">
-                <p>Rate: <span className="text-foreground font-medium">£{mentor.hourly_rate}/hr</span></p>
-                <p>Available: <span className="text-foreground font-medium">{Object.keys(slotsByDay).join(", ") || "No slots"}</span></p>
+              <div className="text-sm space-y-2">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Hourly rate</span>
+                  <span className="text-foreground font-semibold text-base">£{mentor.hourly_rate}/hr</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Rating</span>
+                  <span className="text-foreground font-medium flex items-center gap-1">
+                    <Star size={12} className="text-amber-500 fill-amber-500" /> {parseFloat(mentor.rating || 0).toFixed(1)}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Sessions done</span>
+                  <span className="text-foreground font-medium">{mentor.total_sessions}</span>
+                </div>
+                <Separator />
+                <div>
+                  <p className="text-muted-foreground text-xs mb-1">Available days</p>
+                  <p className="text-foreground font-medium text-xs">
+                    {availableDayNames.length > 0 ? availableDayNames.join(", ") : "Contact for availability"}
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
