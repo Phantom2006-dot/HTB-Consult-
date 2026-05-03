@@ -1,84 +1,76 @@
 # HTB Consult Academy
 
-A full-stack learning management platform for HighTicketBoss (HTB Consults), offering professional training in Project Management, Business Analysis, and career development.
+A full-stack learning and consultancy platform for HighTicketBoss (HTB Consults), offering courses, mentoring, and AI-powered career advice.
 
-## Architecture
+## Stack
 
-- **Frontend**: React 18 + TypeScript + Vite (port 5000)
-- **Backend**: Express.js + TypeScript (port 3001)
+- **Frontend**: React 18 + Vite + TypeScript + Tailwind CSS + Shadcn UI
+- **Backend**: Express.js (Node.js) with TypeScript
 - **Database**: Replit PostgreSQL (via `pg` driver)
-- **Auth**: JWT stored in localStorage (`htb_token`), 30-day expiry
-- **Styling**: Tailwind CSS + shadcn/ui + Radix UI
-- **Animations**: Framer Motion
+- **Auth**: Custom JWT authentication (bcryptjs + jsonwebtoken)
+- **Routing**: React Router DOM v6
+- **State**: TanStack Query (React Query)
 
 ## Project Structure
 
 ```
-src/                  React frontend
-  components/         Reusable UI components
-  pages/              Route-level page components
-    admin/            Admin-only pages
-  contexts/           React context providers (AuthContext)
-  hooks/              Custom data-fetching hooks
-  lib/                API client (api.ts), utilities
-  integrations/       Supabase stub (replaced by Express API)
-server/               Express backend
-  routes/             API route handlers
-  middleware/         Auth middleware (JWT verification)
-  lib/                Email helper (nodemailer)
-  db.ts               PostgreSQL pool connection
-  index.ts            Server entry point
-schema.sql            Full database schema for Replit PostgreSQL
+src/                    # React frontend
+  pages/                # Route-level page components
+  components/           # Reusable UI components (+ Shadcn ui/)
+  contexts/             # AuthContext (JWT-based)
+  hooks/                # Data-fetching hooks
+  lib/                  # api.ts fetch wrapper
+  integrations/supabase # No-op stub (legacy, not used at runtime)
+
+server/                 # Express backend
+  index.ts              # Entry point, middleware, route registration
+  db.ts                 # PostgreSQL pool + runtime migrations
+  schema.ts             # Full schema auto-init on startup
+  routes/               # Modular API endpoints
+  middleware/auth.ts    # JWT verify, requireAuth/requireAdmin
+  lib/email.ts          # Nodemailer (SMTP optional, logs if unconfigured)
+  lib/logger.ts         # Structured console logger
 ```
 
-## Key Features
+## Running the App
 
-- **Courses**: Browse, enroll, track progress through video/live/book courses
-- **Mentors**: Book mentoring sessions with availability management
-- **AI Chat**: HTB Consults AI assistant (OpenAI GPT-4o-mini, streaming SSE)
-- **Admin Panel**: Manage users, courses, mentors, enrollments
-- **Blog/Articles**: Full Medium/Substack-style blog — rich markdown editor with toolbar + live preview, ReactMarkdown rendering with prose styling, featured article toggle (admin-only), read-tracking via IntersectionObserver, mentor article management at `/mentor/articles`, public blog at `/blog` with search + featured hero layout
-- **Email System**: Internal messaging between users
-- **Notifications**: Activity-based notification feed
+```bash
+npm run dev    # Starts both Vite (port 5000) and Express (port 3001) concurrently
+```
+
+Vite proxies `/api/*` requests to `http://localhost:3001`.
 
 ## Environment Variables
 
-Set in `.replit` `[userenv]` section:
-- `JWT_SECRET` — JWT signing secret
-- `SERVER_PORT` — Express port (3001)
-- `NODE_ENV` — development/production
-- `VITE_CLOUDINARY_CLOUD_NAME` — Cloudinary for image uploads
-- `VITE_CLOUDINARY_UPLOAD_PRESET` — Cloudinary upload preset
-- `FRONTEND_URL` — Used for password reset email links
+### Secrets (Replit Secrets tab)
+- `JWT_SECRET` — Required. Signs authentication tokens.
+- `DATABASE_URL` — Auto-provisioned by Replit PostgreSQL.
+- `GROQ_API_KEY` — Optional. Enables AI chat via Groq (llama-3.1-8b-instant).
+- `GEMINI_API_KEY` — Optional. Enables AI chat via Google Gemini.
+- `OPENAI_API_KEY` — Optional. Enables AI chat via OpenAI.
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` — Optional. Enables transactional email (verification, password reset). Without these, emails are logged to console only.
 
-Optional (for AI chat and email):
-- `OPENAI_API_KEY` — Required for AI chat feature
-- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` — For email delivery
+### Shared Env Vars (.replit)
+- `SERVER_PORT=3001` — Express server port
+- `NODE_ENV=development`
+- `VITE_CLOUDINARY_CLOUD_NAME` — For image uploads
+- `VITE_CLOUDINARY_UPLOAD_PRESET` — For image uploads
 
 ## Database
 
-Schema is defined in `server/schema.ts` and auto-applied on server startup via `initSchema()`. Uses Replit's built-in PostgreSQL (connection via `DATABASE_URL`).
+Schema is automatically created on server startup (`server/schema.ts`). No manual migrations needed. Tables include: users, user_roles, courses, modules, lessons, enrollments, lesson_progress, mentors, bookings, bookmarks, certificates, chat_conversations, chat_messages, emails, user_notifications, articles, course_resources, password_reset_tokens.
 
-Tables: `users`, `user_roles`, `categories`, `courses`, `modules`, `lessons`, `enrollments`, `bookmarks`, `mentors`, `availability_slots`, `bookings`, `chat_conversations`, `chat_messages`, `emails`, `certificates`, `articles`, `article_reads`
+## AI Chat
 
-Default admin account:
-- Email: `phantom@htbconsult.com`
-- Password: `Phantom2006++`
+The `/api/chat` endpoint tries providers in order: Groq → Gemini → OpenAI. Add any key to enable that provider. The app works without AI keys — the chat page will show an error if no provider is configured.
 
-## Development
+## User Roles
 
-```bash
-npm run dev   # Starts both Vite (5000) and Express (3001) concurrently
-```
+- `student` — Default role on registration
+- `mentor` — Sign up with `role: "mentor"`, creates a mentor profile
+- `admin` — Manually assigned in `user_roles` table
 
 ## Deployment
 
-Build and serve statically:
-```bash
-npm run build  # Builds frontend to dist/public, compiles server to dist/
-npm start      # Runs compiled server serving static frontend
-```
-
-## Pages of note
-
-- `/services` ("How It Works") — pixel-tuned hero with dark green radial background, left column of 6 dark feature cards, right column with a CSS-animated rotating dashed orbit (`.orbit-spin` class in `src/index.css`), centered HTB workspace photo at `public/how-it-works-center.jpg`, and 6 numbered white step cards orbiting it. Cards positioned via `NODE_POSITIONS` percentages and `Place` enum (`above`/`right`/`left`/`below-right`/`below-left`). Uses Framer Motion for entry animations; mobile (<lg) falls back to `MobileSteps` stacked layout.
+- Build: `npm run build` (Vite → `dist/public`, tsc → `dist/server`)
+- Start: `node dist/server/index.js` with `SERVER_PORT=8080`
