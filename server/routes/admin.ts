@@ -108,8 +108,8 @@ router.get("/analytics", requireAdmin, async (req, res) => {
       userGrowth: userGrowth.rows,
       enrollmentTrend: enrollmentTrend.rows,
       bookingTrend: bookingTrend.rows,
-      topCourses: topCourses.rows,
-      roleBreakdown: roleBreakdown.rows,
+      topCourses: topCourses.rows.map((r: any) => ({ ...r, enrollments: parseInt(r.enrollments), revenue: parseFloat(r.revenue) })),
+      roleBreakdown: roleBreakdown.rows.map((r: any) => ({ ...r, count: parseInt(r.count) })),
       recentUsers: recentUsers.rows,
       period,
     });
