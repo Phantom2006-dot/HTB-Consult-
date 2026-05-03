@@ -280,7 +280,16 @@ const AdminDashboard = () => {
                           ))}
                         </Pie>
                         <Tooltip
-                          contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+                          contentStyle={{
+                            background: "#ffffff",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: 8,
+                            fontSize: 12,
+                            color: "#0f172a",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                          }}
+                          itemStyle={{ color: "#0f172a", fontWeight: 600 }}
+                          labelStyle={{ color: "#64748b" }}
                           formatter={(value: any, name: any) => [value, name]}
                         />
                       </PieChart>
