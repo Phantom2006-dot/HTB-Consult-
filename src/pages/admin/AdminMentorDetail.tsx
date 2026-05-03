@@ -421,7 +421,8 @@ const AdminMentorDetail = () => {
                               type="time"
                               value={daySlots[i].start_time}
                               onChange={(e) => updateSlot(i, "start_time", e.target.value)}
-                              className="h-8 text-sm w-32"
+                              onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker?.()}
+                              className="h-8 text-sm w-32 cursor-pointer"
                             />
                           </div>
                           <div className="flex items-center gap-1.5">
@@ -430,7 +431,8 @@ const AdminMentorDetail = () => {
                               type="time"
                               value={daySlots[i].end_time}
                               onChange={(e) => updateSlot(i, "end_time", e.target.value)}
-                              className="h-8 text-sm w-32"
+                              onClick={(e) => (e.currentTarget as HTMLInputElement).showPicker?.()}
+                              className="h-8 text-sm w-32 cursor-pointer"
                             />
                           </div>
                         </div>
