@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { usePageTracking } from "@/hooks/use-page-tracking";
 import Index from "./pages/Index";
 import Courses from "./pages/Courses";
 import Services from "./pages/Services";
@@ -44,14 +45,10 @@ import VerifyEmail from "./pages/VerifyEmail";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter >
-        <AuthProvider>
-          <Routes>
+function AppRoutes() {
+  usePageTracking();
+  return (
+    <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/courses" element={<Courses />} />
             <Route path="/explore" element={<Explore />} />
@@ -90,7 +87,18 @@ const App = () => (
             <Route path="/mentor/articles" element={<MentorArticles />} />
             <Route path="/mentor/articles/:id" element={<AdminArticleEditor />} />
             <Route path="*" element={<NotFound />} />
-          </Routes>
+    </Routes>
+  );
+}
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <AuthProvider>
+          <AppRoutes />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>

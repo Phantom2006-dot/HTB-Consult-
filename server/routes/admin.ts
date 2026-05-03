@@ -112,6 +112,45 @@ router.get("/analytics", requireAdmin, async (_req, res) => {
   }
 });
 
+router.get("/visitors", requireAdmin, async (_req, res) => {
+  try {
+    const [todayVisits, totalVisits, uniqueToday, uniqueTotal, visitTrend, topPages] = await Promise.all([
+      pool.query(`SELECT COUNT(*) FROM site_visits WHERE created_at >= CURRENT_DATE`),
+      pool.query(`SELECT COUNT(*) FROM site_visits`),
+      pool.query(`SELECT COUNT(DISTINCT session_id) FROM site_visits WHERE created_at >= CURRENT_DATE`),
+      pool.query(`SELECT COUNT(DISTINCT session_id) FROM site_visits`),
+      pool.query(`
+        SELECT
+          TO_CHAR(DATE_TRUNC('day', created_at), 'Mon DD') AS day,
+          COUNT(*) AS visits,
+          COUNT(DISTINCT session_id) AS unique_visitors
+        FROM site_visits
+        WHERE created_at >= NOW() - INTERVAL '14 days'
+        GROUP BY DATE_TRUNC('day', created_at)
+        ORDER BY DATE_TRUNC('day', created_at)
+      `),
+      pool.query(`
+        SELECT page, COUNT(*) AS views, COUNT(DISTINCT session_id) AS unique_views
+        FROM site_visits
+        WHERE created_at >= NOW() - INTERVAL '30 days'
+        GROUP BY page
+        ORDER BY views DESC
+        LIMIT 10
+      `),
+    ]);
+    return res.json({
+      todayVisits: parseInt(todayVisits.rows[0].count),
+      totalVisits: parseInt(totalVisits.rows[0].count),
+      uniqueToday: parseInt(uniqueToday.rows[0].count),
+      uniqueTotal: parseInt(uniqueTotal.rows[0].count),
+      visitTrend: visitTrend.rows,
+      topPages: topPages.rows,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to fetch visitor stats" });
+  }
+});
+
 router.get("/mentors/:id", requireAdmin, async (req, res) => {
   try {
     const { rows: mentorRows } = await pool.query("SELECT * FROM mentors WHERE id = $1", [req.params.id]);

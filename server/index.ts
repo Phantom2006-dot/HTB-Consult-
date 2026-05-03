@@ -112,6 +112,21 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
 app.get("/api/health", (_req, res) => res.json({ status: "ok" }));
 
+// ── Visitor tracking (public, fire-and-forget) ────────────────────────────────
+app.post("/api/track", async (req: Request, res: Response) => {
+  try {
+    const { session_id, page, referrer, user_id } = req.body || {};
+    if (!session_id) return res.status(400).json({ error: "session_id required" });
+    await pool.query(
+      `INSERT INTO site_visits (session_id, page, referrer, user_id) VALUES ($1, $2, $3, $4)`,
+      [String(session_id).slice(0, 64), String(page || "/").slice(0, 255), referrer ? String(referrer).slice(0, 255) : null, user_id || null]
+    );
+    return res.json({ ok: true });
+  } catch {
+    return res.status(500).json({ error: "tracking failed" });
+  }
+});
+
 // ── API routes ────────────────────────────────────────────────────────────────
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", coursesRoutes);

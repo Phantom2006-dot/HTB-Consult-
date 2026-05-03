@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import {
   BookOpen, Users, GraduationCap, UserCheck, PoundSterling,
-  CheckCircle2, ArrowRight, CalendarDays, FileText, TrendingUp,
+  CheckCircle2, ArrowRight, CalendarDays, FileText, TrendingUp, Eye, MousePointerClick,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -33,13 +33,19 @@ const AdminDashboard = () => {
     queryFn: () => api.get<any[]>("/api/admin/recent-enrollments"),
   });
 
+  const { data: visitors } = useQuery({
+    queryKey: ["admin-visitors"],
+    queryFn: () => api.get<any>("/api/admin/visitors"),
+    refetchInterval: 60_000,
+  });
+
   const statCards = [
-    { icon: Users, label: "Registered Users", value: stats?.users ?? 0, color: "text-purple-500", bg: "bg-purple-500/10", trend: "+members" },
+    { icon: Users, label: "Registered Users", value: stats?.users ?? 0, color: "text-purple-500", bg: "bg-purple-500/10" },
     { icon: GraduationCap, label: "Enrollments", value: stats?.enrollments ?? 0, color: "text-primary", bg: "bg-primary/10" },
     { icon: BookOpen, label: "Published Courses", value: stats?.courses ?? 0, color: "text-blue-500", bg: "bg-blue-500/10" },
     { icon: UserCheck, label: "Active Mentors", value: stats?.mentors ?? 0, color: "text-green-500", bg: "bg-green-500/10" },
-    { icon: CheckCircle2, label: "Completions", value: stats?.completed ?? 0, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-    { icon: CalendarDays, label: "Confirmed Bookings", value: stats?.bookings ?? 0, color: "text-cyan-500", bg: "bg-cyan-500/10" },
+    { icon: Eye, label: "Visitors Today", value: visitors?.uniqueToday ?? 0, color: "text-teal-500", bg: "bg-teal-500/10" },
+    { icon: MousePointerClick, label: "Total Page Views", value: visitors?.totalVisits ?? 0, color: "text-sky-500", bg: "bg-sky-500/10" },
     {
       icon: PoundSterling,
       label: "Total Revenue",
@@ -277,8 +283,85 @@ const AdminDashboard = () => {
           </Card>
         </motion.div>
 
+        {/* Visitor Traffic */}
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={5} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Visitor Trend Chart */}
+          <Card className="border-border bg-card lg:col-span-2">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <Eye size={16} className="text-teal-500" /> Site Traffic (14 days)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {!visitors ? (
+                <Skeleton className="h-48 w-full" />
+              ) : (visitors?.visitTrend ?? []).length === 0 ? (
+                <div className="h-48 flex items-center justify-center text-sm text-muted-foreground">No visit data yet</div>
+              ) : (
+                <ResponsiveContainer width="100%" height={200}>
+                  <AreaChart data={visitors.visitTrend} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorVisits" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#14b8a6" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="colorUnique" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                    <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#888" }} tickLine={false} axisLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: "#888" }} tickLine={false} axisLine={false} allowDecimals={false} />
+                    <Tooltip
+                      contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+                      labelStyle={{ color: "hsl(var(--foreground))" }}
+                    />
+                    <Area type="monotone" dataKey="visits" stroke="#14b8a6" strokeWidth={2} fill="url(#colorVisits)" name="Page Views" />
+                    <Area type="monotone" dataKey="unique_visitors" stroke="#0ea5e9" strokeWidth={2} fill="url(#colorUnique)" name="Unique Visitors" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              )}
+              <div className="flex gap-4 mt-1">
+                <span className="flex items-center gap-1.5 text-xs text-muted-foreground"><span className="w-3 h-0.5 bg-teal-500 inline-block rounded" /> Page Views</span>
+                <span className="flex items-center gap-1.5 text-xs text-muted-foreground"><span className="w-3 h-0.5 bg-sky-500 inline-block rounded" /> Unique Visitors</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Top Pages */}
+          <Card className="border-border bg-card">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
+                <MousePointerClick size={16} className="text-sky-500" /> Top Pages (30 days)
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {!visitors ? (
+                <div className="px-5 py-4 space-y-2">
+                  {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}
+                </div>
+              ) : (visitors?.topPages ?? []).length === 0 ? (
+                <p className="p-5 text-sm text-muted-foreground text-center">No data yet</p>
+              ) : (
+                <div className="divide-y divide-border">
+                  {(visitors.topPages as any[]).map((p: any) => (
+                    <div key={p.page} className="px-4 py-2.5 flex items-center justify-between gap-2">
+                      <p className="text-xs text-foreground truncate font-mono flex-1" title={p.page}>{p.page}</p>
+                      <div className="shrink-0 flex items-center gap-2">
+                        <span className="text-[11px] text-muted-foreground">{p.unique_views} uniq</span>
+                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{p.views}</Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+
         {/* Recent Users + Recent Enrollments */}
-        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={5} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={6} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Recent Users */}
           <Card className="border-border bg-card">
             <CardHeader className="pb-2">

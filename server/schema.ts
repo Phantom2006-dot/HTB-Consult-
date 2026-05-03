@@ -260,6 +260,19 @@ export async function initSchema() {
     `);
 
     await client.query(`
+      CREATE TABLE IF NOT EXISTS site_visits (
+        id         BIGSERIAL PRIMARY KEY,
+        session_id TEXT NOT NULL,
+        page       TEXT NOT NULL DEFAULT '/',
+        referrer   TEXT,
+        user_id    UUID REFERENCES users(id) ON DELETE SET NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS idx_site_visits_created ON site_visits(created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_site_visits_session ON site_visits(session_id);
+    `);
+
+    await client.query(`
       INSERT INTO categories (name) VALUES
         ('Business Analysis'),
         ('Digital Transformation'),
