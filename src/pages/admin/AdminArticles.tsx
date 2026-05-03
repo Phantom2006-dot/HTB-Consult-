@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { fadeUp } from "@/lib/animations";
-import SidebarLayout from "@/components/SidebarLayout";
+import AdminLayout from "@/components/AdminLayout";
 
 interface Article {
   id: string;
@@ -75,7 +75,7 @@ const AdminArticles = () => {
   });
 
   return (
-    <SidebarLayout>
+    <AdminLayout>
       <div className="px-4 lg:px-8 py-6 max-w-5xl mx-auto space-y-6">
         <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}
           className="flex items-center justify-between">
@@ -192,7 +192,7 @@ const AdminArticles = () => {
           )}
         </motion.div>
       </div>
-    </SidebarLayout>
+    </AdminLayout>
   );
 };
 
