@@ -19,6 +19,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import KeyboardShortcutHint from "@/components/KeyboardShortcutHint";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { useUnreadCounts } from "@/hooks/use-unread-counts";
+import htbLogo from "@/assets/htb-logo.png";
 
 const sidebarLinks = [
   { icon: Home, label: "Dashboard", path: "/dashboard" },
@@ -136,7 +137,7 @@ const SidebarLayout = ({ children }: { children: ReactNode }) => {
               <button className="lg:hidden text-foreground" onClick={() => setSidebarOpen(true)}>
                 <Menu size={24} />
               </button>
-              <BackButton />
+              <img src={htbLogo} alt="HTB Consult Academy" className="h-9 w-auto" />
             </div>
 
             <div className="hidden md:flex items-center flex-1 max-w-lg mx-8">
