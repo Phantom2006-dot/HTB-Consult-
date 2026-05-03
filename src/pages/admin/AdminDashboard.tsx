@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 import {
   BookOpen, Users, GraduationCap, UserCheck, PoundSterling,
-  CheckCircle2, ArrowRight, CalendarDays, FileText, TrendingUp, Eye, MousePointerClick,
+  ArrowRight, CalendarDays, FileText, TrendingUp, Eye, MousePointerClick,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,17 +16,58 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend,
+  Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
 
 const COLORS = ["#e67000", "#3b82f6", "#10b981", "#8b5cf6", "#f59e0b"];
 
+const PERIODS = [
+  { label: "1M", value: "1m" },
+  { label: "3M", value: "3m" },
+  { label: "6M", value: "6m" },
+  { label: "All", value: "all" },
+];
+
+const VISITOR_PERIODS = [
+  { label: "7D", value: "7d" },
+  { label: "14D", value: "14d" },
+  { label: "1M", value: "1m" },
+  { label: "3M", value: "3m" },
+];
+
+function PeriodSelector({ value, options, onChange }: {
+  value: string;
+  options: { label: string; value: string }[];
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex items-center gap-0.5 bg-muted/40 rounded-lg p-0.5">
+      {options.map((o) => (
+        <button
+          key={o.value}
+          onClick={() => onChange(o.value)}
+          className={`text-[11px] px-2.5 py-1 rounded-md font-medium transition-colors ${
+            value === o.value
+              ? "bg-card text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 const AdminDashboard = () => {
+  const [analyticsPeriod, setAnalyticsPeriod] = useState("3m");
+  const [visitorPeriod, setVisitorPeriod] = useState("14d");
+
   const { data: stats, isLoading } = useAdminStats();
 
   const { data: analytics, isLoading: analyticsLoading } = useQuery({
-    queryKey: ["admin-analytics"],
-    queryFn: () => api.get<any>("/api/admin/analytics"),
+    queryKey: ["admin-analytics", analyticsPeriod],
+    queryFn: () => api.get<any>(`/api/admin/analytics?period=${analyticsPeriod}`),
   });
 
   const { data: recentEnrollments } = useQuery({
@@ -33,9 +75,9 @@ const AdminDashboard = () => {
     queryFn: () => api.get<any[]>("/api/admin/recent-enrollments"),
   });
 
-  const { data: visitors } = useQuery({
-    queryKey: ["admin-visitors"],
-    queryFn: () => api.get<any>("/api/admin/visitors"),
+  const { data: visitors, isLoading: visitorsLoading } = useQuery({
+    queryKey: ["admin-visitors", visitorPeriod],
+    queryFn: () => api.get<any>(`/api/admin/visitors?period=${visitorPeriod}`),
     refetchInterval: 60_000,
   });
 
@@ -67,15 +109,16 @@ const AdminDashboard = () => {
 
   const userGrowthData = analytics?.userGrowth ?? [];
   const enrollmentData = analytics?.enrollmentTrend ?? [];
-  const revenueData = analytics?.revenueTrend ?? [];
   const topCourses = analytics?.topCourses ?? [];
   const roleBreakdown = analytics?.roleBreakdown ?? [];
   const recentUsers = analytics?.recentUsers ?? [];
 
   const combinedTrend = userGrowthData.map((u: any) => {
-    const enroll = enrollmentData.find((e: any) => e.week === u.week);
-    return { week: u.week, users: parseInt(u.count), enrollments: parseInt(enroll?.count ?? 0) };
+    const enroll = enrollmentData.find((e: any) => e.period === u.period);
+    return { period: u.period, users: parseInt(u.count), enrollments: parseInt(enroll?.count ?? 0) };
   });
+
+  const periodLabel = PERIODS.find(p => p.value === analyticsPeriod)?.label ?? "3M";
 
   return (
     <AdminLayout>
@@ -126,22 +169,24 @@ const AdminDashboard = () => {
           </div>
         </motion.div>
 
-        {/* Growth Charts */}
-        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={3} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Member + Enrollment Growth */}
+        {/* Member & Enrollment Growth — full width with period picker */}
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={3}>
           <Card className="border-border bg-card">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
-                <TrendingUp size={16} className="text-primary" /> Member Growth (12 weeks)
-              </CardTitle>
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <TrendingUp size={16} className="text-primary" /> Member &amp; Enrollment Growth
+                </CardTitle>
+                <PeriodSelector value={analyticsPeriod} options={PERIODS} onChange={setAnalyticsPeriod} />
+              </div>
             </CardHeader>
             <CardContent className="pt-0">
               {analyticsLoading ? (
-                <Skeleton className="h-48 w-full" />
+                <Skeleton className="h-56 w-full" />
               ) : combinedTrend.length === 0 ? (
-                <div className="h-48 flex items-center justify-center text-sm text-muted-foreground">No data yet</div>
+                <div className="h-56 flex items-center justify-center text-sm text-muted-foreground">No data for this period yet</div>
               ) : (
-                <ResponsiveContainer width="100%" height={200}>
+                <ResponsiveContainer width="100%" height={220}>
                   <AreaChart data={combinedTrend} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
@@ -154,78 +199,45 @@ const AdminDashboard = () => {
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="week" tick={{ fontSize: 10, fill: "#888" }} tickLine={false} axisLine={false} />
+                    <XAxis dataKey="period" tick={{ fontSize: 10, fill: "#888" }} tickLine={false} axisLine={false} />
                     <YAxis tick={{ fontSize: 10, fill: "#888" }} tickLine={false} axisLine={false} allowDecimals={false} />
                     <Tooltip
                       contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
                       labelStyle={{ color: "hsl(var(--foreground))" }}
                     />
-                    <Area type="monotone" dataKey="users" stroke="#8b5cf6" strokeWidth={2} fill="url(#colorUsers)" name="New Users" />
+                    <Area type="monotone" dataKey="users" stroke="#8b5cf6" strokeWidth={2} fill="url(#colorUsers)" name="New Members" />
                     <Area type="monotone" dataKey="enrollments" stroke="#e67000" strokeWidth={2} fill="url(#colorEnroll)" name="Enrollments" />
                   </AreaChart>
                 </ResponsiveContainer>
               )}
-              <div className="flex gap-4 mt-1">
-                <span className="flex items-center gap-1.5 text-xs text-muted-foreground"><span className="w-3 h-0.5 bg-purple-500 inline-block rounded" /> New Users</span>
+              <div className="flex gap-4 mt-2">
+                <span className="flex items-center gap-1.5 text-xs text-muted-foreground"><span className="w-3 h-0.5 bg-purple-500 inline-block rounded" /> New Members</span>
                 <span className="flex items-center gap-1.5 text-xs text-muted-foreground"><span className="w-3 h-0.5 bg-primary inline-block rounded" /> Enrollments</span>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Revenue Trend */}
-          <Card className="border-border bg-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
-                <PoundSterling size={16} className="text-amber-500" /> Revenue Trend (12 weeks)
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              {analyticsLoading ? (
-                <Skeleton className="h-48 w-full" />
-              ) : revenueData.length === 0 ? (
-                <div className="h-48 flex items-center justify-center text-sm text-muted-foreground">No revenue data yet</div>
-              ) : (
-                <ResponsiveContainer width="100%" height={200}>
-                  <AreaChart data={revenueData} margin={{ top: 4, right: 4, left: -10, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                    <XAxis dataKey="week" tick={{ fontSize: 10, fill: "#888" }} tickLine={false} axisLine={false} />
-                    <YAxis tick={{ fontSize: 10, fill: "#888" }} tickLine={false} axisLine={false} tickFormatter={(v) => `£${v}`} />
-                    <Tooltip
-                      contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
-                      formatter={(v: any) => [`£${parseFloat(v).toLocaleString()}`, "Revenue"]}
-                      labelStyle={{ color: "hsl(var(--foreground))" }}
-                    />
-                    <Area type="monotone" dataKey="revenue" stroke="#f59e0b" strokeWidth={2} fill="url(#colorRevenue)" name="Revenue" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              )}
             </CardContent>
           </Card>
         </motion.div>
 
         {/* Top Courses + Role Breakdown */}
         <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={4} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Top Courses */}
+          {/* Top Courses with period picker */}
           <Card className="border-border bg-card lg:col-span-2">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold text-foreground">Top Courses by Enrollment</CardTitle>
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <CardTitle className="text-sm font-semibold text-foreground">Top Courses by Enrollment</CardTitle>
+                <PeriodSelector value={analyticsPeriod} options={PERIODS} onChange={setAnalyticsPeriod} />
+              </div>
             </CardHeader>
             <CardContent className="pt-0">
               {analyticsLoading ? (
-                <Skeleton className="h-40 w-full" />
+                <Skeleton className="h-44 w-full" />
               ) : topCourses.length === 0 ? (
-                <div className="h-40 flex items-center justify-center text-sm text-muted-foreground">No courses yet</div>
+                <div className="h-44 flex items-center justify-center text-sm text-muted-foreground">No courses yet</div>
               ) : (
-                <ResponsiveContainer width="100%" height={180}>
+                <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={topCourses} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
                     <XAxis type="number" tick={{ fontSize: 10, fill: "#888" }} tickLine={false} axisLine={false} allowDecimals={false} />
-                    <YAxis type="category" dataKey="title" tick={{ fontSize: 10, fill: "#888" }} tickLine={false} axisLine={false} width={120} />
+                    <YAxis type="category" dataKey="title" tick={{ fontSize: 10, fill: "#888" }} tickLine={false} axisLine={false} width={130} />
                     <Tooltip
                       contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
                       labelStyle={{ color: "hsl(var(--foreground))" }}
@@ -234,6 +246,7 @@ const AdminDashboard = () => {
                   </BarChart>
                 </ResponsiveContainer>
               )}
+              <p className="text-[10px] text-muted-foreground mt-1">Showing top 8 courses · {periodLabel} period</p>
             </CardContent>
           </Card>
 
@@ -257,7 +270,7 @@ const AdminDashboard = () => {
                         nameKey="role"
                         cx="50%"
                         cy="50%"
-                        outerRadius={60}
+                        outerRadius={62}
                         paddingAngle={3}
                       >
                         {roleBreakdown.map((_: any, i: number) => (
@@ -285,20 +298,23 @@ const AdminDashboard = () => {
 
         {/* Visitor Traffic */}
         <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={5} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Visitor Trend Chart */}
+          {/* Visitor Trend with period picker */}
           <Card className="border-border bg-card lg:col-span-2">
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
-                <Eye size={16} className="text-teal-500" /> Site Traffic (14 days)
-              </CardTitle>
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
+                  <Eye size={16} className="text-teal-500" /> Site Traffic
+                </CardTitle>
+                <PeriodSelector value={visitorPeriod} options={VISITOR_PERIODS} onChange={setVisitorPeriod} />
+              </div>
             </CardHeader>
             <CardContent className="pt-0">
-              {!visitors ? (
-                <Skeleton className="h-48 w-full" />
+              {visitorsLoading ? (
+                <Skeleton className="h-52 w-full" />
               ) : (visitors?.visitTrend ?? []).length === 0 ? (
-                <div className="h-48 flex items-center justify-center text-sm text-muted-foreground">No visit data yet</div>
+                <div className="h-52 flex items-center justify-center text-sm text-muted-foreground">No visit data yet</div>
               ) : (
-                <ResponsiveContainer width="100%" height={200}>
+                <ResponsiveContainer width="100%" height={210}>
                   <AreaChart data={visitors.visitTrend} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorVisits" x1="0" y1="0" x2="0" y2="1">
@@ -322,7 +338,7 @@ const AdminDashboard = () => {
                   </AreaChart>
                 </ResponsiveContainer>
               )}
-              <div className="flex gap-4 mt-1">
+              <div className="flex gap-4 mt-2">
                 <span className="flex items-center gap-1.5 text-xs text-muted-foreground"><span className="w-3 h-0.5 bg-teal-500 inline-block rounded" /> Page Views</span>
                 <span className="flex items-center gap-1.5 text-xs text-muted-foreground"><span className="w-3 h-0.5 bg-sky-500 inline-block rounded" /> Unique Visitors</span>
               </div>
@@ -333,11 +349,11 @@ const AdminDashboard = () => {
           <Card className="border-border bg-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-semibold text-foreground flex items-center gap-2">
-                <MousePointerClick size={16} className="text-sky-500" /> Top Pages (30 days)
+                <MousePointerClick size={16} className="text-sky-500" /> Top Pages
               </CardTitle>
             </CardHeader>
             <CardContent className="p-0">
-              {!visitors ? (
+              {visitorsLoading ? (
                 <div className="px-5 py-4 space-y-2">
                   {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}
                 </div>

@@ -31,55 +31,61 @@ router.get("/stats", requireAdmin, async (_req, res) => {
   }
 });
 
-router.get("/analytics", requireAdmin, async (_req, res) => {
+router.get("/analytics", requireAdmin, async (req, res) => {
   try {
-    const [userGrowth, enrollmentTrend, revenueTrend, bookingTrend, topCourses, roleBreakdown, recentUsers] = await Promise.all([
+    const period = (req.query.period as string) || "3m";
+
+    // Determine interval + grouping based on period
+    type TruncUnit = "week" | "month";
+    const config: Record<string, { interval: string; trunc: TruncUnit; fmt: string }> = {
+      "1m":  { interval: "1 month",   trunc: "week",  fmt: "Mon DD" },
+      "3m":  { interval: "3 months",  trunc: "week",  fmt: "Mon DD" },
+      "6m":  { interval: "6 months",  trunc: "month", fmt: "Mon YYYY" },
+      "all": { interval: "100 years", trunc: "month", fmt: "Mon YYYY" },
+    };
+    const { interval, trunc, fmt } = config[period] ?? config["3m"];
+
+    const whereClause = period === "all" ? "" : `WHERE created_at >= NOW() - INTERVAL '${interval}'`;
+    const enrollWhereClause = period === "all" ? "" : `WHERE enrolled_at >= NOW() - INTERVAL '${interval}'`;
+
+    const [userGrowth, enrollmentTrend, bookingTrend, topCourses, roleBreakdown, recentUsers] = await Promise.all([
       pool.query(`
         SELECT
-          TO_CHAR(DATE_TRUNC('week', created_at), 'Mon DD') AS week,
+          TO_CHAR(DATE_TRUNC('${trunc}', created_at), '${fmt}') AS period,
           COUNT(*) AS count
         FROM users
-        WHERE created_at >= NOW() - INTERVAL '12 weeks'
-        GROUP BY DATE_TRUNC('week', created_at)
-        ORDER BY DATE_TRUNC('week', created_at)
+        ${whereClause}
+        GROUP BY DATE_TRUNC('${trunc}', created_at)
+        ORDER BY DATE_TRUNC('${trunc}', created_at)
       `),
       pool.query(`
         SELECT
-          TO_CHAR(DATE_TRUNC('week', enrolled_at), 'Mon DD') AS week,
+          TO_CHAR(DATE_TRUNC('${trunc}', enrolled_at), '${fmt}') AS period,
           COUNT(*) AS count
         FROM enrollments
-        WHERE enrolled_at >= NOW() - INTERVAL '12 weeks'
-        GROUP BY DATE_TRUNC('week', enrolled_at)
-        ORDER BY DATE_TRUNC('week', enrolled_at)
+        ${enrollWhereClause}
+        GROUP BY DATE_TRUNC('${trunc}', enrolled_at)
+        ORDER BY DATE_TRUNC('${trunc}', enrolled_at)
       `),
       pool.query(`
         SELECT
-          TO_CHAR(DATE_TRUNC('week', e.enrolled_at), 'Mon DD') AS week,
-          COALESCE(SUM(c.price), 0) AS revenue
-        FROM enrollments e
-        JOIN courses c ON c.id = e.course_id
-        WHERE e.enrolled_at >= NOW() - INTERVAL '12 weeks'
-        GROUP BY DATE_TRUNC('week', e.enrolled_at)
-        ORDER BY DATE_TRUNC('week', e.enrolled_at)
-      `),
-      pool.query(`
-        SELECT
-          TO_CHAR(DATE_TRUNC('week', created_at), 'Mon DD') AS week,
+          TO_CHAR(DATE_TRUNC('${trunc}', created_at), '${fmt}') AS period,
           COUNT(*) AS count
         FROM bookings
-        WHERE created_at >= NOW() - INTERVAL '12 weeks'
-        GROUP BY DATE_TRUNC('week', created_at)
-        ORDER BY DATE_TRUNC('week', created_at)
+        ${whereClause}
+        GROUP BY DATE_TRUNC('${trunc}', created_at)
+        ORDER BY DATE_TRUNC('${trunc}', created_at)
       `),
       pool.query(`
         SELECT c.title, c.category, COUNT(e.id) AS enrollments,
                COALESCE(SUM(c.price), 0) AS revenue
         FROM courses c
         LEFT JOIN enrollments e ON e.course_id = c.id
+          ${period !== "all" ? `AND e.enrolled_at >= NOW() - INTERVAL '${interval}'` : ""}
         WHERE c.published = true
         GROUP BY c.id, c.title, c.category
         ORDER BY enrollments DESC
-        LIMIT 5
+        LIMIT 8
       `),
       pool.query(`
         SELECT r.role, COUNT(*) AS count
@@ -101,19 +107,31 @@ router.get("/analytics", requireAdmin, async (_req, res) => {
     return res.json({
       userGrowth: userGrowth.rows,
       enrollmentTrend: enrollmentTrend.rows,
-      revenueTrend: revenueTrend.rows,
       bookingTrend: bookingTrend.rows,
       topCourses: topCourses.rows,
       roleBreakdown: roleBreakdown.rows,
       recentUsers: recentUsers.rows,
+      period,
     });
   } catch (err: any) {
     return res.status(500).json({ error: "Failed to fetch analytics" });
   }
 });
 
-router.get("/visitors", requireAdmin, async (_req, res) => {
+router.get("/visitors", requireAdmin, async (req, res) => {
   try {
+    const period = (req.query.period as string) || "14d";
+
+    const trendConfig: Record<string, { interval: string; trunc: string; fmt: string }> = {
+      "7d":  { interval: "7 days",   trunc: "day",   fmt: "Mon DD" },
+      "14d": { interval: "14 days",  trunc: "day",   fmt: "Mon DD" },
+      "1m":  { interval: "1 month",  trunc: "day",   fmt: "Mon DD" },
+      "3m":  { interval: "3 months", trunc: "week",  fmt: "Mon DD" },
+    };
+    const { interval, trunc, fmt } = trendConfig[period] ?? trendConfig["14d"];
+
+    const topPagesInterval = period === "3m" ? "3 months" : period === "1m" ? "1 month" : "30 days";
+
     const [todayVisits, totalVisits, uniqueToday, uniqueTotal, visitTrend, topPages] = await Promise.all([
       pool.query(`SELECT COUNT(*) FROM site_visits WHERE created_at >= CURRENT_DATE`),
       pool.query(`SELECT COUNT(*) FROM site_visits`),
@@ -121,18 +139,18 @@ router.get("/visitors", requireAdmin, async (_req, res) => {
       pool.query(`SELECT COUNT(DISTINCT session_id) FROM site_visits`),
       pool.query(`
         SELECT
-          TO_CHAR(DATE_TRUNC('day', created_at), 'Mon DD') AS day,
+          TO_CHAR(DATE_TRUNC('${trunc}', created_at), '${fmt}') AS day,
           COUNT(*) AS visits,
           COUNT(DISTINCT session_id) AS unique_visitors
         FROM site_visits
-        WHERE created_at >= NOW() - INTERVAL '14 days'
-        GROUP BY DATE_TRUNC('day', created_at)
-        ORDER BY DATE_TRUNC('day', created_at)
+        WHERE created_at >= NOW() - INTERVAL '${interval}'
+        GROUP BY DATE_TRUNC('${trunc}', created_at)
+        ORDER BY DATE_TRUNC('${trunc}', created_at)
       `),
       pool.query(`
         SELECT page, COUNT(*) AS views, COUNT(DISTINCT session_id) AS unique_views
         FROM site_visits
-        WHERE created_at >= NOW() - INTERVAL '30 days'
+        WHERE created_at >= NOW() - INTERVAL '${topPagesInterval}'
         GROUP BY page
         ORDER BY views DESC
         LIMIT 10
@@ -145,6 +163,7 @@ router.get("/visitors", requireAdmin, async (_req, res) => {
       uniqueTotal: parseInt(uniqueTotal.rows[0].count),
       visitTrend: visitTrend.rows,
       topPages: topPages.rows,
+      period,
     });
   } catch (err) {
     return res.status(500).json({ error: "Failed to fetch visitor stats" });
