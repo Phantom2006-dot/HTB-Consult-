@@ -255,38 +255,43 @@ const AdminDashboard = () => {
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-semibold text-foreground">Member Roles</CardTitle>
             </CardHeader>
-            <CardContent className="pt-0 flex flex-col items-center">
+            <CardContent className="pt-0">
               {analyticsLoading ? (
-                <Skeleton className="h-40 w-40 rounded-full" />
+                <div className="flex justify-center"><Skeleton className="h-40 w-40 rounded-full" /></div>
               ) : roleBreakdown.length === 0 ? (
                 <div className="h-40 flex items-center justify-center text-sm text-muted-foreground">No data</div>
               ) : (
                 <>
-                  <ResponsiveContainer width="100%" height={160}>
-                    <PieChart>
-                      <Pie
-                        data={roleBreakdown}
-                        dataKey="count"
-                        nameKey="role"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={62}
-                        paddingAngle={3}
-                      >
-                        {roleBreakdown.map((_: any, i: number) => (
-                          <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                  <div className="flex flex-wrap gap-2 justify-center mt-1">
+                  <div className="w-full">
+                    <ResponsiveContainer width="100%" height={170}>
+                      <PieChart>
+                        <Pie
+                          data={roleBreakdown.map((r: any) => ({ ...r, count: parseInt(r.count) }))}
+                          dataKey="count"
+                          nameKey="role"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={68}
+                          innerRadius={30}
+                          paddingAngle={3}
+                        >
+                          {roleBreakdown.map((_: any, i: number) => (
+                            <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="transparent" />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+                          formatter={(value: any, name: any) => [value, name]}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="flex flex-wrap gap-3 justify-center mt-1">
                     {roleBreakdown.map((r: any, i: number) => (
-                      <span key={r.role} className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ background: COLORS[i % COLORS.length] }} />
-                        {r.role} ({r.count})
+                      <span key={r.role} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <span className="w-2.5 h-2.5 rounded-full inline-block shrink-0" style={{ background: COLORS[i % COLORS.length] }} />
+                        <span className="capitalize">{r.role}</span>
+                        <span className="font-semibold text-foreground">({parseInt(r.count)})</span>
                       </span>
                     ))}
                   </div>
