@@ -554,9 +554,8 @@ const Index = () => {
               <Link to="/auth?tab=signup">Get Started Free <ArrowRight className="ml-2" size={15} /></Link>
             </Button>
             <Button
-              variant="outline"
               asChild
-              className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold px-8 h-11 text-sm"
+              className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold px-8 h-11 text-sm shadow-none"
             >
               <Link to="/courses">View All Courses</Link>
             </Button>
@@ -599,9 +598,8 @@ const Index = () => {
               </motion.p>
               <motion.div variants={fadeUp} custom={3}>
                 <Button
-                  variant="outline"
                   asChild
-                  className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold px-6"
+                  className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold px-6 shadow-none"
                 >
                   <Link to="/about">Learn More About Us <ChevronRight size={15} className="ml-1" /></Link>
                 </Button>
