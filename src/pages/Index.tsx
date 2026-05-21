@@ -1,432 +1,665 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, BookOpen, Target, CheckCircle, Star, Lightbulb, UserCheck, Briefcase, Brain, BarChart3, Quote, LogIn, LayoutDashboard, Sparkles, TrendingUp, Award } from "lucide-react";
+import {
+  ArrowRight, BookOpen, Target, CheckCircle, Star, Lightbulb,
+  UserCheck, Briefcase, Brain, BarChart3, Quote, LogIn,
+  LayoutDashboard, Sparkles, TrendingUp, Award, ChevronRight,
+  Users, Clock, Shield, Rocket, GraduationCap, Building2
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import Layout from "@/components/Layout";
-import { fadeUp, scaleIn, slideLeft, slideRight } from "@/lib/animations";
 import { useAuth } from "@/contexts/AuthContext";
 
-const learningAreas = [
+/* ── Animation helpers ── */
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: (i = 0) => ({
+    opacity: 1, y: 0,
+    transition: { delay: i * 0.12, duration: 0.55, ease: [0.25, 0.1, 0.25, 1] },
+  }),
+};
+const fadeIn = {
+  hidden: { opacity: 0 },
+  visible: (i = 0) => ({
+    opacity: 1,
+    transition: { delay: i * 0.1, duration: 0.5 },
+  }),
+};
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.93 },
+  visible: (i = 0) => ({
+    opacity: 1, scale: 1,
+    transition: { delay: i * 0.1, duration: 0.5, ease: "easeOut" },
+  }),
+};
+
+/* ── Data ── */
+const learningSteps = [
+  {
+    num: "01",
+    title: "BA Foundation Bootcamp",
+    desc: "Build strong foundations in Business Analysis principles, techniques and best practices.",
+    tag: "Foundation",
+    tagColor: "bg-blue-500/15 text-blue-400 border-blue-500/20",
+    icon: BookOpen,
+    iconBg: "bg-blue-500/15 text-blue-400",
+  },
+  {
+    num: "02",
+    title: "Practical BA Application & Simulation",
+    desc: "Apply your knowledge through hands-on exercises, case studies and real-world simulations.",
+    tag: "Application",
+    tagColor: "bg-purple-500/15 text-purple-400 border-purple-500/20",
+    icon: Target,
+    iconBg: "bg-purple-500/15 text-purple-400",
+  },
+  {
+    num: "03",
+    title: "Domain Specialisation",
+    desc: "Specialise in your industry of choice and deepen your domain knowledge.",
+    tag: "Specialisation",
+    tagColor: "bg-amber-500/15 text-amber-400 border-amber-500/20",
+    icon: Brain,
+    iconBg: "bg-amber-500/15 text-amber-400",
+  },
+  {
+    num: "04",
+    title: "Industry Project Experience & Mentorship",
+    desc: "Work on real projects with expert mentors and build your professional portfolio.",
+    tag: "Impact",
+    tagColor: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
+    icon: Users,
+    iconBg: "bg-emerald-500/15 text-emerald-400",
+  },
+];
+
+const programmes = [
+  {
+    icon: GraduationCap,
+    iconBg: "bg-primary/15 text-primary",
+    title: "BA Foundation Bootcamp",
+    badge: "Beginner Friendly",
+    badgeColor: "bg-emerald-500/15 text-emerald-400",
+    desc: "Perfect for beginners and career changers. Start your BA journey with confidence.",
+  },
   {
     icon: BarChart3,
-    title: "Business Analysis & Digital Transformation",
-    description: "Analyse business problems, gather requirements, and support organisational change.",
-    image: "/images/Business-Solutions.jpg",
-    courses: [
-      "Foundations of Business Analysis",
-      "Requirements Engineering",
-      "Process Mapping and BPMN",
-      "Digital Transformation Strategy",
-    ],
-    link: "/courses",
-    accent: "from-blue-500/20 to-blue-600/5",
-    iconColor: "bg-blue-500/20 text-blue-400",
-    glow: "hover:shadow-[0_20px_60px_-15px_rgba(59,130,246,0.3)]",
+    iconBg: "bg-purple-500/15 text-purple-400",
+    title: "Practical BA Simulation",
+    badge: "Hands-on Learning",
+    badgeColor: "bg-purple-500/15 text-purple-400",
+    desc: "Build practical skills through real scenarios, case studies and deliverable simulations.",
   },
   {
-    icon: Briefcase,
-    title: "Project Delivery & Business Execution",
-    description: "Manage projects, coordinate stakeholders, and deliver business initiatives successfully.",
-    image: "/images/Strategic-Growth-Sustainability-Solutions.jpg",
-    courses: [
-      "Project Management Foundations",
-      "Project Governance",
-      "Delivering Business Transformation",
-      "Stakeholder Management",
-    ],
-    link: "/courses",
-    accent: "from-amber-500/20 to-amber-600/5",
-    iconColor: "bg-amber-500/20 text-amber-400",
-    glow: "hover:shadow-[0_20px_60px_-15px_rgba(245,158,11,0.3)]",
-  },
-  {
-    icon: Brain,
-    title: "Professional & Leadership Development",
-    description: "Strengthen the professional skills required to perform effectively in modern organisations.",
-    image: "/images/Bid-Writing-2.jpg",
-    courses: [
-      "Communication and Professional Writing",
-      "Time Management and Productivity",
-      "Emotional Intelligence",
-      "Leadership and Influence",
-    ],
-    link: "/courses",
-    accent: "from-emerald-500/20 to-emerald-600/5",
-    iconColor: "bg-emerald-500/20 text-emerald-400",
-    glow: "hover:shadow-[0_20px_60px_-15px_rgba(16,185,129,0.3)]",
+    icon: Building2,
+    iconBg: "bg-amber-500/15 text-amber-400",
+    title: "Domain Specialisation",
+    badge: "Industry Focused",
+    badgeColor: "bg-amber-500/15 text-amber-400",
+    desc: "Choose your domain and become an expert BA in high-demand industries.",
   },
 ];
 
 const whyReasons = [
-  { icon: Target, text: "Practical learning focused on real business environments", color: "bg-blue-500/15 text-blue-400" },
-  { icon: Lightbulb, text: "Industry-informed training built from genuine consulting experience", color: "bg-amber-500/15 text-amber-400" },
-  { icon: UserCheck, text: "Structured programmes designed for measurable professional growth", color: "bg-emerald-500/15 text-emerald-400" },
-  { icon: BookOpen, text: "Flexible online learning that fits around your career", color: "bg-purple-500/15 text-purple-400" },
+  {
+    icon: Target,
+    title: "Practical & Relevant Learning",
+    desc: "Real-world scenarios and industry aligned curriculum.",
+    color: "bg-primary/15 text-primary",
+  },
+  {
+    icon: UserCheck,
+    title: "Expert Mentorship",
+    desc: "Learn from senior BAs with years of industry experience.",
+    color: "bg-blue-500/15 text-blue-400",
+  },
+  {
+    icon: TrendingUp,
+    title: "Career Focused",
+    desc: "Build the right skills, portfolio and mindset to get hired.",
+    color: "bg-amber-500/15 text-amber-400",
+  },
+  {
+    icon: Shield,
+    title: "Trusted by Learners",
+    desc: "Join thousands of learners transforming their careers.",
+    color: "bg-emerald-500/15 text-emerald-400",
+  },
 ];
 
 const testimonials = [
-  { name: "Sarah K.", role: "Project Manager", text: "HTB Consult transformed my career. The training was practical, relevant, and immediately applicable." },
-  { name: "James O.", role: "Business Analyst", text: "The mentoring programme gave me the confidence and skills to transition into business analysis seamlessly." },
-  { name: "Amara T.", role: "Senior Consultant", text: "Their CV review service helped me land three interviews within two weeks. Highly recommended!" },
+  {
+    quote: "The BA Foundation Bootcamp gave me the clarity and confidence to start my BA career. The practical approach is outstanding!",
+    name: "Aisha M.",
+    role: "Junior Business Analyst",
+    initial: "A",
+    color: "bg-primary/20 text-primary",
+  },
+  {
+    quote: "The simulations and real-world projects helped me transition from theory to practice seamlessly. Highly recommended!",
+    name: "Kevin L.",
+    role: "Business Analyst",
+    initial: "K",
+    color: "bg-blue-500/20 text-blue-400",
+  },
+  {
+    quote: "The mentorship and domain specialisation helped me stand out and land my dream role in the banking sector.",
+    name: "Sarah T.",
+    role: "BA Associate",
+    initial: "S",
+    color: "bg-purple-500/20 text-purple-400",
+  },
 ];
 
 const stats = [
-  { value: "500+", label: "Professionals Trained", icon: TrendingUp, color: "text-amber-400" },
-  { value: "95%", label: "Satisfaction Rate", icon: Star, color: "text-blue-400" },
-  { value: "12+", label: "Expert Programmes", icon: BookOpen, color: "text-emerald-400" },
-  { value: "10+", label: "Years Consulting", icon: Award, color: "text-purple-400" },
+  { value: "500+", label: "Professionals Trained", icon: TrendingUp },
+  { value: "95%", label: "Satisfaction Rate", icon: Star },
+  { value: "12+", label: "Expert Programmes", icon: BookOpen },
+  { value: "10+", label: "Years Consulting", icon: Award },
 ];
+
+const trustBadges = [
+  { icon: BookOpen, label: "Practical Learning", sub: "Hands-on projects & simulations" },
+  { icon: UserCheck, label: "Industry Mentorship", sub: "Learn from experienced BA professionals" },
+  { icon: Rocket, label: "Structured Pathway", sub: "From foundation to industry readiness" },
+  { icon: TrendingUp, label: "Career Growth", sub: "Build skills that get you hired" },
+];
+
+/* ═══════════════════════════════════════════════════════════ */
 
 const Index = () => {
   const { user } = useAuth();
 
   return (
     <Layout>
-      {/* ── Hero with background video ── */}
+
+      {/* ─────────────────────── HERO ─────────────────────── */}
       <section className="relative overflow-hidden min-h-[100vh] flex items-center -mt-[72px] pt-[72px]">
-        {/* Background video */}
-        <video
-          className="absolute inset-0 w-full h-full object-cover"
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster="/images/Strategic-Growth-Sustainability-Solutions-1.jpg"
-        >
-          <source src="https://assets.mixkit.co/videos/preview/mixkit-group-of-colleagues-working-in-a-business-meeting-4851-large.mp4" type="video/mp4" />
-          <source src="https://assets.mixkit.co/videos/preview/mixkit-business-team-having-a-meeting-around-a-table-17-large.mp4" type="video/mp4" />
-        </video>
-
-        {/* Dark overlay + gradient */}
-        <div className="absolute inset-0 bg-[hsl(163,36%,10%)]/80" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[hsl(163,36%,8%)]/95 via-[hsl(163,36%,10%)]/75 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[hsl(163,36%,12%)]/90 via-transparent to-transparent" />
-
-        {/* Animated radial glow blobs */}
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] rounded-full bg-primary/8 blur-[100px] animate-[pulse-glow_8s_ease-in-out_infinite]" />
-        <div className="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] rounded-full bg-blue-500/6 blur-[100px] animate-[pulse-glow_10s_ease-in-out_infinite_2s]" />
-
-        {/* Grid overlay */}
-        <div className="absolute inset-0 grid-pattern opacity-30" />
-
-        <div className="container mx-auto px-6 lg:px-12 relative z-10 py-24 lg:py-36">
-          <div className="max-w-3xl xl:max-w-4xl">
-            <motion.div
-              initial="hidden" animate="visible" variants={fadeUp} custom={0}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-primary/20 mb-8"
-            >
-              <Sparkles size={14} className="text-primary" />
-              <span className="text-primary font-semibold tracking-[0.2em] uppercase text-xs">HTB Consult Academy</span>
-            </motion.div>
-
-            <motion.h1
-              initial="hidden" animate="visible" variants={fadeUp} custom={1}
-              className="text-5xl md:text-6xl xl:text-7xl font-serif font-normal text-white leading-[1.05] mb-8 tracking-display text-shadow-lg"
-            >
-              Practical Training for{" "}
-              <em className="text-gradient-gold not-italic">Business,{" "}
-              Transformation</em>
-              {" "}&amp; Professional Growth
-            </motion.h1>
-
-            <motion.p
-              initial="hidden" animate="visible" variants={fadeUp} custom={2}
-              className="text-base lg:text-lg text-white/65 max-w-xl mb-10 leading-[1.9] font-light"
-            >
-              The learning platform of HTB Consult — equipping professionals and organisations with practical skills in business analysis, project delivery, digital transformation, and professional development.
-            </motion.p>
-
-            <motion.div
-              initial="hidden" animate="visible" variants={fadeUp} custom={3}
-              className="flex flex-wrap gap-4"
-            >
-              <Button size="lg" asChild className="bg-gradient-gold hover:opacity-90 text-sm font-semibold px-8 h-12 shadow-orange btn-shimmer">
-                <Link to="/courses">Explore Courses <ArrowRight className="ml-2" size={16} /></Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild className="text-sm font-semibold px-8 h-12 glass border-white/20 hover:bg-white/10 text-white">
-                <Link to="/about">Our Story</Link>
-              </Button>
-              {user ? (
-                <Button size="lg" asChild className="text-sm font-semibold px-8 h-12 glass hover:bg-white/10 text-white border border-white/15">
-                  <Link to="/dashboard"><LayoutDashboard className="mr-2" size={16} />My Dashboard</Link>
-                </Button>
-              ) : (
-                <Button size="lg" asChild className="text-sm font-semibold px-8 h-12 glass hover:bg-white/10 text-white border border-white/15">
-                  <Link to="/auth"><LogIn className="mr-2" size={16} />Sign In / Register</Link>
-                </Button>
-              )}
-            </motion.div>
-
-            {/* Floating trust badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.8, duration: 0.6 }}
-              className="flex items-center gap-3 mt-12"
-            >
-              <div className="flex -space-x-2">
-                {["S", "J", "A", "R"].map((l, i) => (
-                  <div key={i} className="w-8 h-8 rounded-full bg-gradient-gold flex items-center justify-center text-xs font-bold text-white border-2 border-[hsl(163,36%,14%)]">{l}</div>
-                ))}
-              </div>
-              <p className="text-sm text-white/60"><span className="text-white font-semibold">500+</span> professionals already enrolled</p>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
-      </section>
-
-      {/* ── Stats Strip ── */}
-      <section className="relative bg-[hsl(163,36%,13%)] border-y border-white/5 overflow-hidden">
-        <div className="absolute inset-0 dot-pattern" />
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-blue-500/5" />
-        <div className="container mx-auto px-6 lg:px-12 relative">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/5">
-            {stats.map((s, i) => (
-              <motion.div
-                key={s.label}
-                initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={scaleIn}
-                className="py-10 px-6 text-center group"
-              >
-                <s.icon size={20} className={`${s.color} mx-auto mb-3 opacity-70`} />
-                <p className="text-4xl lg:text-5xl font-serif stat-number mb-1">{s.value}</p>
-                <p className="text-xs text-white/40 uppercase tracking-widest font-medium">{s.label}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Learning Areas ── */}
-      <section className="py-28 lg:py-36 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-[hsl(163,36%,14%)] to-background" />
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-blue-500/5 blur-[120px]" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-primary/5 blur-[100px]" />
-
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="mb-16 text-center">
-            <motion.div variants={fadeUp} custom={0} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass border border-primary/20 mb-5">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-primary font-semibold tracking-[0.2em] uppercase text-xs">What You'll Learn</span>
-            </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-4xl md:text-5xl font-serif font-normal text-white max-w-lg mx-auto leading-tight">
-              Our <em className="text-gradient-gold not-italic">Learning Areas</em>
-            </motion.h2>
-          </motion.div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {learningAreas.map((area, i) => (
-              <motion.div key={area.title} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={fadeUp} className="card-lift">
-                <Link to={area.link}>
-                  <div className={`rounded-2xl overflow-hidden glass border border-white/8 ${area.glow} transition-all duration-500 h-full group`}>
-                    {/* Card image */}
-                    <div className="h-48 overflow-hidden relative">
-                      <img
-                        src={area.image}
-                        alt={area.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                      />
-                      <div className={`absolute inset-0 bg-gradient-to-t ${area.accent} opacity-60`} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[hsl(163,36%,14%)]/90 via-[hsl(163,36%,14%)]/20 to-transparent" />
-                      <div className="absolute bottom-3 left-4">
-                        <div className={`w-10 h-10 rounded-xl ${area.iconColor} backdrop-blur-sm flex items-center justify-center`}>
-                          <area.icon size={18} />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="p-6">
-                      <h3 className="font-serif text-lg font-normal text-white mb-2 leading-snug group-hover:text-gradient-gold transition-colors">{area.title}</h3>
-                      <p className="text-xs text-white/50 leading-relaxed mb-4">{area.description}</p>
-                      <ul className="space-y-2">
-                        {area.courses.map((course) => (
-                          <li key={course} className="flex items-start gap-2 text-xs text-white/60">
-                            <CheckCircle size={12} className="text-primary shrink-0 mt-0.5" />
-                            <span>{course}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Why HTB ── */}
-      <section className="py-28 lg:py-36 overflow-hidden relative">
-        <div className="absolute inset-0 bg-[hsl(163,36%,13%)]" />
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-primary/4 blur-[150px]" />
-
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-16 xl:gap-24 items-center">
-            {/* Image column */}
-            <motion.div
-              initial="hidden" whileInView="visible" viewport={{ once: true }} variants={slideLeft} custom={0}
-              className="relative"
-            >
-              <div className="relative rounded-2xl overflow-hidden aspect-[4/5] glow-gold">
-                <img
-                  src="/images/Business-Solutions.jpg"
-                  alt="Business professionals"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[hsl(163,36%,10%)]/70 to-transparent" />
-              </div>
-              {/* Floating accent card */}
-              <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -bottom-6 -right-6 glass-gold rounded-2xl p-5 shadow-orange max-w-[200px] border border-primary/30"
-              >
-                <p className="text-2xl font-serif text-gradient-gold">500+</p>
-                <p className="text-xs text-white/70 mt-1 font-medium">Professionals trained across the UK</p>
-              </motion.div>
-              {/* Secondary floating badge */}
-              <motion.div
-                animate={{ y: [0, 8, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute -top-4 -left-4 glass rounded-xl p-4 border border-blue-500/20 max-w-[160px]"
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[10px] text-white/60 uppercase tracking-wider">Live Learning</span>
-                </div>
-                <p className="text-sm font-semibold text-white">12+ Active Courses</p>
-              </motion.div>
-            </motion.div>
-
-            {/* Text column */}
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}>
-              <motion.div variants={fadeUp} custom={0} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass border border-primary/20 mb-6">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-                <span className="text-primary font-semibold tracking-[0.2em] uppercase text-xs">Why Choose Us</span>
-              </motion.div>
-              <motion.h2 variants={fadeUp} custom={1} className="text-4xl md:text-5xl font-serif font-normal text-white mb-6 leading-tight">
-                Built from Real <em className="text-gradient-gold not-italic">Consulting Experience</em>
-              </motion.h2>
-              <motion.p variants={fadeUp} custom={2} className="text-white/55 leading-[1.9] mb-10 text-sm lg:text-base">
-                Our training is designed to give you skills that are immediately applicable in business environments. Every programme is structured to support professional growth and deliver measurable results.
-              </motion.p>
-              <motion.div variants={fadeUp} custom={3} className="space-y-3 mb-10">
-                {whyReasons.map((reason, i) => (
-                  <motion.div
-                    key={reason.text}
-                    initial={{ opacity: 0, x: 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
-                    className="flex items-start gap-3 p-3 rounded-xl glass border border-white/5 hover:border-white/10 transition-colors"
-                  >
-                    <div className={`w-9 h-9 rounded-lg ${reason.color} flex items-center justify-center shrink-0`}>
-                      <reason.icon size={16} />
-                    </div>
-                    <p className="text-sm text-white/75 leading-relaxed mt-1">{reason.text}</p>
-                  </motion.div>
-                ))}
-              </motion.div>
-              <motion.div variants={fadeUp} custom={4}>
-                <Button asChild className="bg-gradient-gold hover:opacity-90 font-semibold text-sm px-7 h-11 shadow-orange btn-shimmer">
-                  <Link to="/courses">Start Learning <ArrowRight className="ml-2" size={15} /></Link>
-                </Button>
-              </motion.div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Testimonials ── */}
-      <section className="py-28 lg:py-36 relative overflow-hidden">
-        {/* Background with Unsplash image */}
-        <div className="absolute inset-0">
-          <img
-            src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=1920&q=80&auto=format&fit=crop"
-            alt=""
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-[hsl(163,36%,8%)]/92" />
-          <div className="absolute inset-0 dot-pattern opacity-30" />
-        </div>
-        <div className="absolute top-0 left-1/3 w-[500px] h-[500px] rounded-full bg-primary/6 blur-[120px]" />
-        <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] rounded-full bg-blue-500/6 blur-[100px]" />
-
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} className="text-center mb-16">
-            <motion.div variants={fadeUp} custom={0} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass border border-primary/20 mb-5">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-primary font-semibold tracking-[0.2em] uppercase text-xs">Client Stories</span>
-            </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-4xl md:text-5xl font-serif font-normal text-white">
-              What Our <em className="text-gradient-gold not-italic">Clients Say</em>
-            </motion.h2>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {testimonials.map((t, i) => (
-              <motion.div key={t.name} initial="hidden" whileInView="visible" viewport={{ once: true }} custom={i} variants={scaleIn} className="card-lift">
-                <div className="glass rounded-2xl border border-white/8 p-7 h-full hover:border-primary/20 transition-all duration-300">
-                  <Quote className="text-primary/50 mb-4" size={28} />
-                  <p className="font-elegant text-lg italic text-white/75 leading-relaxed mb-6">"{t.text}"</p>
-                  <div className="glow-line mb-4" />
-                  <div className="flex gap-1 mb-3">
-                    {[...Array(5)].map((_, j) => (
-                      <Star key={j} className="text-amber-400 fill-amber-400" size={13} />
-                    ))}
-                  </div>
-                  <p className="font-semibold text-white text-sm">{t.name}</p>
-                  <p className="text-xs text-white/40">{t.role}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA ── */}
-      <section className="relative py-28 lg:py-40 overflow-hidden">
         {/* Background image */}
         <div className="absolute inset-0">
           <img
             src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=1920&q=80&auto=format&fit=crop"
             alt=""
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-[hsl(163,36%,7%)]/85 backdrop-blur-[2px]" />
-          <div className="absolute inset-0 bg-gradient-to-br from-[hsl(163,36%,6%)]/90 via-[hsl(163,36%,8%)]/80 to-[hsl(163,36%,6%)]/90" />
-          <div className="absolute inset-0 grid-pattern opacity-20" />
         </div>
-        {/* Animated glows */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-primary/8 blur-[120px] animate-[pulse-glow_8s_ease-in-out_infinite]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[300px] rounded-full bg-blue-500/5 blur-[80px]" />
 
-        <div className="container mx-auto px-6 lg:px-12 relative z-10 text-center">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <motion.div variants={fadeUp} custom={0} className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass border border-primary/20 mb-6">
-              <Sparkles size={12} className="text-primary" />
-              <span className="text-primary font-semibold tracking-[0.2em] uppercase text-xs">Get Started Today</span>
+        {/* Overlays */}
+        <div className="absolute inset-0"
+          style={{ background: "linear-gradient(to right, hsl(var(--hero-overlay)) 45%, hsl(var(--hero-overlay) / 0.6) 75%, transparent)" }} />
+        <div className="absolute inset-0"
+          style={{ background: "linear-gradient(to top, hsl(var(--background)) 0%, transparent 40%)" }} />
+        <div className="absolute inset-0 grid-pattern opacity-20" />
+
+        {/* Glow blobs */}
+        <div className="absolute top-1/4 left-1/5 w-[500px] h-[500px] rounded-full blur-[120px] animate-[pulse-glow_8s_ease-in-out_infinite]"
+          style={{ background: "hsl(var(--primary) / 0.07)" }} />
+
+        {/* Badge top-left corner */}
+        <div className="absolute top-28 left-4 lg:left-10 z-10">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest glass border border-primary/25"
+            style={{ color: "hsl(var(--primary))" }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "hsl(var(--primary))" }} />
+            Business Analysis. Real Training. Real Impact.
+          </motion.div>
+        </div>
+
+        <div className="container mx-auto px-6 lg:px-12 relative z-10 py-24 lg:py-36">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left — copy */}
+            <div className="max-w-xl">
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+                className="text-5xl md:text-6xl xl:text-7xl font-serif font-normal text-white leading-[1.05] mb-6 tracking-display text-shadow-lg"
+              >
+                Become a Future Ready{" "}
+                <em className="not-italic text-gradient-gold">Business Analyst</em>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.55 }}
+                className="text-base lg:text-lg text-white/60 mb-8 leading-[1.85] font-light"
+              >
+                Practical learning. Real projects. Industry mentorship.<br />
+                Build the BA career you want.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45, duration: 0.5 }}
+                className="flex flex-wrap gap-3 mb-10"
+              >
+                <Button
+                  size="lg"
+                  asChild
+                  className="bg-gradient-gold hover:opacity-90 font-semibold px-8 h-12 shadow-orange btn-shimmer text-sm"
+                >
+                  <Link to="/services">Explore Pathways <ArrowRight className="ml-2" size={16} /></Link>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  asChild
+                  className="font-semibold px-8 h-12 glass border-white/20 hover:bg-white/10 text-white text-sm"
+                >
+                  <Link to="/courses">View Courses</Link>
+                </Button>
+              </motion.div>
+
+              {/* Community badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                className="inline-flex items-center gap-3 glass border border-white/10 rounded-2xl px-4 py-3"
+              >
+                <div className="flex -space-x-2">
+                  {["A", "K", "S", "R", "M"].map((l, i) => (
+                    <div
+                      key={i}
+                      className="w-8 h-8 rounded-full bg-gradient-gold flex items-center justify-center text-xs font-bold text-white border-2"
+                      style={{ borderColor: "hsl(var(--background))" }}
+                    >
+                      {l}
+                    </div>
+                  ))}
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-white">Join a community of</p>
+                  <p className="text-xs text-white/50">aspiring and practising Business Analysts</p>
+                </div>
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30">
+                  +2K
+                </span>
+              </motion.div>
+            </div>
+
+            {/* Right — trust badges grid (desktop only) */}
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.35, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="hidden lg:grid grid-cols-2 gap-4"
+            >
+              {trustBadges.map((b, i) => (
+                <motion.div
+                  key={b.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 + i * 0.1 }}
+                  className="glass border border-white/10 rounded-2xl p-5 hover:border-primary/30 transition-all duration-300 card-lift"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center mb-3">
+                    <b.icon size={20} className="text-primary" />
+                  </div>
+                  <p className="text-sm font-semibold text-white mb-1">{b.label}</p>
+                  <p className="text-xs text-white/45 leading-relaxed">{b.sub}</p>
+                </motion.div>
+              ))}
             </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-4xl md:text-5xl lg:text-6xl font-serif font-normal text-white mb-6 leading-tight max-w-3xl mx-auto text-shadow-lg">
-              Build the Skills That <em className="text-gradient-gold not-italic">Drive Results</em>
-            </motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-white/80 max-w-xl mx-auto mb-10 leading-[1.9] text-sm lg:text-base text-shadow">
-              Develop the knowledge and capabilities required to succeed in today's evolving business landscape.
+          </div>
+
+          {/* Mobile trust badges row */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="lg:hidden flex gap-4 mt-8 overflow-x-auto pb-2 -mx-2 px-2"
+          >
+            {trustBadges.map((b) => (
+              <div key={b.label} className="flex items-center gap-2 glass border border-white/10 rounded-xl px-3 py-2 shrink-0">
+                <b.icon size={14} className="text-primary shrink-0" />
+                <span className="text-xs font-medium text-white/70 whitespace-nowrap">{b.label}</span>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+
+        {/* Bottom fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-28"
+          style={{ background: "linear-gradient(to top, hsl(var(--background)), transparent)" }} />
+      </section>
+
+      {/* ─────────────────── LEARNING PATHWAY ─────────────────── */}
+      <section className="py-24 lg:py-32 relative overflow-hidden">
+        <div className="absolute inset-0" style={{ background: "hsl(var(--background))" }} />
+        <div className="absolute inset-0 dot-pattern opacity-30" />
+
+        <div className="container mx-auto px-6 lg:px-12 relative z-10">
+          {/* Section header */}
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <motion.p variants={fadeUp} custom={0}
+              className="text-xs font-bold uppercase tracking-[0.25em] mb-4"
+              style={{ color: "hsl(var(--primary))" }}
+            >
+              Our Learning Pathway
             </motion.p>
-            <motion.div variants={fadeUp} custom={3} className="flex justify-center gap-4 flex-wrap">
-              <Button size="lg" asChild className="bg-gradient-gold hover:opacity-90 text-sm font-semibold px-10 h-12 shadow-orange btn-shimmer glow-gold">
-                <Link to="/courses">Explore Courses <ArrowRight className="ml-2" size={16} /></Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild className="text-sm font-semibold px-10 h-12 glass border-white/20 hover:bg-white/10 text-white">
-                <Link to="/contact">Contact Us</Link>
-              </Button>
-            </motion.div>
+            <motion.h2 variants={fadeUp} custom={1}
+              className="text-3xl md:text-4xl lg:text-5xl font-serif text-white mb-4 leading-tight"
+            >
+              A structured journey from{" "}
+              <em className="not-italic text-gradient-gold">foundation to industry impact</em>
+            </motion.h2>
+          </motion.div>
+
+          {/* Steps */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 relative">
+            {/* Connector line — desktop */}
+            <div className="hidden lg:block absolute top-[3.75rem] left-[12.5%] right-[12.5%] h-px step-connector z-0" />
+
+            {learningSteps.map((step, i) => (
+              <motion.div
+                key={step.num}
+                initial="hidden" whileInView="visible" viewport={{ once: true }}
+                custom={i} variants={fadeUp}
+                className="relative z-10"
+              >
+                <div className="glass border border-white/8 rounded-2xl p-6 hover:border-primary/25 transition-all duration-300 card-lift h-full">
+                  {/* Number circle */}
+                  <div className="w-12 h-12 rounded-full bg-primary/15 border-2 border-primary/30 flex items-center justify-center mb-5 mx-auto">
+                    <span className="text-xs font-bold" style={{ color: "hsl(var(--primary))" }}>
+                      {step.num}
+                    </span>
+                  </div>
+                  {/* Icon */}
+                  <div className={`w-10 h-10 rounded-xl ${step.iconBg} flex items-center justify-center mb-4`}>
+                    <step.icon size={18} />
+                  </div>
+                  <h3 className="font-serif text-base font-normal text-white mb-2 leading-snug">{step.title}</h3>
+                  <p className="text-xs text-white/50 leading-relaxed mb-4">{step.desc}</p>
+                  <Link
+                    to="/courses"
+                    className={`inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full border ${step.tagColor}`}
+                  >
+                    {step.tag} <ChevronRight size={11} />
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────── EXPLORE PROGRAMMES ─────────────────── */}
+      <section className="py-24 lg:py-32 relative overflow-hidden"
+        style={{ background: "hsl(var(--section-alt))" }}>
+        <div className="absolute inset-0 grid-pattern opacity-30" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[120px] opacity-5"
+          style={{ background: "hsl(var(--primary))" }} />
+
+        <div className="container mx-auto px-6 lg:px-12 relative z-10">
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true }}
+            className="text-center mb-14"
+          >
+            <motion.p variants={fadeUp} custom={0}
+              className="text-xs font-bold uppercase tracking-[0.25em] mb-4"
+              style={{ color: "hsl(var(--primary))" }}
+            >
+              Start Your Journey
+            </motion.p>
+            <motion.h2 variants={fadeUp} custom={1}
+              className="text-3xl md:text-4xl lg:text-5xl font-serif text-white"
+            >
+              Explore Our{" "}
+              <em className="not-italic text-gradient-gold">Programmes</em>
+            </motion.h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            {programmes.map((prog, i) => (
+              <motion.div
+                key={prog.title}
+                initial="hidden" whileInView="visible" viewport={{ once: true }}
+                custom={i} variants={scaleIn}
+                className="card-lift"
+              >
+                <div className="glass border border-white/8 rounded-2xl p-6 h-full hover:border-primary/25 transition-all duration-300 group">
+                  <div className={`w-12 h-12 rounded-xl ${prog.iconBg} flex items-center justify-center mb-5`}>
+                    <prog.icon size={22} />
+                  </div>
+                  <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-full mb-4 ${prog.badgeColor}`}>
+                    {prog.badge}
+                  </span>
+                  <h3 className="font-serif text-lg font-normal text-white mb-2">{prog.title}</h3>
+                  <p className="text-sm text-white/50 leading-relaxed mb-5">{prog.desc}</p>
+                  <Link
+                    to="/courses"
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold transition-colors group-hover:gap-2.5"
+                    style={{ color: "hsl(var(--primary))" }}
+                  >
+                    View Details <ArrowRight size={14} />
+                  </Link>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true }}
+            variants={fadeUp} custom={3}
+            className="text-center"
+          >
+            <Button variant="outline" asChild className="glass border-white/20 hover:bg-white/10 text-white font-semibold px-8">
+              <Link to="/courses">View All Courses</Link>
+            </Button>
           </motion.div>
         </div>
       </section>
+
+      {/* ─────────────────── WHY HTB ─────────────────── */}
+      <section className="py-24 lg:py-32 relative overflow-hidden">
+        <div className="absolute inset-0" style={{ background: "hsl(var(--background))" }} />
+        <div className="absolute inset-0 dot-pattern opacity-25" />
+
+        <div className="container mx-auto px-6 lg:px-12 relative z-10">
+          <div className="grid lg:grid-cols-2 gap-16 xl:gap-24 items-center">
+            {/* Left text */}
+            <motion.div
+              initial="hidden" whileInView="visible" viewport={{ once: true }}
+            >
+              <motion.p variants={fadeUp} custom={0}
+                className="text-xs font-bold uppercase tracking-[0.25em] mb-4"
+                style={{ color: "hsl(var(--primary))" }}
+              >
+                Why HTB Academy
+              </motion.p>
+              <motion.h2 variants={fadeUp} custom={1}
+                className="text-4xl md:text-5xl font-serif text-white mb-4 leading-tight"
+              >
+                We don't just teach.{" "}
+                <em className="not-italic text-gradient-gold">We prepare you for impact.</em>
+              </motion.h2>
+              <motion.p variants={fadeUp} custom={2}
+                className="text-white/50 leading-[1.9] mb-10 text-sm lg:text-base max-w-md"
+              >
+                Our practical and structured approach ensures you gain the skills, confidence and experience to thrive in real-world BA roles.
+              </motion.p>
+              <motion.div variants={fadeUp} custom={3} className="mb-10">
+                <Button variant="outline" asChild className="glass border-white/20 hover:bg-white/10 text-white font-semibold px-6">
+                  <Link to="/about">Learn More About Us <ChevronRight size={15} className="ml-1" /></Link>
+                </Button>
+              </motion.div>
+            </motion.div>
+
+            {/* Right grid */}
+            <div className="grid grid-cols-2 gap-4">
+              {whyReasons.map((reason, i) => (
+                <motion.div
+                  key={reason.title}
+                  initial="hidden" whileInView="visible" viewport={{ once: true }}
+                  custom={i} variants={scaleIn}
+                  className="glass border border-white/8 rounded-2xl p-5 hover:border-primary/20 transition-all duration-300 card-lift"
+                >
+                  <div className={`w-10 h-10 rounded-xl ${reason.color} flex items-center justify-center mb-3`}>
+                    <reason.icon size={18} />
+                  </div>
+                  <h4 className="text-sm font-semibold text-white mb-1.5">{reason.title}</h4>
+                  <p className="text-xs text-white/45 leading-relaxed">{reason.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────── STATS ─────────────────── */}
+      <section className="relative border-y border-white/5 overflow-hidden"
+        style={{ background: "hsl(var(--section-alt))" }}>
+        <div className="absolute inset-0 grid-pattern opacity-30" />
+        <div className="container mx-auto px-6 lg:px-12 relative">
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/5">
+            {stats.map((s, i) => (
+              <motion.div
+                key={s.label}
+                initial="hidden" whileInView="visible" viewport={{ once: true }}
+                custom={i} variants={fadeIn}
+                className="py-10 px-6 text-center"
+              >
+                <s.icon size={18} className="mx-auto mb-3 opacity-60 text-primary" />
+                <p className="text-4xl lg:text-5xl font-serif stat-number mb-1">{s.value}</p>
+                <p className="text-xs text-white/35 uppercase tracking-widest font-medium">{s.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────── TESTIMONIALS ─────────────────── */}
+      <section className="py-24 lg:py-32 relative overflow-hidden">
+        <div className="absolute inset-0" style={{ background: "hsl(var(--background))" }} />
+        <div className="absolute inset-0 dot-pattern opacity-25" />
+        <div className="absolute top-0 left-1/3 w-[500px] h-[400px] rounded-full blur-[120px] opacity-5"
+          style={{ background: "hsl(var(--primary))" }} />
+
+        <div className="container mx-auto px-6 lg:px-12 relative z-10">
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true }}
+            className="text-center mb-14"
+          >
+            <motion.p variants={fadeUp} custom={0}
+              className="text-xs font-bold uppercase tracking-[0.25em] mb-4"
+              style={{ color: "hsl(var(--primary))" }}
+            >
+              What Our Learners Say
+            </motion.p>
+            <motion.h2 variants={fadeUp} custom={1}
+              className="text-3xl md:text-4xl lg:text-5xl font-serif text-white"
+            >
+              Real people.{" "}
+              <em className="not-italic text-gradient-gold">Real growth. Real impact.</em>
+            </motion.h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {testimonials.map((t, i) => (
+              <motion.div
+                key={t.name}
+                initial="hidden" whileInView="visible" viewport={{ once: true }}
+                custom={i} variants={scaleIn}
+                className="card-lift"
+              >
+                <div className="glass border border-white/8 rounded-2xl p-7 h-full hover:border-primary/20 transition-all duration-300">
+                  <div className="flex gap-0.5 mb-5">
+                    {[...Array(5)].map((_, j) => (
+                      <Star key={j} size={14} className="text-amber-400 fill-amber-400" />
+                    ))}
+                  </div>
+                  <Quote size={22} className="text-primary/40 mb-3" />
+                  <p className="font-elegant text-lg italic text-white/65 leading-relaxed mb-6">
+                    "{t.quote}"
+                  </p>
+                  <div className="glow-line mb-5" />
+                  <div className="flex items-center gap-3">
+                    <div className={`w-9 h-9 rounded-full ${t.color} flex items-center justify-center text-sm font-bold`}>
+                      {t.initial}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">{t.name}</p>
+                      <p className="text-xs text-white/40">{t.role}</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────────── CTA BANNER ─────────────────── */}
+      <section className="relative py-20 lg:py-28 overflow-hidden">
+        <div
+          className="absolute inset-0"
+          style={{ background: "var(--gradient-cta-bg)" }}
+        />
+        <div className="absolute inset-0 grid-pattern opacity-20" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full blur-[100px] opacity-15"
+          style={{ background: "hsl(var(--primary))" }} />
+
+        <div className="container mx-auto px-6 lg:px-12 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
+            <motion.div
+              initial="hidden" whileInView="visible" viewport={{ once: true }}
+              className="max-w-xl"
+            >
+              <motion.div
+                variants={fadeUp} custom={0}
+                className="w-12 h-12 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center mb-6"
+              >
+                <Rocket size={22} className="text-primary" />
+              </motion.div>
+              <motion.h2 variants={fadeUp} custom={1}
+                className="text-3xl md:text-4xl font-serif text-white mb-3 leading-tight"
+              >
+                Ready to start your BA journey?
+              </motion.h2>
+              <motion.p variants={fadeUp} custom={2}
+                className="text-white/50 text-sm leading-relaxed"
+              >
+                Join HTB Academy and take the next step towards a future ready career in Business Analysis.
+              </motion.p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.55 }}
+              className="flex flex-wrap gap-3 shrink-0"
+            >
+              <Button
+                size="lg"
+                asChild
+                className="bg-gradient-gold hover:opacity-90 font-semibold px-8 h-12 text-sm btn-shimmer shadow-orange"
+              >
+                <Link to="/auth?tab=signup">Register Now <ArrowRight className="ml-2" size={16} /></Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                asChild
+                className="glass border-white/20 hover:bg-white/10 text-white font-semibold px-8 h-12 text-sm"
+              >
+                <Link to="/services">Explore Pathways</Link>
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
     </Layout>
   );
 };

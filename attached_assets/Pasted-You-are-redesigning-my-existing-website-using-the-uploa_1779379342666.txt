@@ -1,0 +1,148 @@
+You are redesigning my existing website using the uploaded ZIP file that contains:
+- new UI/UX reference images
+- design inspirations
+- layout references
+- icons
+- backgrounds
+- visual assets
+- animations
+- component ideas
+
+IMPORTANT RULES:
+- Do NOT rebuild the project from scratch.
+- Do NOT remove any existing functionality.
+- Preserve all:
+  - backend logic
+  - APIs
+  - routing
+  - authentication
+  - database connections
+  - user flows
+  - existing features
+- ONLY replace and upgrade the current UI/UX.
+
+MAIN OBJECTIVE:
+Analyze all uploaded design references carefully and replicate the NEW UI/UX DESIGN as accurately as possible across the entire site.
+
+DESIGN REQUIREMENTS:
+Match the uploaded designs as closely as possible:
+- layout structure
+- spacing
+- typography
+- color schemes
+- gradients
+- shadows
+- glassmorphism
+- blur effects
+- hover states
+- transitions
+- animations
+- cards
+- buttons
+- navbar
+- dashboard styling
+- responsiveness
+- mobile behavior
+- futuristic effects
+- section arrangements
+
+IMPORTANT:
+- Do NOT invent your own UI.
+- Do NOT simplify the design.
+- Do NOT use generic templates.
+- Match the uploaded references almost pixel-for-pixel.
+
+IMPLEMENTATION REQUIREMENTS:
+1. Analyze the current architecture first.
+2. Identify reusable components.
+3. Create a safe migration plan.
+4. Then begin implementing the new UI page-by-page.
+
+START WITH:
+- Landing page
+- Navbar
+- Hero section
+- Features section
+- Dashboard
+- Footer
+- Authentication pages
+- Then remaining pages
+
+TECH STACK:
+Use:
+- React
+- TailwindCSS
+- Framer Motion
+- CSS variables
+- Modular component architecture
+
+OPTIONAL:
+Use:
+- GSAP for advanced animations
+- Three.js for cosmic/3D effects if needed
+
+ANIMATION STYLE:
+Use premium futuristic animations inspired by:
+- Apple
+- Tesla
+- Linear
+- Stripe
+- Vercel
+
+Include:
+- smooth transitions
+- glowing effects
+- floating particles
+- blur animations
+- hover motion
+- subtle parallax
+- animated gradients
+- modern micro-interactions
+
+THEME SYSTEM:
+Create a GLOBAL THEME ENGINE for the entire website.
+
+Add TWO THEMES:
+1. Existing/default color scheme
+2. New futuristic color scheme from the uploaded designs
+
+THEME TOGGLE REQUIREMENTS:
+Add a floating theme toggle button that:
+- switches the ENTIRE website instantly
+- smoothly animates between themes
+- affects all components globally
+- saves user preference using localStorage
+- persists after refresh
+- transitions smoothly between colors
+
+THEME IMPLEMENTATION:
+Use:
+- CSS variables
+OR
+- Tailwind theme extension
+OR
+- React Context Theme Provider
+
+RESPONSIVENESS:
+Ensure the entire site is fully responsive on:
+- desktop
+- tablet
+- mobile
+
+CODE QUALITY:
+- Keep code clean
+- Keep components reusable
+- Maintain scalability
+- Preserve performance
+- Avoid unnecessary libraries
+- Optimize animations for smooth performance
+
+WORKFLOW:
+Before making edits:
+1. Analyze all uploaded images/assets
+2. Explain the detected design system
+3. Explain the planned UI migration
+4. Then begin implementation carefully
+
+FINAL GOAL:
+Transform the existing website into the exact futuristic UI/UX shown in the uploaded references while preserving all current functionality and making the entire experience feel premium, cinematic, advanced, and modern.
