@@ -363,45 +363,114 @@ const Index = () => {
             </motion.h2>
           </motion.div>
 
-          {/* Steps */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 relative">
-            {/* Dashed connector line — desktop */}
-            <div
-              className="hidden lg:block absolute top-[2.75rem] left-[14%] right-[14%] z-0"
-              style={{ borderTop: "2px dashed hsl(var(--primary) / 0.25)", height: 0 }}
-            />
+          {/* ── Desktop/tablet: flex row with inline connectors (md+) ── */}
+          <div className="hidden md:flex items-start">
+            {learningSteps.map((step, i) => (
+              <div key={step.num} className="flex items-start flex-1 min-w-0">
+                {/* Step column */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.12, duration: 0.45 }}
+                  className="flex-1 min-w-0"
+                >
+                  {/* Numbered circle — centered */}
+                  <div className="flex justify-center mb-5">
+                    <div
+                      className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-base shadow-md"
+                      style={{ background: "hsl(var(--primary))" }}
+                    >
+                      {i + 1}
+                    </div>
+                  </div>
 
+                  {/* Card body */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/8 transition-all duration-300 card-lift mx-1 h-full">
+                    <div className={`w-11 h-11 rounded-xl ${step.iconBg} flex items-center justify-center mb-4`}>
+                      <step.icon size={19} />
+                    </div>
+                    <h3 className="font-serif text-sm font-normal text-slate-900 mb-2 leading-snug">
+                      {step.title}
+                    </h3>
+                    <p className="text-xs text-slate-500 leading-relaxed mb-4">{step.desc}</p>
+                    <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border ${step.tagColor}`}>
+                      {step.tag}
+                    </span>
+                  </div>
+                </motion.div>
+
+                {/* Connector between steps */}
+                {i < learningSteps.length - 1 && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.12 + 0.25, duration: 0.4 }}
+                    className="flex items-center shrink-0 mt-[1.375rem]"
+                  >
+                    {/* Left dashed segment */}
+                    <div
+                      className="w-4 xl:w-6"
+                      style={{ borderTop: "2px dashed hsl(var(--primary) / 0.35)", height: 0 }}
+                    />
+                    {/* Arrow circle */}
+                    <div
+                      className="w-7 h-7 rounded-full border-2 bg-white flex items-center justify-center shrink-0"
+                      style={{
+                        borderColor: "hsl(var(--primary) / 0.4)",
+                        color: "hsl(var(--primary))",
+                      }}
+                    >
+                      <ChevronRight size={13} />
+                    </div>
+                    {/* Right dashed segment */}
+                    <div
+                      className="w-4 xl:w-6"
+                      style={{ borderTop: "2px dashed hsl(var(--primary) / 0.35)", height: 0 }}
+                    />
+                  </motion.div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* ── Mobile: vertical list ── */}
+          <div className="flex flex-col gap-4 md:hidden">
             {learningSteps.map((step, i) => (
               <motion.div
                 key={step.num}
-                initial="hidden" whileInView="visible" viewport={{ once: true }}
-                custom={i} variants={fadeUp}
-                className="relative z-10"
+                initial={{ opacity: 0, x: -16 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.4 }}
+                className="flex gap-4"
               >
-                <div className="bg-white border border-slate-200 rounded-2xl p-6 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/8 transition-all duration-300 card-lift h-full text-center">
-                  {/* Number circle */}
+                {/* Left column: number + vertical line */}
+                <div className="flex flex-col items-center shrink-0">
                   <div
-                    className="w-11 h-11 rounded-full border-2 flex items-center justify-center mb-5 mx-auto font-bold text-sm"
-                    style={{
-                      borderColor: "hsl(var(--primary))",
-                      color: "hsl(var(--primary))",
-                      background: "hsl(var(--primary) / 0.08)",
-                    }}
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shadow"
+                    style={{ background: "hsl(var(--primary))" }}
                   >
-                    {step.num}
+                    {i + 1}
                   </div>
-                  {/* Icon */}
-                  <div className={`w-10 h-10 rounded-xl ${step.iconBg} flex items-center justify-center mb-4 mx-auto`}>
-                    <step.icon size={18} />
+                  {i < learningSteps.length - 1 && (
+                    <div
+                      className="flex-1 w-px mt-2"
+                      style={{ background: "hsl(var(--primary) / 0.2)" }}
+                    />
+                  )}
+                </div>
+                {/* Card content */}
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 flex-1 mb-2">
+                  <div className={`w-10 h-10 rounded-xl ${step.iconBg} flex items-center justify-center mb-3`}>
+                    <step.icon size={17} />
                   </div>
-                  <h3 className="font-serif text-base font-normal text-slate-900 mb-2 leading-snug">{step.title}</h3>
-                  <p className="text-xs text-slate-500 leading-relaxed mb-4">{step.desc}</p>
-                  <Link
-                    to="/courses"
-                    className={`inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full border ${step.tagColor}`}
-                  >
-                    {step.tag} <ChevronRight size={11} />
-                  </Link>
+                  <h3 className="font-serif text-sm font-normal text-slate-900 mb-1.5 leading-snug">{step.title}</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed mb-3">{step.desc}</p>
+                  <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border ${step.tagColor}`}>
+                    {step.tag}
+                  </span>
                 </div>
               </motion.div>
             ))}
