@@ -330,16 +330,24 @@ const Index = () => {
           style={{ background: "linear-gradient(to top, hsl(var(--background)), transparent)" }} />
       </section>
 
-      {/* ─────────────────── LEARNING PATHWAY ─────────────────── */}
-      <section className="py-24 lg:py-32 relative overflow-hidden">
-        <div className="absolute inset-0" style={{ background: "hsl(var(--background))" }} />
-        <div className="absolute inset-0 dot-pattern opacity-30" />
+      {/* ─────────────────── LEARNING PATHWAY (white) ─────────────────── */}
+      <section className="pt-24 lg:pt-32 pb-0 relative overflow-hidden bg-white">
+        {/* Top divider from dark hero */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-slate-200" />
+
+        {/* Very subtle grid */}
+        <div className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: "linear-gradient(rgba(0,0,0,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.025) 1px,transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
 
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
           {/* Section header */}
           <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-14"
           >
             <motion.p variants={fadeUp} custom={0}
               className="text-xs font-bold uppercase tracking-[0.25em] mb-4"
@@ -348,7 +356,7 @@ const Index = () => {
               Our Learning Pathway
             </motion.p>
             <motion.h2 variants={fadeUp} custom={1}
-              className="text-3xl md:text-4xl lg:text-5xl font-serif text-white mb-4 leading-tight"
+              className="text-3xl md:text-4xl lg:text-5xl font-serif text-slate-900 leading-tight"
             >
               A structured journey from{" "}
               <em className="not-italic text-gradient-gold">foundation to industry impact</em>
@@ -357,8 +365,11 @@ const Index = () => {
 
           {/* Steps */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 relative">
-            {/* Connector line — desktop */}
-            <div className="hidden lg:block absolute top-[3.75rem] left-[12.5%] right-[12.5%] h-px step-connector z-0" />
+            {/* Dashed connector line — desktop */}
+            <div
+              className="hidden lg:block absolute top-[2.75rem] left-[14%] right-[14%] z-0"
+              style={{ borderTop: "2px dashed hsl(var(--primary) / 0.25)", height: 0 }}
+            />
 
             {learningSteps.map((step, i) => (
               <motion.div
@@ -367,19 +378,24 @@ const Index = () => {
                 custom={i} variants={fadeUp}
                 className="relative z-10"
               >
-                <div className="glass border border-white/8 rounded-2xl p-6 hover:border-primary/25 transition-all duration-300 card-lift h-full">
+                <div className="bg-white border border-slate-200 rounded-2xl p-6 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/8 transition-all duration-300 card-lift h-full text-center">
                   {/* Number circle */}
-                  <div className="w-12 h-12 rounded-full bg-primary/15 border-2 border-primary/30 flex items-center justify-center mb-5 mx-auto">
-                    <span className="text-xs font-bold" style={{ color: "hsl(var(--primary))" }}>
-                      {step.num}
-                    </span>
+                  <div
+                    className="w-11 h-11 rounded-full border-2 flex items-center justify-center mb-5 mx-auto font-bold text-sm"
+                    style={{
+                      borderColor: "hsl(var(--primary))",
+                      color: "hsl(var(--primary))",
+                      background: "hsl(var(--primary) / 0.08)",
+                    }}
+                  >
+                    {step.num}
                   </div>
                   {/* Icon */}
-                  <div className={`w-10 h-10 rounded-xl ${step.iconBg} flex items-center justify-center mb-4`}>
+                  <div className={`w-10 h-10 rounded-xl ${step.iconBg} flex items-center justify-center mb-4 mx-auto`}>
                     <step.icon size={18} />
                   </div>
-                  <h3 className="font-serif text-base font-normal text-white mb-2 leading-snug">{step.title}</h3>
-                  <p className="text-xs text-white/50 leading-relaxed mb-4">{step.desc}</p>
+                  <h3 className="font-serif text-base font-normal text-slate-900 mb-2 leading-snug">{step.title}</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed mb-4">{step.desc}</p>
                   <Link
                     to="/courses"
                     className={`inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full border ${step.tagColor}`}
@@ -393,27 +409,24 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ─────────────────── EXPLORE PROGRAMMES (WHITE SECTION) ─────────────────── */}
-      <section className="py-24 lg:py-32 relative overflow-hidden bg-white">
-        {/* Subtle top & bottom dividers */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-slate-200" />
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-slate-200" />
+      {/* ─────────────────── EXPLORE PROGRAMMES (white, seamless) ─────────────────── */}
+      <section className="py-16 lg:py-24 relative overflow-hidden bg-white">
+        {/* Subtle section divider */}
+        <div className="absolute top-0 left-6 right-6 lg:left-12 lg:right-12 h-px bg-slate-100" />
 
         {/* Very light grid pattern */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             backgroundImage:
-              "linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px)",
+              "linear-gradient(rgba(0,0,0,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.025) 1px, transparent 1px)",
             backgroundSize: "40px 40px",
           }}
         />
 
         {/* Soft radial accent blobs */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[140px] opacity-[0.07] pointer-events-none"
+        <div className="absolute top-0 right-0 w-[400px] h-[400px] rounded-full blur-[140px] opacity-[0.06] pointer-events-none"
           style={{ background: "hsl(var(--primary))" }} />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-[120px] opacity-[0.05] pointer-events-none"
-          style={{ background: "hsl(217,91%,56%)" }} />
 
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
           {/* Header */}
@@ -500,13 +513,18 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ─────────────────── WHY HTB ─────────────────── */}
-      <section className="py-24 lg:py-32 relative overflow-hidden">
-        <div className="absolute inset-0" style={{ background: "hsl(var(--background))" }} />
-        <div className="absolute inset-0 dot-pattern opacity-25" />
+      {/* ─────────────────── WHY HTB (white) ─────────────────── */}
+      <section className="py-16 lg:py-24 relative overflow-hidden bg-white">
+        <div className="absolute top-0 left-6 right-6 lg:left-12 lg:right-12 h-px bg-slate-100" />
+        <div className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: "linear-gradient(rgba(0,0,0,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.025) 1px,transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
 
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-16 xl:gap-24 items-center">
+          <div className="grid lg:grid-cols-2 gap-14 xl:gap-20 items-start">
             {/* Left text */}
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true }}
@@ -518,37 +536,41 @@ const Index = () => {
                 Why HTB Academy
               </motion.p>
               <motion.h2 variants={fadeUp} custom={1}
-                className="text-4xl md:text-5xl font-serif text-white mb-4 leading-tight"
+                className="text-4xl md:text-5xl font-serif text-slate-900 mb-4 leading-tight"
               >
                 We don't just teach.{" "}
                 <em className="not-italic text-gradient-gold">We prepare you for impact.</em>
               </motion.h2>
               <motion.p variants={fadeUp} custom={2}
-                className="text-white/50 leading-[1.9] mb-10 text-sm lg:text-base max-w-md"
+                className="text-slate-500 leading-[1.9] mb-8 text-sm lg:text-base max-w-md"
               >
                 Our practical and structured approach ensures you gain the skills, confidence and experience to thrive in real-world BA roles.
               </motion.p>
-              <motion.div variants={fadeUp} custom={3} className="mb-10">
-                <Button variant="outline" asChild className="glass border-white/20 hover:bg-white/10 text-white font-semibold px-6">
+              <motion.div variants={fadeUp} custom={3}>
+                <Button
+                  variant="outline"
+                  asChild
+                  className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold px-6"
+                >
                   <Link to="/about">Learn More About Us <ChevronRight size={15} className="ml-1" /></Link>
                 </Button>
               </motion.div>
             </motion.div>
 
-            {/* Right grid */}
+            {/* Right — 2×2 feature cards */}
             <div className="grid grid-cols-2 gap-4">
               {whyReasons.map((reason, i) => (
                 <motion.div
                   key={reason.title}
                   initial="hidden" whileInView="visible" viewport={{ once: true }}
                   custom={i} variants={scaleIn}
-                  className="glass border border-white/8 rounded-2xl p-5 hover:border-primary/20 transition-all duration-300 card-lift"
+                  className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-primary/40 hover:shadow-md hover:shadow-primary/8 transition-all duration-300 card-lift"
                 >
                   <div className={`w-10 h-10 rounded-xl ${reason.color} flex items-center justify-center mb-3`}>
                     <reason.icon size={18} />
                   </div>
-                  <h4 className="text-sm font-semibold text-white mb-1.5">{reason.title}</h4>
-                  <p className="text-xs text-white/45 leading-relaxed">{reason.desc}</p>
+                  <h4 className="text-sm font-semibold text-slate-900 mb-1.5">{reason.title}</h4>
+                  <p className="text-xs text-slate-500 leading-relaxed">{reason.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -556,12 +578,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ─────────────────── STATS ─────────────────── */}
-      <section className="relative border-y border-white/5 overflow-hidden"
-        style={{ background: "hsl(var(--section-alt))" }}>
-        <div className="absolute inset-0 grid-pattern opacity-30" />
-        <div className="container mx-auto px-6 lg:px-12 relative">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/5">
+      {/* ─────────────────── STATS (white) ─────────────────── */}
+      <section className="relative overflow-hidden bg-slate-50 border-y border-slate-200">
+        <div className="container mx-auto px-6 lg:px-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-slate-200">
             {stats.map((s, i) => (
               <motion.div
                 key={s.label}
@@ -569,26 +589,34 @@ const Index = () => {
                 custom={i} variants={fadeIn}
                 className="py-10 px-6 text-center"
               >
-                <s.icon size={18} className="mx-auto mb-3 opacity-60 text-primary" />
+                <s.icon size={18} className="mx-auto mb-3 text-primary opacity-70" />
                 <p className="text-4xl lg:text-5xl font-serif stat-number mb-1">{s.value}</p>
-                <p className="text-xs text-white/35 uppercase tracking-widest font-medium">{s.label}</p>
+                <p className="text-xs text-slate-400 uppercase tracking-widest font-medium">{s.label}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─────────────────── TESTIMONIALS ─────────────────── */}
-      <section className="py-24 lg:py-32 relative overflow-hidden">
-        <div className="absolute inset-0" style={{ background: "hsl(var(--background))" }} />
-        <div className="absolute inset-0 dot-pattern opacity-25" />
-        <div className="absolute top-0 left-1/3 w-[500px] h-[400px] rounded-full blur-[120px] opacity-5"
+      {/* ─────────────────── TESTIMONIALS (white) ─────────────────── */}
+      <section className="py-16 lg:py-24 relative overflow-hidden bg-white">
+        <div className="absolute top-0 left-6 right-6 lg:left-12 lg:right-12 h-px bg-slate-100" />
+        {/* Bottom divider back to dark */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-slate-200" />
+
+        <div className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: "linear-gradient(rgba(0,0,0,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.025) 1px,transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+        <div className="absolute top-0 right-1/4 w-[400px] h-[300px] rounded-full blur-[120px] opacity-[0.05] pointer-events-none"
           style={{ background: "hsl(var(--primary))" }} />
 
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
           <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true }}
-            className="text-center mb-14"
+            className="text-center mb-12"
           >
             <motion.p variants={fadeUp} custom={0}
               className="text-xs font-bold uppercase tracking-[0.25em] mb-4"
@@ -597,7 +625,7 @@ const Index = () => {
               What Our Learners Say
             </motion.p>
             <motion.h2 variants={fadeUp} custom={1}
-              className="text-3xl md:text-4xl lg:text-5xl font-serif text-white"
+              className="text-3xl md:text-4xl lg:text-5xl font-serif text-slate-900"
             >
               Real people.{" "}
               <em className="not-italic text-gradient-gold">Real growth. Real impact.</em>
@@ -612,24 +640,28 @@ const Index = () => {
                 custom={i} variants={scaleIn}
                 className="card-lift"
               >
-                <div className="glass border border-white/8 rounded-2xl p-7 h-full hover:border-primary/20 transition-all duration-300">
-                  <div className="flex gap-0.5 mb-5">
+                <div className="bg-white border border-slate-200 rounded-2xl p-7 h-full hover:border-primary/40 hover:shadow-lg hover:shadow-primary/8 transition-all duration-300">
+                  {/* Stars */}
+                  <div className="flex gap-0.5 mb-4">
                     {[...Array(5)].map((_, j) => (
                       <Star key={j} size={14} className="text-amber-400 fill-amber-400" />
                     ))}
                   </div>
-                  <Quote size={22} className="text-primary/40 mb-3" />
-                  <p className="font-elegant text-lg italic text-white/65 leading-relaxed mb-6">
+                  {/* Quote mark */}
+                  <Quote size={26} className="mb-3" style={{ color: "hsl(var(--primary) / 0.35)" }} />
+                  <p className="font-elegant text-lg italic text-slate-600 leading-relaxed mb-6">
                     "{t.quote}"
                   </p>
-                  <div className="glow-line mb-5" />
+                  {/* Divider */}
+                  <div className="h-px bg-slate-100 mb-5" />
+                  {/* Author */}
                   <div className="flex items-center gap-3">
                     <div className={`w-9 h-9 rounded-full ${t.color} flex items-center justify-center text-sm font-bold`}>
                       {t.initial}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-white">{t.name}</p>
-                      <p className="text-xs text-white/40">{t.role}</p>
+                      <p className="text-sm font-semibold text-slate-900">{t.name}</p>
+                      <p className="text-xs text-slate-400">{t.role}</p>
                     </div>
                   </div>
                 </div>
