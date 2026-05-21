@@ -574,7 +574,7 @@ const Index = () => {
         />
 
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-14 xl:gap-20 items-start">
+          <div className="grid md:grid-cols-2 gap-10 lg:gap-14 xl:gap-20 items-start">
             {/* Left text */}
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true }}
