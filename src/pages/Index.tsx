@@ -393,14 +393,30 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ─────────────────── EXPLORE PROGRAMMES ─────────────────── */}
-      <section className="py-24 lg:py-32 relative overflow-hidden"
-        style={{ background: "hsl(var(--section-alt))" }}>
-        <div className="absolute inset-0 grid-pattern opacity-30" />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[120px] opacity-5"
+      {/* ─────────────────── EXPLORE PROGRAMMES (WHITE SECTION) ─────────────────── */}
+      <section className="py-24 lg:py-32 relative overflow-hidden bg-white">
+        {/* Subtle top & bottom dividers */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-slate-200" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-slate-200" />
+
+        {/* Very light grid pattern */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.03) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+
+        {/* Soft radial accent blobs */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[140px] opacity-[0.07] pointer-events-none"
           style={{ background: "hsl(var(--primary))" }} />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full blur-[120px] opacity-[0.05] pointer-events-none"
+          style={{ background: "hsl(217,91%,56%)" }} />
 
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
+          {/* Header */}
           <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true }}
             className="text-center mb-14"
@@ -412,14 +428,20 @@ const Index = () => {
               Start Your Journey
             </motion.p>
             <motion.h2 variants={fadeUp} custom={1}
-              className="text-3xl md:text-4xl lg:text-5xl font-serif text-white"
+              className="text-3xl md:text-4xl lg:text-5xl font-serif text-slate-900 leading-tight"
             >
               Explore Our{" "}
               <em className="not-italic text-gradient-gold">Programmes</em>
             </motion.h2>
+            <motion.p variants={fadeUp} custom={2}
+              className="mt-4 text-slate-500 text-sm max-w-xl mx-auto leading-relaxed"
+            >
+              Choose the pathway that matches your experience level and career goals.
+            </motion.p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          {/* Programme cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
             {programmes.map((prog, i) => (
               <motion.div
                 key={prog.title}
@@ -427,18 +449,25 @@ const Index = () => {
                 custom={i} variants={scaleIn}
                 className="card-lift"
               >
-                <div className="glass border border-white/8 rounded-2xl p-6 h-full hover:border-primary/25 transition-all duration-300 group">
-                  <div className={`w-12 h-12 rounded-xl ${prog.iconBg} flex items-center justify-center mb-5`}>
-                    <prog.icon size={22} />
+                <div className="bg-white rounded-2xl border border-slate-200 p-7 h-full hover:border-primary/40 hover:shadow-xl hover:shadow-primary/8 transition-all duration-300 group">
+                  {/* Icon */}
+                  <div className={`w-14 h-14 rounded-2xl ${prog.iconBg} flex items-center justify-center mb-5`}>
+                    <prog.icon size={24} />
                   </div>
+                  {/* Badge */}
                   <span className={`inline-block text-xs font-semibold px-3 py-1 rounded-full mb-4 ${prog.badgeColor}`}>
                     {prog.badge}
                   </span>
-                  <h3 className="font-serif text-lg font-normal text-white mb-2">{prog.title}</h3>
-                  <p className="text-sm text-white/50 leading-relaxed mb-5">{prog.desc}</p>
+                  {/* Title */}
+                  <h3 className="font-serif text-xl font-normal text-slate-900 mb-2 leading-snug">
+                    {prog.title}
+                  </h3>
+                  {/* Description */}
+                  <p className="text-sm text-slate-500 leading-relaxed mb-6">{prog.desc}</p>
+                  {/* CTA link */}
                   <Link
                     to="/courses"
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold transition-colors group-hover:gap-2.5"
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold group-hover:gap-2.5 transition-all duration-200"
                     style={{ color: "hsl(var(--primary))" }}
                   >
                     View Details <ArrowRight size={14} />
@@ -448,12 +477,23 @@ const Index = () => {
             ))}
           </div>
 
+          {/* Bottom CTA row */}
           <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true }}
             variants={fadeUp} custom={3}
-            className="text-center"
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Button variant="outline" asChild className="glass border-white/20 hover:bg-white/10 text-white font-semibold px-8">
+            <Button
+              asChild
+              className="bg-gradient-gold hover:opacity-90 font-semibold px-8 h-11 text-sm btn-shimmer shadow-orange"
+            >
+              <Link to="/auth?tab=signup">Get Started Free <ArrowRight className="ml-2" size={15} /></Link>
+            </Button>
+            <Button
+              variant="outline"
+              asChild
+              className="border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold px-8 h-11 text-sm"
+            >
               <Link to="/courses">View All Courses</Link>
             </Button>
           </motion.div>
