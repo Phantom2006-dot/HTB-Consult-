@@ -195,24 +195,25 @@ const Index = () => {
         <div className="absolute top-1/4 left-1/5 w-[500px] h-[500px] rounded-full blur-[120px] animate-[pulse-glow_8s_ease-in-out_infinite]"
           style={{ background: "hsl(var(--primary) / 0.07)" }} />
 
-        {/* Badge top-left corner */}
-        <div className="absolute top-28 left-4 lg:left-10 z-10">
+        <div className="container mx-auto px-6 lg:px-12 relative z-10 flex flex-col min-h-[calc(100vh-72px)] justify-between py-16 lg:py-24">
+
+          {/* Top badge */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4, duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest glass border border-primary/25"
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="inline-flex self-start items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest glass border border-primary/25 mb-10"
             style={{ color: "hsl(var(--primary))" }}
           >
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "hsl(var(--primary))" }} />
             Business Analysis. Real Training. Real Impact.
           </motion.div>
-        </div>
 
-        <div className="container mx-auto px-6 lg:px-12 relative z-10 py-24 lg:py-36">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left — copy */}
-            <div className="max-w-xl">
+          {/* Main row */}
+          <div className="flex-1 flex items-center">
+            <div className="w-full lg:max-w-[55%]">
+
+              {/* Headline */}
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -223,6 +224,7 @@ const Index = () => {
                 <em className="not-italic text-gradient-gold">Business Analyst</em>
               </motion.h1>
 
+              {/* Subtitle */}
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -233,36 +235,58 @@ const Index = () => {
                 Build the BA career you want.
               </motion.p>
 
+              {/* CTA Buttons */}
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.45, duration: 0.5 }}
                 className="flex flex-wrap gap-3 mb-10"
               >
-                <Button
-                  size="lg"
-                  asChild
+                <Button size="lg" asChild
                   className="bg-gradient-gold hover:opacity-90 font-semibold px-8 h-12 shadow-orange btn-shimmer text-sm"
                 >
                   <Link to="/services">Explore Pathways <ArrowRight className="ml-2" size={16} /></Link>
                 </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  asChild
+                <Button size="lg" variant="outline" asChild
                   className="font-semibold px-8 h-12 glass border-white/20 hover:bg-white/10 text-white text-sm"
                 >
                   <Link to="/courses">View Courses</Link>
                 </Button>
               </motion.div>
 
-              {/* Community badge */}
+              {/* Trust badges — 4 items in a row below buttons */}
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6, duration: 0.5 }}
-                className="inline-flex items-center gap-3 glass border border-white/10 rounded-2xl px-4 py-3"
+                className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4 border-t border-white/10 pt-8"
               >
+                {trustBadges.map((b, i) => (
+                  <div key={b.label} className="flex items-start gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+                      <b.icon size={14} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-white leading-tight">{b.label}</p>
+                      <p className="text-[10px] text-white/45 leading-snug mt-0.5">{b.sub}</p>
+                    </div>
+                  </div>
+                ))}
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Community badge — bottom right */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.75, duration: 0.5 }}
+            className="self-end mt-10 lg:mt-0"
+          >
+            <div className="glass border border-white/15 rounded-2xl px-5 py-4 text-right">
+              <p className="text-sm font-semibold text-white mb-0.5">Join a community of</p>
+              <p className="text-xs text-white/50 mb-3">aspiring and practising Business Analysts</p>
+              <div className="flex items-center justify-end gap-2">
                 <div className="flex -space-x-2">
                   {["A", "K", "S", "R", "M"].map((l, i) => (
                     <div
@@ -274,55 +298,13 @@ const Index = () => {
                     </div>
                   ))}
                 </div>
-                <div>
-                  <p className="text-xs font-semibold text-white">Join a community of</p>
-                  <p className="text-xs text-white/50">aspiring and practising Business Analysts</p>
-                </div>
                 <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30">
                   +2K
                 </span>
-              </motion.div>
-            </div>
-
-            {/* Right — trust badges grid (desktop only) */}
-            <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.35, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              className="hidden lg:grid grid-cols-2 gap-4"
-            >
-              {trustBadges.map((b, i) => (
-                <motion.div
-                  key={b.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 + i * 0.1 }}
-                  className="glass border border-white/10 rounded-2xl p-5 hover:border-primary/30 transition-all duration-300 card-lift"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center mb-3">
-                    <b.icon size={20} className="text-primary" />
-                  </div>
-                  <p className="text-sm font-semibold text-white mb-1">{b.label}</p>
-                  <p className="text-xs text-white/45 leading-relaxed">{b.sub}</p>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-
-          {/* Mobile trust badges row */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="lg:hidden flex gap-4 mt-8 overflow-x-auto pb-2 -mx-2 px-2"
-          >
-            {trustBadges.map((b) => (
-              <div key={b.label} className="flex items-center gap-2 glass border border-white/10 rounded-xl px-3 py-2 shrink-0">
-                <b.icon size={14} className="text-primary shrink-0" />
-                <span className="text-xs font-medium text-white/70 whitespace-nowrap">{b.label}</span>
               </div>
-            ))}
+            </div>
           </motion.div>
+
         </div>
 
         {/* Bottom fade */}
@@ -386,8 +368,8 @@ const Index = () => {
                   </div>
 
                   {/* Card body */}
-                  <div className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/8 transition-all duration-300 card-lift mx-1 h-full">
-                    <div className={`w-11 h-11 rounded-xl ${step.iconBg} flex items-center justify-center mb-4`}>
+                  <div className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/8 transition-all duration-300 card-lift mx-1 h-full text-center">
+                    <div className={`w-11 h-11 rounded-xl ${step.iconBg} flex items-center justify-center mb-4 mx-auto`}>
                       <step.icon size={19} />
                     </div>
                     <h3 className="font-serif text-sm font-normal text-slate-900 mb-2 leading-snug">
@@ -400,14 +382,14 @@ const Index = () => {
                   </div>
                 </motion.div>
 
-                {/* Connector between steps */}
+                {/* Connector between steps — mt aligns with circle centre (circle=3rem → centre=1.5rem, arrow=1.75rem → half=0.875rem → mt=0.625rem) */}
                 {i < learningSteps.length - 1 && (
                   <motion.div
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
                     transition={{ delay: i * 0.12 + 0.25, duration: 0.4 }}
-                    className="flex items-center shrink-0 mt-[1.375rem]"
+                    className="flex items-center shrink-0 mt-[0.625rem]"
                   >
                     {/* Left dashed segment */}
                     <div
