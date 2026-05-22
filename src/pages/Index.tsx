@@ -586,7 +586,7 @@ const Index = () => {
                 Why HTB Academy
               </motion.p>
               <motion.h2 variants={fadeUp} custom={1}
-                className="text-4xl md:text-5xl font-serif text-slate-900 mb-4 leading-tight"
+                className="text-5xl md:text-6xl font-serif text-slate-900 mb-4 leading-[1.1]"
               >
                 We don't just teach.{" "}
                 <em className="not-italic text-gradient-gold">We prepare you for impact.</em>
