@@ -30,10 +30,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
   if (user) {
     return (
       <SidebarLayout>
-        <div className="flex flex-col min-h-[calc(100vh-65px)]">
-          <div className="flex-1">{children}</div>
-          <Footer />
-        </div>
+        {children}
         <ThemeToggle />
       </SidebarLayout>
     );
