@@ -618,8 +618,8 @@ const Index = () => {
                   <div className={`w-10 h-10 rounded-xl ${reason.color} flex items-center justify-center mb-3`}>
                     <reason.icon size={18} />
                   </div>
-                  <h4 className="text-sm font-semibold text-slate-900 mb-1.5">{reason.title}</h4>
-                  <p className="text-xs text-slate-500 leading-relaxed">{reason.desc}</p>
+                  <h4 className="text-base font-semibold text-slate-900 mb-2">{reason.title}</h4>
+                  <p className="text-sm text-slate-500 leading-relaxed">{reason.desc}</p>
                 </motion.div>
               ))}
             </div>
