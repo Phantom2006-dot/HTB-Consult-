@@ -48,7 +48,7 @@ const quickLinks = [
   { label: "Why HTB Academy", path: "/about" },
   { label: "Learning Pathways", path: "/services" },
   { label: "Courses", path: "/courses" },
-  { label: "About HTB Academy", path: "/about" },
+  { label: "About HTB Academy", path: "/about-htb" },
   { label: "Contact", path: "/contact" },
 ];
 
