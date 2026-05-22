@@ -40,8 +40,11 @@ const Navbar = () => {
   };
 
   const isHome = location.pathname === "/";
-  const isActive = (path: string) =>
-    path === "/" ? location.pathname === "/" : location.pathname.startsWith(path.split("#")[0]);
+  const isActive = (path: string) => {
+    const base = path.split("#")[0];
+    if (base === "/") return location.pathname === "/";
+    return location.pathname === base || location.pathname.startsWith(base + "/");
+  };
 
   /*
    * Colour logic:
