@@ -373,7 +373,7 @@ const Services = () => {
                     <h3 className="font-bold text-slate-900 text-[15px] mb-2">{opt.title}</h3>
                     <p className="text-[13px] text-slate-500 leading-relaxed">{opt.desc}</p>
                   </div>
-                  <Button asChild variant="outline" className="w-full border-slate-300 text-slate-700 hover:border-primary hover:text-primary text-sm mt-1">
+                  <Button asChild className="w-full bg-white border border-slate-300 text-slate-800 hover:bg-primary hover:text-white hover:border-primary text-sm mt-1 font-semibold shadow-sm transition-colors">
                     <Link to={opt.href}>{opt.cta}</Link>
                   </Button>
                 </motion.div>
