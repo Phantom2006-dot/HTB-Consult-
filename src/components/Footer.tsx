@@ -175,7 +175,7 @@ const Footer = () => {
                 </div>
                 <div>
                   <p className="text-xs text-white/35 mb-0.5">Office</p>
-                  <p className="text-sm text-white/55">South Africa</p>
+                  <p className="text-sm text-white/55">London, United Kingdom</p>
                 </div>
               </li>
             </ul>
