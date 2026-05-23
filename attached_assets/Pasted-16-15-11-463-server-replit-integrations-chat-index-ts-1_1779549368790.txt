@@ -1,0 +1,31 @@
+16:15:11.463 
+server/replit_integrations/chat/index.ts(1,36): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './routes.js'?
+16:15:11.463 
+server/replit_integrations/chat/index.ts(2,48): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './storage.js'?
+16:15:11.463 
+server/replit_integrations/chat/routes.ts(3,29): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './storage.js'?
+16:15:11.463 
+server/replit_integrations/chat/routes.ts(34,27): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+16:15:11.463 
+  Type 'string[]' is not assignable to type 'string'.
+16:15:11.463 
+server/replit_integrations/chat/routes.ts(62,27): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+16:15:11.464 
+  Type 'string[]' is not assignable to type 'string'.
+16:15:11.464 
+server/replit_integrations/chat/routes.ts(74,39): error TS2345: Argument of type 'string | string[]' is not assignable to parameter of type 'string'.
+16:15:11.464 
+  Type 'string[]' is not assignable to type 'string'.
+16:15:11.464 
+server/replit_integrations/chat/storage.ts(1,20): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean '../../db.js'?
+16:15:11.464 
+server/replit_integrations/chat/storage.ts(2,41): error TS2307: Cannot find module '@shared/schema' or its corresponding type declarations.
+16:15:11.465 
+server/replit_integrations/image/index.ts(1,37): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './routes.js'?
+16:15:11.465 
+server/replit_integrations/image/index.ts(2,35): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './client.js'?
+16:15:11.465 
+server/replit_integrations/image/routes.ts(3,20): error TS2835: Relative import paths need explicit file extensions in ECMAScript imports when '--moduleResolution' is 'node16' or 'nodenext'. Did you mean './client.js'?
+16:15:11.518 
+Error: Command "npm run build" exited with 2
+Deployment Summary

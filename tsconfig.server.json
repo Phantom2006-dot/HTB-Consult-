@@ -9,5 +9,6 @@
     "skipLibCheck": true,
     "strict": false
   },
-  "include": ["server/**/*"]
+  "include": ["server/**/*"],
+  "exclude": ["server/replit_integrations/**/*"]
 }
