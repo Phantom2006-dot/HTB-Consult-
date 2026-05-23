@@ -77,7 +77,7 @@ const Courses = () => {
               <GraduationCap size={13} className="text-primary" />
               <span className="text-primary font-semibold tracking-[0.2em] uppercase text-xs">HTB Consult Academy</span>
             </motion.div>
-            <motion.h1 variants={fadeUp} custom={1} className="text-4xl md:text-5xl font-serif font-bold text-white mb-4 text-shadow-lg">
+            <motion.h1 variants={fadeUp} custom={1} className="text-4xl md:text-5xl lg:text-6xl font-serif font-normal text-white mb-4 text-shadow-lg leading-[1.08] tracking-display">
               Practical Training for <em className="text-gradient-gold not-italic">Professional Growth</em>
             </motion.h1>
             <motion.p variants={fadeUp} custom={2} className="text-lg text-white/85 max-w-2xl leading-relaxed text-shadow">
@@ -216,7 +216,7 @@ const Courses = () => {
                             </span>
                           )}
                         </div>
-                        <h3 className="font-serif text-lg font-semibold text-white mb-2 leading-snug">{course.title}</h3>
+                        <h3 className="font-serif text-lg font-normal text-white mb-2 leading-snug">{course.title}</h3>
                         <p className="text-xs text-white/40 leading-relaxed mb-4 line-clamp-3 flex-1">{course.description}</p>
                         <div className="flex items-center gap-4 text-xs text-white/35">
                           <span className="flex items-center gap-1"><Clock size={12} /> {course.total_duration}</span>
@@ -276,7 +276,7 @@ const Courses = () => {
                 </div>
               </div>
               <Badge variant="outline" className="text-[10px] border-amber-500/40 text-amber-400 mb-3">{lockedCourse.category}</Badge>
-              <h2 className="text-xl font-serif font-bold text-white mb-2">This Course is Currently Locked</h2>
+              <h2 className="text-xl font-serif font-normal text-white mb-2">This Course is Currently Locked</h2>
               <p className="text-sm text-white/50 font-medium mb-1">"{lockedCourse.title}"</p>
               <p className="text-sm text-white/40 leading-relaxed mt-3 mb-6">
                 Our team is preparing this course for you. It will be available again soon.

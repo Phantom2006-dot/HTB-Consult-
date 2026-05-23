@@ -169,7 +169,7 @@ const Services = () => {
             <motion.div initial="hidden" animate="visible">
               <motion.h1
                 variants={fadeUp} custom={0}
-                className="text-4xl md:text-5xl lg:text-[3.25rem] font-serif font-bold text-white leading-[1.08] mb-5 tracking-tight"
+                className="text-4xl md:text-5xl lg:text-6xl font-serif font-normal text-white leading-[1.05] mb-5 tracking-display"
               >
                 Your Journey to<br />
                 <span className="text-gradient-gold">Industry Impact</span>
@@ -222,7 +222,7 @@ const Services = () => {
             <motion.p variants={fadeUp} custom={0} className="text-xs font-bold tracking-[0.22em] uppercase text-primary mb-3">
               Our Learning Pathway
             </motion.p>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-serif font-bold text-slate-900">
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-serif font-normal text-slate-900 leading-tight">
               4 Stages. One Goal. Your Success.
             </motion.h2>
           </motion.div>
@@ -292,7 +292,7 @@ const Services = () => {
             <motion.p variants={fadeUp} custom={0} className="text-xs font-bold tracking-[0.22em] uppercase text-primary mb-3">
               What You Will Learn
             </motion.p>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-serif font-bold text-slate-900">
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-serif font-normal text-slate-900 leading-tight">
               Progressively Build. Continuously Grow.
             </motion.h2>
           </motion.div>
@@ -351,7 +351,7 @@ const Services = () => {
             <motion.p variants={fadeUp} custom={0} className="text-xs font-bold tracking-[0.22em] uppercase text-primary mb-3">
               Choose Your Path
             </motion.p>
-            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-serif font-bold text-slate-900">
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-serif font-normal text-slate-900 leading-tight">
               Start Where You Are.<br className="hidden sm:block" /> Grow Where You Want to Go.
             </motion.h2>
           </motion.div>
@@ -395,7 +395,7 @@ const Services = () => {
                 <BarChart3 size={26} className="text-primary" />
               </div>
               <div>
-                <h2 className="text-xl md:text-2xl font-serif font-bold text-white mb-1">
+                <h2 className="text-xl md:text-2xl font-serif font-normal text-white mb-1">
                   Your future in Business Analysis starts here.
                 </h2>
                 <p className="text-sm text-white/60">
