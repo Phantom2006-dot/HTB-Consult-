@@ -174,7 +174,25 @@ const Dashboard = () => {
 
   return (
     <Layout>
-      <div className="p-4 lg:p-6 space-y-6">
+      <div className="relative min-h-screen bg-white p-4 lg:p-6 space-y-6">
+        {/* Subtle grid pattern — matches home page white sections */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(0,0,0,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.025) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+        {/* Soft radial accent blobs */}
+        <div
+          className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full blur-[140px] opacity-[0.05] pointer-events-none"
+          style={{ background: "hsl(var(--primary))" }}
+        />
+        <div
+          className="absolute bottom-1/3 left-0 w-[400px] h-[400px] rounded-full blur-[140px] opacity-[0.04] pointer-events-none"
+          style={{ background: "hsl(var(--primary))" }}
+        />
 
         {/* ── Welcome Header ──────────────────────────────────────── */}
         <div>
