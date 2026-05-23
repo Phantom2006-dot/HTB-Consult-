@@ -1,15 +1,24 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, ArrowLeft, Mail, RefreshCw } from "lucide-react";
+import {
+  Eye, EyeOff, ArrowLeft, Mail, RefreshCw,
+  BookOpen, Users, Target, TrendingUp, CheckCircle2, ChevronRight
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { fadeUp } from "@/lib/animations";
 import htbLogo from "@/assets/htb-logo.png";
 import { useAuth, setToken } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
+
+const features = [
+  { icon: BookOpen,   text: "Practical & Hands-on Learning",       sub: "Real projects, case studies and simulations." },
+  { icon: Users,      text: "Industry Expert Mentorship",          sub: "Learn from experienced Business Analysts." },
+  { icon: Target,     text: "Structured Learning Pathways",        sub: "Foundation to industry specialisation." },
+  { icon: TrendingUp, text: "Career Growth Focused",               sub: "Build skills and confidence to get hired." },
+];
 
 const Auth = () => {
   const [searchParams] = useSearchParams();
@@ -28,14 +37,12 @@ const Auth = () => {
   const [forgotEmail, setForgotEmail] = useState("");
   const [verificationSent, setVerificationSent] = useState(false);
   const [verificationEmail, setVerificationEmail] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState("");
 
   useEffect(() => {
-    if (!authLoading && user) {
-      navigate("/dashboard");
-    }
+    if (!authLoading && user) navigate("/dashboard");
   }, [user, authLoading, navigate]);
-
-  const [unverifiedEmail, setUnverifiedEmail] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,8 +103,6 @@ const Auth = () => {
     }
   };
 
-  const [forgotSent, setForgotSent] = useState(false);
-
   const handleForgot = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!forgotEmail) {
@@ -118,124 +123,268 @@ const Auth = () => {
   if (authLoading) return null;
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-gradient-green" />
-      <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "radial-gradient(circle at 50% 50%, hsl(30, 100%, 46%) 0%, transparent 50%)" }} />
+    <div className="min-h-screen flex flex-col lg:flex-row">
 
-      <motion.div initial="hidden" animate="visible" className="relative z-10 w-full max-w-md">
-        <motion.div variants={fadeUp} custom={0} className="mb-8 text-center">
-          <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <img src={htbLogo} alt="HTB HighTicketBoss" className="h-12 w-auto" />
+      {/* ── LEFT PANEL ─────────────────────────────────────────────────── */}
+      <div
+        className="hidden lg:flex lg:w-[45%] xl:w-[42%] flex-col relative overflow-hidden"
+        style={{ background: "hsl(var(--hero-gradient-from))" }}
+      >
+        {/* Grid pattern */}
+        <div className="absolute inset-0 grid-pattern opacity-30 pointer-events-none" />
+        {/* Glow blobs */}
+        <div className="absolute top-0 right-0 w-72 h-72 rounded-full bg-primary/10 blur-[80px] pointer-events-none" />
+        <div className="absolute bottom-1/4 left-0 w-56 h-56 rounded-full bg-primary/6 blur-[60px] pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col h-full p-10 xl:p-14">
+          {/* Logo */}
+          <Link to="/" className="inline-flex items-center gap-2 mb-12 shrink-0">
+            <img src={htbLogo} alt="HTB Consult Academy" className="h-10 w-auto" />
           </Link>
-        </motion.div>
 
-        <motion.div variants={fadeUp} custom={1}>
-          <Card className="bg-card border-border">
-            <CardContent className="p-8">
-              {tab !== "forgot" && (
-                <div className="flex gap-4 mb-8">
+          {/* Headline */}
+          <div className="flex-1 flex flex-col justify-center">
+            <div className="inline-flex items-center gap-2 mb-5">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span className="text-xs text-primary/80 uppercase tracking-widest font-medium">Join HTB Academy</span>
+            </div>
+            <h1 className="text-3xl xl:text-[2.5rem] font-serif font-bold text-white leading-[1.12] mb-4 tracking-tight">
+              Start Your Journey to Becoming an{" "}
+              <span className="text-gradient-gold">Industry-Ready Business Analyst</span>
+            </h1>
+            <p className="text-sm text-white/55 leading-relaxed mb-10 max-w-sm">
+              Create your account to access world-class BA training, practical simulations and expert mentorship.
+            </p>
+
+            {/* Feature list */}
+            <div className="space-y-5 mb-10">
+              {features.map((f) => {
+                const Icon = f.icon;
+                return (
+                  <div key={f.text} className="flex items-start gap-3.5">
+                    <div className="w-9 h-9 rounded-xl bg-primary/12 border border-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+                      <Icon size={16} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-white">{f.text}</p>
+                      <p className="text-xs text-white/45 mt-0.5">{f.sub}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Testimonial */}
+            <div className="glass rounded-xl p-5 border border-white/8">
+              <div className="flex gap-1 mb-2">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-3.5 h-3.5 text-amber-400 fill-amber-400" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.174c.969 0 1.371 1.24.588 1.81l-3.376 2.452a1 1 0 00-.363 1.118l1.287 3.967c.3.921-.755 1.688-1.54 1.118L10 15.347l-3.957 2.872c-.784.57-1.838-.197-1.539-1.118l1.287-3.967a1 1 0 00-.363-1.118L2.052 9.394c-.783-.57-.38-1.81.588-1.81h4.174a1 1 0 00.95-.69L9.049 2.927z" /></svg>
+                ))}
+              </div>
+              <p className="text-sm text-white/70 italic leading-relaxed mb-3">
+                "HTB Academy gave me the practical skills and confidence I needed to transition into a BA role."
+              </p>
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-xs font-bold text-primary">A</div>
+                <div>
+                  <p className="text-xs font-semibold text-white">Aisha M.</p>
+                  <p className="text-[11px] text-white/40">Junior Business Analyst</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Back link */}
+          <Link to="/" className="mt-8 flex items-center gap-1.5 text-xs text-white/35 hover:text-white/70 transition-colors shrink-0">
+            <ArrowLeft size={13} /> Back to Home
+          </Link>
+        </div>
+      </div>
+
+      {/* ── RIGHT PANEL ────────────────────────────────────────────────── */}
+      <div className="flex-1 flex flex-col items-center justify-center min-h-screen bg-background relative overflow-hidden px-4 py-10 lg:py-0">
+        {/* Subtle pattern on white/dark sections — matches homepage */}
+        <div className="absolute inset-0 grid-pattern opacity-[0.06] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] rounded-full bg-primary/5 blur-[100px] pointer-events-none" />
+
+        {/* Mobile logo */}
+        <div className="lg:hidden mb-8 flex flex-col items-center">
+          <Link to="/">
+            <img src={htbLogo} alt="HTB Consult Academy" className="h-10 w-auto mb-2" />
+          </Link>
+        </div>
+
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          className="relative z-10 w-full max-w-[440px]"
+        >
+          {/* Card */}
+          <motion.div
+            variants={fadeUp} custom={0}
+            className="bg-card border border-border rounded-2xl shadow-2xl overflow-hidden"
+          >
+            {/* Tab bar — only for login/signup */}
+            {tab !== "forgot" && (
+              <div className="flex border-b border-border">
+                <button
+                  onClick={() => setTab("login")}
+                  className={`flex-1 text-sm font-semibold py-4 transition-all border-b-2 -mb-px ${
+                    tab === "login"
+                      ? "border-primary text-primary bg-primary/5"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Log In
+                </button>
+                <button
+                  onClick={() => setTab("signup")}
+                  className={`flex-1 text-sm font-semibold py-4 transition-all border-b-2 -mb-px ${
+                    tab === "signup"
+                      ? "border-primary text-primary bg-primary/5"
+                      : "border-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Create Account
+                </button>
+              </div>
+            )}
+
+            <div className="p-7 lg:p-8">
+
+              {/* ── FORGOT PASSWORD ── */}
+              {tab === "forgot" && (
+                <>
                   <button
                     onClick={() => setTab("login")}
-                    className={`text-sm font-medium pb-2 border-b-2 transition-colors ${
-                      tab === "login" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-                    }`}
+                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors"
                   >
-                    Login
+                    <ArrowLeft size={15} /> Back to Login
                   </button>
-                  <button
-                    onClick={() => setTab("signup")}
-                    className={`text-sm font-medium pb-2 border-b-2 transition-colors ${
-                      tab === "signup" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    Sign Up
-                  </button>
-                </div>
+
+                  {forgotSent ? (
+                    <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="text-center py-4">
+                      <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-5">
+                        <CheckCircle2 className="text-primary" size={28} />
+                      </div>
+                      <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Check Your Email</h2>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        If <strong className="text-foreground">{forgotEmail}</strong> is registered, a reset link has been sent.
+                      </p>
+                      <p className="text-xs text-muted-foreground mb-6">The link expires in 1 hour. Check your spam folder.</p>
+                      <button type="button" onClick={() => { setForgotSent(false); setTab("login"); }} className="text-sm text-primary hover:underline font-medium">
+                        Back to Login
+                      </button>
+                    </motion.div>
+                  ) : (
+                    <form onSubmit={handleForgot} className="space-y-5">
+                      <div>
+                        <h2 className="font-serif text-2xl font-bold text-foreground mb-1">Reset Password</h2>
+                        <p className="text-sm text-muted-foreground">Enter your email and we'll send a reset link.</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-foreground mb-1.5 block">Email Address</label>
+                        <Input
+                          type="email" placeholder="your@email.com"
+                          value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)}
+                          className="bg-muted border-border h-11" maxLength={255} autoFocus
+                        />
+                      </div>
+                      <Button type="submit" disabled={loading} className="w-full h-11 bg-gradient-gold hover:opacity-90 font-semibold btn-shimmer">
+                        {loading ? "Sending..." : "Send Reset Link"}
+                      </Button>
+                    </form>
+                  )}
+                </>
               )}
 
-              {tab === "forgot" && (
-                <button onClick={() => setTab("login")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
-                  <ArrowLeft size={16} /> Back to Login
-                </button>
-              )}
-
+              {/* ── LOGIN ── */}
               {tab === "login" && (
                 <form onSubmit={handleLogin} className="space-y-4">
-                  <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Welcome Back</h2>
-                  <p className="text-sm text-muted-foreground mb-4">Sign in to access your account.</p>
+                  <div className="mb-5">
+                    <h2 className="font-serif text-2xl font-bold text-foreground mb-1">Welcome Back</h2>
+                    <p className="text-sm text-muted-foreground">Sign in to continue your learning journey.</p>
+                  </div>
 
                   {unverifiedEmail && (
-                    <div className="bg-primary/10 border border-primary/30 rounded-lg px-4 py-3 text-sm">
-                      <p className="text-foreground font-medium mb-1">Email not verified</p>
+                    <div className="bg-primary/10 border border-primary/25 rounded-xl px-4 py-3 text-sm">
+                      <p className="text-foreground font-semibold mb-1">Email not verified</p>
                       <p className="text-muted-foreground text-xs mb-2">
                         Please verify <strong>{unverifiedEmail}</strong> before logging in.
                       </p>
-                      <Link
-                        to={`/verify-email`}
-                        className="inline-flex items-center gap-1.5 text-xs text-primary font-medium hover:underline"
-                      >
-                        <RefreshCw size={12} /> Resend verification email
+                      <Link to="/verify-email" className="inline-flex items-center gap-1.5 text-xs text-primary font-medium hover:underline">
+                        <RefreshCw size={11} /> Resend verification email
                       </Link>
                     </div>
                   )}
 
                   {/* Student / Mentor toggle */}
-                  <div className="flex rounded-lg bg-muted p-1 mb-2">
-                    <button
-                      type="button"
-                      onClick={() => setLoginMode("student")}
-                      className={`flex-1 text-sm font-medium py-2 rounded-md transition-all ${
-                        loginMode === "student"
-                          ? "bg-background text-foreground shadow-sm"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      Student
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setLoginMode("mentor")}
-                      className={`flex-1 text-sm font-medium py-2 rounded-md transition-all ${
-                        loginMode === "mentor"
-                          ? "bg-background text-foreground shadow-sm"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      Mentor / Admin
-                    </button>
+                  <div className="flex rounded-xl bg-muted p-1 gap-1">
+                    {(["student", "mentor"] as const).map((m) => (
+                      <button
+                        key={m} type="button" onClick={() => setLoginMode(m)}
+                        className={`flex-1 text-sm font-medium py-2 rounded-lg transition-all capitalize ${
+                          loginMode === m
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {m === "mentor" ? "Mentor / Admin" : "Student"}
+                      </button>
+                    ))}
                   </div>
 
                   {loginMode === "mentor" && (
-                    <p className="text-xs text-primary bg-primary/10 rounded-md px-3 py-2">
+                    <p className="text-xs text-primary bg-primary/10 rounded-lg px-3 py-2 border border-primary/15">
                       Mentor accounts have access to both the Mentor Dashboard and Admin Panel.
                     </p>
                   )}
 
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-1 block">Email</label>
-                    <Input type="email" placeholder="your@email.com" value={loginData.email} onChange={(e) => setLoginData({ ...loginData, email: e.target.value })} className="bg-muted border-border text-foreground placeholder:text-muted-foreground" maxLength={255} />
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Email Address</label>
+                    <Input
+                      type="email" placeholder="your@email.com"
+                      value={loginData.email} onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                      className="bg-muted border-border h-11" maxLength={255}
+                    />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-1 block">Password</label>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-sm font-medium text-foreground">Password</label>
+                      <button type="button" onClick={() => setTab("forgot")} className="text-xs text-primary hover:underline">
+                        Forgot password?
+                      </button>
+                    </div>
                     <div className="relative">
-                      <Input type={showPassword ? "text" : "password"} placeholder="••••••••" value={loginData.password} onChange={(e) => setLoginData({ ...loginData, password: e.target.value })} className="bg-muted border-border text-foreground placeholder:text-muted-foreground pr-10" maxLength={128} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      <Input
+                        type={showPassword ? "text" : "password"} placeholder="••••••••"
+                        value={loginData.password} onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                        className="bg-muted border-border h-11 pr-11" maxLength={128}
+                      />
+                      <button type="button" onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                        {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                       </button>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <button type="button" onClick={() => setTab("forgot")} className="text-xs text-primary hover:underline">Forgot password?</button>
-                  </div>
-                  <Button type="submit" disabled={loading} className="w-full bg-gradient-gold hover:opacity-90">
+
+                  <Button type="submit" disabled={loading} className="w-full h-11 bg-gradient-gold hover:opacity-90 font-semibold btn-shimmer mt-2">
                     {loading ? "Signing in..." : loginMode === "mentor" ? "Sign In as Mentor" : "Sign In"}
                   </Button>
+
+                  <p className="text-center text-sm text-muted-foreground pt-1">
+                    Don't have an account?{" "}
+                    <button type="button" onClick={() => setTab("signup")} className="text-primary font-semibold hover:underline">
+                      Create one
+                    </button>
+                  </p>
                 </form>
               )}
 
+              {/* ── SIGN UP — verification sent ── */}
               {tab === "signup" && verificationSent && (
-                <div className="text-center py-4">
-                  <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+                <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="text-center py-4">
+                  <div className="w-14 h-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-5">
                     <Mail className="text-primary" size={28} />
                   </div>
                   <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Check Your Email</h2>
@@ -243,118 +392,107 @@ const Auth = () => {
                     We've sent a verification link to <strong className="text-foreground">{verificationEmail}</strong>.
                   </p>
                   <p className="text-xs text-muted-foreground mb-6">
-                    Click the link in the email to activate your account. It expires in 24 hours. Check your spam folder if you don't see it.
+                    Click the link to activate your account. It expires in 24 hours. Check your spam folder if needed.
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => { setVerificationSent(false); setTab("login"); }}
-                    className="text-xs text-primary hover:underline"
-                  >
+                  <button type="button" onClick={() => { setVerificationSent(false); setTab("login"); }}
+                    className="text-sm text-primary hover:underline font-medium">
                     Back to Login
                   </button>
-                </div>
+                </motion.div>
               )}
 
+              {/* ── SIGN UP — form ── */}
               {tab === "signup" && !verificationSent && (
                 <form onSubmit={handleSignup} className="space-y-4">
-                  <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Create Account</h2>
-                  <p className="text-sm text-muted-foreground mb-4">Join HTB Consults and start your learning journey.</p>
+                  <div className="mb-5">
+                    <h2 className="font-serif text-2xl font-bold text-foreground mb-1">Create Your Account</h2>
+                    <p className="text-sm text-muted-foreground">Join HTB Consults and start your learning journey today.</p>
+                  </div>
 
                   {/* Role selector */}
-                  <div className="flex rounded-lg bg-muted p-1">
-                    <button
-                      type="button"
-                      onClick={() => setSignupRole("student")}
-                      className={`flex-1 text-sm font-medium py-2 rounded-md transition-all ${
-                        signupRole === "student"
-                          ? "bg-background text-foreground shadow-sm"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      Student
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSignupRole("mentor")}
-                      className={`flex-1 text-sm font-medium py-2 rounded-md transition-all ${
-                        signupRole === "mentor"
-                          ? "bg-background text-foreground shadow-sm"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      Mentor
-                    </button>
+                  <div className="flex rounded-xl bg-muted p-1 gap-1">
+                    {(["student", "mentor"] as const).map((r) => (
+                      <button
+                        key={r} type="button" onClick={() => setSignupRole(r)}
+                        className={`flex-1 text-sm font-medium py-2 rounded-lg transition-all capitalize ${
+                          signupRole === r
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {r}
+                      </button>
+                    ))}
                   </div>
                   {signupRole === "mentor" && (
-                    <p className="text-xs text-accent bg-accent/10 rounded-md px-3 py-2">
-                      You'll be registered as a mentor. Your profile will need to be reviewed and published by an admin before students can book you.
+                    <p className="text-xs text-primary bg-primary/10 rounded-lg px-3 py-2 border border-primary/15">
+                      You'll be registered as a mentor. Your profile will need admin approval before students can book you.
                     </p>
                   )}
 
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-1 block">Full Name</label>
-                    <Input placeholder="Your full name" value={signupData.name} onChange={(e) => setSignupData({ ...signupData, name: e.target.value })} className="bg-muted border-border text-foreground placeholder:text-muted-foreground" maxLength={100} />
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Full Name</label>
+                    <Input
+                      placeholder="Your full name"
+                      value={signupData.name} onChange={(e) => setSignupData({ ...signupData, name: e.target.value })}
+                      className="bg-muted border-border h-11" maxLength={100}
+                    />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-1 block">Email</label>
-                    <Input type="email" placeholder="your@email.com" value={signupData.email} onChange={(e) => setSignupData({ ...signupData, email: e.target.value })} className="bg-muted border-border text-foreground placeholder:text-muted-foreground" maxLength={255} />
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Email Address</label>
+                    <Input
+                      type="email" placeholder="your@email.com"
+                      value={signupData.email} onChange={(e) => setSignupData({ ...signupData, email: e.target.value })}
+                      className="bg-muted border-border h-11" maxLength={255}
+                    />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-1 block">Password</label>
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Password</label>
                     <div className="relative">
-                      <Input type={showPassword ? "text" : "password"} placeholder="Min. 6 characters" value={signupData.password} onChange={(e) => setSignupData({ ...signupData, password: e.target.value })} className="bg-muted border-border text-foreground placeholder:text-muted-foreground pr-10" maxLength={128} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      <Input
+                        type={showPassword ? "text" : "password"} placeholder="Min. 6 characters"
+                        value={signupData.password} onChange={(e) => setSignupData({ ...signupData, password: e.target.value })}
+                        className="bg-muted border-border h-11 pr-11" maxLength={128}
+                      />
+                      <button type="button" onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
+                        {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                       </button>
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground mb-1 block">Confirm Password</label>
-                    <Input type="password" placeholder="Confirm your password" value={signupData.confirm} onChange={(e) => setSignupData({ ...signupData, confirm: e.target.value })} className="bg-muted border-border text-foreground placeholder:text-muted-foreground" maxLength={128} />
+                    <label className="text-sm font-medium text-foreground mb-1.5 block">Confirm Password</label>
+                    <Input
+                      type="password" placeholder="Confirm your password"
+                      value={signupData.confirm} onChange={(e) => setSignupData({ ...signupData, confirm: e.target.value })}
+                      className="bg-muted border-border h-11" maxLength={128}
+                    />
                   </div>
-                  <Button type="submit" disabled={loading} className="w-full bg-gradient-gold hover:opacity-90">
+
+                  <Button type="submit" disabled={loading} className="w-full h-11 bg-gradient-gold hover:opacity-90 font-semibold btn-shimmer mt-2">
                     {loading ? "Creating account..." : signupRole === "mentor" ? "Register as Mentor" : "Create Account"}
                   </Button>
+
+                  <p className="text-center text-sm text-muted-foreground pt-1">
+                    Already have an account?{" "}
+                    <button type="button" onClick={() => setTab("login")} className="text-primary font-semibold hover:underline">
+                      Log in
+                    </button>
+                  </p>
                 </form>
               )}
 
-              {tab === "forgot" && (
-                forgotSent ? (
-                  <div className="text-center py-4">
-                    <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary"><polyline points="20 6 9 17 4 12"/></svg>
-                    </div>
-                    <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Check Your Email</h2>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      If <strong className="text-foreground">{forgotEmail}</strong> is registered, a password reset link has been sent.
-                    </p>
-                    <p className="text-xs text-muted-foreground mb-6">The link expires in 1 hour. Check your spam folder if you don't see it.</p>
-                    <button type="button" onClick={() => { setForgotSent(false); setTab("login"); }} className="text-xs text-primary hover:underline">
-                      Back to Login
-                    </button>
-                  </div>
-                ) : (
-                  <form onSubmit={handleForgot} className="space-y-4">
-                    <h2 className="font-serif text-2xl font-bold text-foreground mb-2">Reset Password</h2>
-                    <p className="text-sm text-muted-foreground mb-4">Enter your email and we'll send you a reset link. It expires in 1 hour.</p>
-                    <div>
-                      <label className="text-sm font-medium text-foreground mb-1 block">Email</label>
-                      <Input type="email" placeholder="your@email.com" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} className="bg-muted border-border text-foreground placeholder:text-muted-foreground" maxLength={255} autoFocus />
-                    </div>
-                    <Button type="submit" disabled={loading} className="w-full bg-gradient-gold hover:opacity-90">
-                      {loading ? "Sending..." : "Send Reset Link"}
-                    </Button>
-                  </form>
-                )
-              )}
-            </CardContent>
-          </Card>
-        </motion.div>
+            </div>
+          </motion.div>
 
-        <motion.p variants={fadeUp} custom={2} className="text-center text-sm text-muted-foreground mt-6">
-          <Link to="/" className="hover:text-primary transition-colors">← Back to Home</Link>
-        </motion.p>
-      </motion.div>
+          {/* Mobile back link */}
+          <p className="lg:hidden text-center mt-5 text-sm text-muted-foreground">
+            <Link to="/" className="hover:text-primary transition-colors flex items-center justify-center gap-1">
+              <ArrowLeft size={13} /> Back to Home
+            </Link>
+          </p>
+        </motion.div>
+      </div>
     </div>
   );
 };
