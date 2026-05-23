@@ -7,7 +7,15 @@ const router = Router();
 router.get("/", requireAuth, async (req: AuthRequest, res) => {
   try {
     const { rows } = await pool.query(
-      "SELECT * FROM bookings WHERE student_id = $1 ORDER BY session_date ASC",
+      `SELECT b.*,
+              m.name        AS mentor_name,
+              m.title       AS mentor_title,
+              m.avatar_url  AS mentor_avatar,
+              m.specialty   AS mentor_specialty
+       FROM bookings b
+       JOIN mentors  m ON m.id = b.mentor_id
+       WHERE b.student_id = $1
+       ORDER BY b.session_date ASC, b.start_time ASC`,
       [req.user!.id]
     );
     return res.json(rows);

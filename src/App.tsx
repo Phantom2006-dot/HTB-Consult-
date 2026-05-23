@@ -40,6 +40,7 @@ import AdminMentorDetail from "./pages/admin/AdminMentorDetail";
 import Blog from "./pages/Blog";
 import ArticleReader from "./pages/ArticleReader";
 import MentorArticles from "./pages/MentorArticles";
+import Sessions from "./pages/Sessions";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
@@ -88,6 +89,7 @@ function AppRoutes() {
             <Route path="/blog/:slug" element={<ArticleReader />} />
             <Route path="/mentor/articles" element={<MentorArticles />} />
             <Route path="/mentor/articles/:id" element={<AdminArticleEditor />} />
+            <Route path="/sessions" element={<Sessions />} />
             <Route path="*" element={<NotFound />} />
     </Routes>
   );
