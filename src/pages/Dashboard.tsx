@@ -336,13 +336,10 @@ const Dashboard = () => {
               </div>
             </motion.section>
 
-            {/* Charts Row */}
-            <motion.div
-              initial="hidden" animate="visible" variants={fadeUp} custom={3}
-              className="grid grid-cols-1 md:grid-cols-2 gap-4"
-            >
+            {/* Charts Row — plain div, NOT motion.div: Framer Motion transforms + Recharts SVG = GPU glitch on mobile */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Learning Engagement Donut */}
-              <div className="rounded-2xl bg-card border border-border p-5">
+              <div className="rounded-2xl bg-card border border-border p-5" style={{ isolation: "isolate" }}>
                 <div className="flex items-center justify-between mb-4">
                   <div>
                     <h3 className="font-serif font-bold text-white text-sm">Learning Engagement</h3>
@@ -471,7 +468,7 @@ const Dashboard = () => {
                   </div>
                 )}
               </div>
-            </motion.div>
+            </div>
 
             {/* Recent Articles / Announcements */}
             <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={4}>
