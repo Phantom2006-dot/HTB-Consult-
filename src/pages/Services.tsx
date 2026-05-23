@@ -1,470 +1,478 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  ArrowRight,
-  BookOpen,
-  Puzzle,
-  BarChart3,
-  Users,
-  Target,
-  Rocket,
-  Sparkles,
+  ArrowRight, BookOpen, Target, Users, Briefcase,
+  CheckCircle, ChevronRight, BarChart3, GraduationCap,
+  Brain, Lightbulb, Home,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import { fadeUp } from "@/lib/animations";
 
-const steps = [
+/* ── Stage data ── */
+const stages = [
   {
-    n: "01",
+    num: 1,
+    code: "01",
+    tag: "Foundation",
+    tagColor: "bg-blue-100 text-blue-700 border-blue-200",
+    iconBg: "bg-blue-600",
+    circleBg: "bg-blue-600",
     icon: BookOpen,
-    accent: "primary",
-    title: "Structured Learning with Clear Direction",
-    short: "Structured Learning",
-    nodeTitle: "Learn with Structure",
-    nodeDesc: "Follow a clear path from basics to advanced skills.",
-    desc: "Each programme follows a clear path, starting from core principles and building into practical application. You will understand not just what to do, but why it matters.",
-    cardDesc: "Clear, step-by-step learning from fundamentals to real-world application.",
+    title: "BA Foundation Bootcamp",
+    short: "BA Foundation Bootcamp",
+    desc: "Build a strong foundation in Business Analysis principles, techniques and best practices.",
+    bullets: [
+      "Business Analysis Fundamentals",
+      "Requirements Elicitation",
+      "Documentation Techniques",
+      "Process Modelling (BPMN)",
+      "Stakeholder Management",
+      "Agile & Waterfall Basics",
+      "BA Tools Introduction",
+    ],
+    outcome: "Strong BA foundation and core skillset.",
+    accentText: "text-blue-600",
+    accentBorder: "border-blue-100",
   },
   {
-    n: "02",
-    icon: Puzzle,
-    accent: "amber",
-    title: "Real World Application",
-    short: "Real-World Application",
-    nodeTitle: "Apply to Real Scenarios",
-    nodeDesc: "Work on real business situations and case examples.",
-    desc: "Our training is grounded in real consulting scenarios. You will work through practical examples such as analysing business problems, defining requirements, improving processes, and supporting project delivery.",
-    cardDesc: "Work on practical scenarios and real business challenges.",
-  },
-  {
-    n: "03",
-    icon: BarChart3,
-    accent: "primary",
-    title: "Practical Skills that Reflect Industry Needs",
-    short: "Build Practical Skills",
-    nodeTitle: "Build Practical Skills",
-    nodeDesc: "Gain skills you can use in real roles and projects.",
-    desc: "We focus on skills that are directly relevant in today's work environment — business analysis, requirements gathering, project delivery, process improvement, and stakeholder engagement.",
-    cardDesc: "Develop in-demand skills that are relevant in today's workplace.",
-  },
-  {
-    n: "04",
-    icon: Users,
-    accent: "amber",
-    title: "Guided Learning and Support",
-    short: "Get Guided Support",
-    nodeTitle: "Get Guided Support",
-    nodeDesc: "Receive guidance and feedback throughout your learning.",
-    desc: "You are not left to figure things out alone. Our programmes are designed to guide you through each stage, helping you build confidence and clarity as you progress.",
-    cardDesc: "Get expert guidance and support at every step of your learning journey.",
-  },
-  {
-    n: "05",
+    num: 2,
+    code: "02",
+    tag: "Application",
+    tagColor: "bg-teal-100 text-teal-700 border-teal-200",
+    iconBg: "bg-teal-600",
+    circleBg: "bg-teal-600",
     icon: Target,
-    accent: "primary",
-    title: "Career and Professional Development",
-    short: "Grow Professionally",
-    nodeTitle: "Grow Professionally",
-    nodeDesc: "Build your career with mentoring and CV support.",
-    desc: "Beyond technical skills, we support your overall growth through professional mentoring, CV and career positioning support, and insight into how to present your value in the market.",
-    cardDesc: "Access mentoring, career guidance, and CV positioning support.",
+    title: "Practical BA Application & Simulation",
+    short: "Practical BA Application & Simulation",
+    desc: "Apply your knowledge through hands-on exercises, case studies and real-world simulations.",
+    bullets: [
+      "Real-world Case Studies",
+      "Requirements Analysis",
+      "Solution Evaluation",
+      "User Stories & Use Cases",
+      "Mock Interviews & Assessments",
+      "BA Deliverables Simulation",
+      "Tools & Templates Practice",
+    ],
+    outcome: "Applied skills through practice and simulation.",
+    accentText: "text-teal-600",
+    accentBorder: "border-teal-100",
   },
   {
-    n: "06",
-    icon: Rocket,
-    accent: "amber",
-    title: "Built for Immediate Impact",
-    short: "Apply What You Learn",
-    nodeTitle: "Apply What You Learn",
-    nodeDesc: "Put your skills into action and create real impact.",
-    desc: "Everything you learn is designed to be applied. The goal is simple — to help you move from learning to doing, with clarity and confidence.",
-    cardDesc: "Use your skills with confidence and create real impact.",
+    num: 3,
+    code: "03",
+    tag: "Specialisation",
+    tagColor: "bg-purple-100 text-purple-700 border-purple-200",
+    iconBg: "bg-purple-600",
+    circleBg: "bg-purple-600",
+    icon: Brain,
+    title: "Domain Specialisation",
+    short: "Domain Specialisation",
+    desc: "Specialise in your industry of choice and deepen your domain knowledge.",
+    bullets: [
+      "Banking Business Analysis",
+      "Insurance Business Analysis",
+      "Healthcare Business Analysis",
+      "Logistics & Warehouse Analysis",
+      "Other Emerging Domains",
+      "Domain Processes & Regulations",
+      "Industry Case Studies",
+    ],
+    outcome: "Domain expertise and industry-relevant knowledge.",
+    accentText: "text-purple-600",
+    accentBorder: "border-purple-100",
+  },
+  {
+    num: 4,
+    code: "04",
+    tag: "Impact",
+    tagColor: "bg-emerald-100 text-emerald-700 border-emerald-200",
+    iconBg: "bg-emerald-600",
+    circleBg: "bg-emerald-600",
+    icon: Users,
+    title: "Industry Project Experience & Mentorship",
+    short: "Industry Project Experience & Mentorship",
+    desc: "Work on real projects with expert mentors and build your professional portfolio to get hired.",
+    bullets: [
+      "Real Industry Projects",
+      "Expert Mentorship",
+      "End-to-End Project Execution",
+      "Portfolio Development",
+      "Career Coaching",
+      "Job Readiness Preparation",
+    ],
+    outcome: "Industry experience and career readiness.",
+    accentText: "text-emerald-600",
+    accentBorder: "border-emerald-100",
   },
 ];
 
-const accentClasses = {
-  primary: {
-    bg: "bg-primary/15",
-    border: "border-primary/30",
-    text: "text-primary",
-    solid: "bg-primary",
-    nodeBg: "bg-primary",
-  },
-  amber: {
-    bg: "bg-amber-500/15",
-    border: "border-amber-500/30",
-    text: "text-amber-400",
-    solid: "bg-amber-500",
-    nodeBg: "bg-amber-500",
-  },
-};
+const heroFeatures = [
+  { icon: BarChart3, title: "Structured", desc: "A clear progression from foundation to industry impact." },
+  { icon: Lightbulb, title: "Practical", desc: "Hands-on learning, simulations and real project experience." },
+  { icon: GraduationCap, title: "Career Focused", desc: "Build the skills and confidence to grow and get hired." },
+];
 
-// Hand-tuned positions for each satellite node so the layout matches
-// the reference design and cards never overlap the central image.
-// dot{X,Y} are percentages within the square diagram container.
-// place dictates where the card sits relative to the dot.
-type Place = "right" | "left" | "below-right" | "below-left" | "above";
-// Dots are aligned on the dashed ring (radius 38% from centre).
-// Each (x, y) satisfies (x-50)^2 + (y-50)^2 ≈ 38^2 so the dot sits on the ring.
-// Dots sit on the dashed orbit ring (radius 42% from centre). Each (x, y)
-// satisfies (x-50)^2 + (y-50)^2 ≈ 42^2.
-const NODE_POSITIONS: { dotX: number; dotY: number; place: Place }[] = [
-  { dotX: 50, dotY: 8,  place: "above"       }, // 01 top
-  { dotX: 85, dotY: 30, place: "right"       }, // 02 upper-right
-  { dotX: 85, dotY: 70, place: "right"       }, // 03 lower-right
-  { dotX: 50, dotY: 92, place: "below-right" }, // 04 bottom-centre (below-right anchor)
-  { dotX: 15, dotY: 70, place: "left"        }, // 05 lower-left
-  { dotX: 15, dotY: 30, place: "left"        }, // 06 upper-left
+const pathOptions = [
+  {
+    icon: BookOpen,
+    title: "New to Business Analysis?",
+    desc: "Start with the Foundation Bootcamp and build your BA career from the ground up.",
+    cta: "Start from Stage 1",
+    href: "/courses",
+    iconBg: "bg-blue-100 text-blue-600",
+  },
+  {
+    icon: Target,
+    title: "Have BA Knowledge?",
+    desc: "Skip to Practical BA Application & Simulation and strengthen your hands-on experience.",
+    cta: "Start from Stage 2",
+    href: "/courses",
+    iconBg: "bg-teal-100 text-teal-600",
+  },
+  {
+    icon: Briefcase,
+    title: "Experienced BA?",
+    desc: "Advance to Domain Specialisation or Industry Project & Mentorship to accelerate your career.",
+    cta: "Explore Advanced Stages",
+    href: "/courses",
+    iconBg: "bg-purple-100 text-purple-600",
+  },
 ];
 
 const Services = () => {
   return (
     <Layout>
-      {/* Hero with circular how-it-works diagram */}
-      <section className="relative overflow-hidden bg-[#0a2419] pt-14 pb-24 lg:pt-20 lg:pb-32">
-        {/* Background image (training classroom) with dark green wash */}
-        <div className="absolute inset-0 pointer-events-none">
-          <img
-            src="/how-it-works-bg.jpg"
-            alt=""
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-[#0a2419]/93 backdrop-blur-[3px]" />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "radial-gradient(circle at 30% 20%, rgba(15,61,46,0.85) 0%, rgba(7,37,28,0.92) 60%, rgba(4,26,20,0.96) 100%)",
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0a2419]/85 via-[#0a2419]/55 to-[#0a2419]/35" />
-        </div>
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-primary/8 blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-amber-500/[0.06] blur-[100px] pointer-events-none" />
+      {/* ── HERO ─────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden" style={{ background: "hsl(var(--hero-gradient-from))" }}>
+        {/* background texture */}
+        <div className="absolute inset-0 grid-pattern opacity-30 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 rounded-full blur-[120px] opacity-10 pointer-events-none bg-primary" />
 
-        <div className="container mx-auto px-4 lg:px-8 relative z-10">
-          <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] gap-10 lg:gap-8 items-center">
-            {/* Left: text + vertical cards */}
-            <div>
-              <motion.div initial="hidden" animate="visible">
-                <motion.div variants={fadeUp} custom={0} className="flex items-center gap-3 mb-5">
-                  <span className="block w-10 h-[2px] bg-amber-500" />
-                  <span className="text-amber-400 font-semibold tracking-[0.25em] uppercase text-xs">
-                    How It Works
-                  </span>
-                </motion.div>
+        <div className="container mx-auto px-4 lg:px-8 pt-28 pb-16 lg:pt-32 lg:pb-20 relative z-10">
+          {/* Breadcrumb */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="flex items-center gap-1.5 text-xs text-white/40 mb-8"
+          >
+            <Home size={12} />
+            <Link to="/" className="hover:text-white/70 transition-colors">Home</Link>
+            <ChevronRight size={11} />
+            <span className="text-white/60">Learning Pathways</span>
+          </motion.div>
 
-                <motion.h1
-                  variants={fadeUp}
-                  custom={1}
-                  className="text-4xl md:text-5xl lg:text-[3.4rem] font-serif font-bold text-white leading-[1.05] mb-3"
-                >
-                  Learn. Apply.
-                  <br />
-                  <span className="text-gradient-gold">Grow. Succeed.</span>
-                </motion.h1>
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+            {/* Left */}
+            <motion.div initial="hidden" animate="visible">
+              <motion.h1
+                variants={fadeUp} custom={0}
+                className="text-4xl md:text-5xl lg:text-[3.25rem] font-serif font-bold text-white leading-[1.08] mb-5 tracking-tight"
+              >
+                Your Journey to<br />
+                <span className="text-gradient-gold">Industry Impact</span>
+              </motion.h1>
+              <motion.p
+                variants={fadeUp} custom={1}
+                className="text-base text-white/65 leading-relaxed mb-10 max-w-md"
+              >
+                A structured learning pathway designed to turn aspiring Business Analysts into industry-ready professionals.
+              </motion.p>
 
-                <motion.p
-                  variants={fadeUp}
-                  custom={2}
-                  className="text-[15px] text-white/70 leading-relaxed max-w-md mt-5 mb-7"
-                >
-                  Our training is built on real consulting experience and designed to give you
-                  practical skills you can apply immediately.
-                </motion.p>
-
-                <div className="space-y-2.5">
-                  {steps.map((step, i) => {
-                    const Icon = step.icon;
-                    return (
-                      <motion.div
-                        key={`left-${step.n}`}
-                        initial="hidden"
-                        animate="visible"
-                        custom={3 + i * 0.4}
-                        variants={fadeUp}
-                        className="rounded-xl bg-[#0f2f25]/90 border border-white/[0.06] p-3.5 flex items-start gap-3.5 hover:border-white/15 hover:bg-[#123a2d]/90 transition-colors"
-                      >
-                        <div className="w-10 h-10 rounded-lg bg-[#145c44] flex items-center justify-center shrink-0">
-                          <Icon size={18} className="text-white" />
-                        </div>
-                        <div className="min-w-0">
-                          <h3 className="font-semibold text-white text-[13.5px] leading-snug mb-0.5">
-                            {step.short}
-                          </h3>
-                          <p className="text-[12px] text-white/55 leading-relaxed">{step.cardDesc}</p>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
+              {/* Feature highlights */}
+              <motion.div variants={fadeUp} custom={2} className="grid grid-cols-3 gap-4">
+                {heroFeatures.map((f) => {
+                  const Icon = f.icon;
+                  return (
+                    <div key={f.title} className="flex flex-col gap-2">
+                      <div className="w-9 h-9 rounded-lg bg-primary/15 border border-primary/20 flex items-center justify-center shrink-0">
+                        <Icon size={17} className="text-primary" />
+                      </div>
+                      <p className="text-[13px] font-semibold text-white">{f.title}</p>
+                      <p className="text-[11.5px] text-white/50 leading-snug">{f.desc}</p>
+                    </div>
+                  );
+                })}
               </motion.div>
-            </div>
+            </motion.div>
 
-            {/* Right: circular diagram (lg and up only) */}
-            <div className="hidden lg:block">
-              <CircleDiagram />
-            </div>
-
-            {/* Right: mobile stacked steps fallback */}
-            <div className="lg:hidden">
-              <MobileSteps />
-            </div>
+            {/* Right — pathway staircase diagram */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
+              className="hidden lg:flex justify-center items-end"
+            >
+              <PathwayDiagram />
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Detailed sections */}
-      <section className="py-16 lg:py-20 bg-[hsl(163,30%,12%)] relative">
-        <div className="container mx-auto px-4 lg:px-8 max-w-4xl space-y-10">
-          {steps.map((step, i) => {
-            const accent = accentClasses[step.accent as keyof typeof accentClasses];
-            const Icon = step.icon;
-            return (
-              <motion.div
-                key={step.n}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                custom={i % 3}
-                variants={fadeUp}
-                className="flex gap-5 items-start"
-              >
-                <div
-                  className={`w-14 h-14 rounded-2xl ${accent.bg} ${accent.border} border flex items-center justify-center shrink-0`}
-                >
-                  <Icon size={24} className={accent.text} />
+      {/* ── 4 STAGES CARDS ──────────────────────────────────────────── */}
+      <section className="bg-white py-16 lg:py-20">
+        <div className="container mx-auto px-4 lg:px-8">
+          {/* Label */}
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true }}
+            className="text-center mb-10"
+          >
+            <motion.p variants={fadeUp} custom={0} className="text-xs font-bold tracking-[0.22em] uppercase text-primary mb-3">
+              Our Learning Pathway
+            </motion.p>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-serif font-bold text-slate-900">
+              4 Stages. One Goal. Your Success.
+            </motion.h2>
+          </motion.div>
+
+          {/* Cards row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-0 lg:gap-0 relative">
+            {stages.map((stage, i) => {
+              const Icon = stage.icon;
+              return (
+                <div key={stage.num} className="flex items-stretch">
+                  <motion.div
+                    initial="hidden" whileInView="visible" viewport={{ once: true }}
+                    variants={fadeUp} custom={i * 0.5}
+                    className={`flex-1 bg-white border border-slate-200 rounded-2xl p-6 flex flex-col gap-4 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ${i > 0 ? "lg:ml-[-1px]" : ""}`}
+                  >
+                    {/* Number circle + icon */}
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full ${stage.circleBg} flex items-center justify-center text-white font-bold text-lg shrink-0`}>
+                        {stage.num}
+                      </div>
+                      <div className={`w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0`}>
+                        <Icon size={20} className="text-slate-600" />
+                      </div>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-slate-900 text-[15px] leading-snug mb-2">{stage.title}</h3>
+                      <p className="text-[13px] text-slate-500 leading-relaxed">{stage.desc}</p>
+                    </div>
+                    <span className={`self-start text-[11px] font-semibold px-2.5 py-1 rounded-full border ${stage.tagColor}`}>
+                      {stage.tag}
+                    </span>
+                  </motion.div>
+                  {/* Arrow between cards */}
+                  {i < stages.length - 1 && (
+                    <div className="hidden lg:flex items-center justify-center w-8 shrink-0 z-10">
+                      <ChevronRight size={20} className="text-slate-300" />
+                    </div>
+                  )}
                 </div>
-                <div className="flex-1">
-                  <p className={`text-xs font-bold tracking-widest ${accent.text} mb-1`}>
-                    {step.n}
-                  </p>
-                  <h3 className="font-serif text-xl md:text-2xl font-semibold text-white mb-2">
-                    {step.title}
-                  </h3>
-                  <p className="text-white/70 leading-relaxed">{step.desc}</p>
-                </div>
-              </motion.div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          {/* Info bar */}
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true }}
+            variants={fadeUp} custom={2}
+            className="mt-8 flex items-center gap-3 bg-blue-50 border border-blue-100 rounded-xl px-5 py-4"
+          >
+            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
+              <CheckCircle size={16} className="text-white" />
+            </div>
+            <p className="text-[13px] text-blue-800 leading-snug">
+              Each stage builds upon the previous one, ensuring you gain the skills, confidence and experience to create real impact in your career.
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-16 lg:py-24 bg-[hsl(163,32%,10%)]">
-        <div className="container mx-auto px-4 lg:px-8 text-center max-w-2xl">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}>
-            <motion.h2
-              variants={fadeUp}
-              custom={0}
-              className="text-3xl md:text-4xl font-serif font-bold text-white mb-4"
-            >
-              Ready to move from learning to doing?
-            </motion.h2>
-            <motion.p
-              variants={fadeUp}
-              custom={1}
-              className="text-white/70 mb-8 leading-relaxed"
-            >
-              Explore our programmes and start building practical skills you can apply with
-              clarity and confidence.
+      {/* ── WHAT YOU WILL LEARN ─────────────────────────────────────── */}
+      <section className="bg-slate-50 py-16 lg:py-20">
+        <div className="container mx-auto px-4 lg:px-8">
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <motion.p variants={fadeUp} custom={0} className="text-xs font-bold tracking-[0.22em] uppercase text-primary mb-3">
+              What You Will Learn
             </motion.p>
-            <motion.div
-              variants={fadeUp}
-              custom={2}
-              className="flex justify-center gap-4 flex-wrap"
-            >
-              <Button size="lg" asChild className="bg-gradient-gold hover:opacity-90">
-                <Link to="/courses">
-                  Explore Courses <ArrowRight className="ml-2" size={18} />
-                </Link>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                asChild
-                className="border-white/20 text-white hover:bg-white/5"
-              >
-                <Link to="/about">Learn About Us</Link>
-              </Button>
-            </motion.div>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-serif font-bold text-slate-900">
+              Progressively Build. Continuously Grow.
+            </motion.h2>
           </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {stages.map((stage, i) => {
+              const Icon = stage.icon;
+              return (
+                <motion.div
+                  key={stage.num}
+                  initial="hidden" whileInView="visible" viewport={{ once: true }}
+                  variants={fadeUp} custom={i * 0.4}
+                  className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col gap-4 shadow-sm"
+                >
+                  {/* Header */}
+                  <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+                    <div className={`w-7 h-7 rounded-full ${stage.circleBg} flex items-center justify-center text-white font-bold text-xs shrink-0`}>
+                      {stage.num}
+                    </div>
+                    <p className={`text-[11px] font-bold tracking-wide uppercase ${stage.accentText}`}>
+                      {stage.short}
+                    </p>
+                  </div>
+
+                  {/* Bullets */}
+                  <ul className="space-y-1.5 flex-1">
+                    {stage.bullets.map((b) => (
+                      <li key={b} className="flex items-start gap-2">
+                        <div className={`w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 ${stage.iconBg}`} />
+                        <span className="text-[12.5px] text-slate-600 leading-snug">{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Outcome */}
+                  <div className={`flex items-start gap-2 pt-3 border-t ${stage.accentBorder}`}>
+                    <CheckCircle size={14} className={`${stage.accentText} shrink-0 mt-0.5`} />
+                    <p className={`text-[12px] font-semibold ${stage.accentText} leading-snug`}>
+                      <span className="text-slate-500 font-normal">Outcome: </span>{stage.outcome}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CHOOSE YOUR PATH ────────────────────────────────────────── */}
+      <section className="bg-white py-16 lg:py-20">
+        <div className="container mx-auto px-4 lg:px-8">
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <motion.p variants={fadeUp} custom={0} className="text-xs font-bold tracking-[0.22em] uppercase text-primary mb-3">
+              Choose Your Path
+            </motion.p>
+            <motion.h2 variants={fadeUp} custom={1} className="text-3xl md:text-4xl font-serif font-bold text-slate-900">
+              Start Where You Are.<br className="hidden sm:block" /> Grow Where You Want to Go.
+            </motion.h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {pathOptions.map((opt, i) => {
+              const Icon = opt.icon;
+              return (
+                <motion.div
+                  key={opt.title}
+                  initial="hidden" whileInView="visible" viewport={{ once: true }}
+                  variants={fadeUp} custom={i * 0.4}
+                  className="bg-slate-50 border border-slate-200 rounded-2xl p-6 flex flex-col gap-4 hover:shadow-md hover:-translate-y-1 transition-all duration-300"
+                >
+                  <div className={`w-12 h-12 rounded-xl ${opt.iconBg} flex items-center justify-center`}>
+                    <Icon size={22} />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-slate-900 text-[15px] mb-2">{opt.title}</h3>
+                    <p className="text-[13px] text-slate-500 leading-relaxed">{opt.desc}</p>
+                  </div>
+                  <Button asChild variant="outline" className="w-full border-slate-300 text-slate-700 hover:border-primary hover:text-primary text-sm mt-1">
+                    <Link to={opt.href}>{opt.cta}</Link>
+                  </Button>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA BANNER ──────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden py-14 lg:py-16" style={{ background: "hsl(var(--hero-gradient-from))" }}>
+        <div className="absolute inset-0 grid-pattern opacity-20 pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-80 h-80 rounded-full blur-[100px] opacity-10 bg-primary pointer-events-none" />
+
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-8 max-w-5xl mx-auto">
+            <div className="flex items-center gap-5">
+              <div className="w-14 h-14 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
+                <BarChart3 size={26} className="text-primary" />
+              </div>
+              <div>
+                <h2 className="text-xl md:text-2xl font-serif font-bold text-white mb-1">
+                  Your future in Business Analysis starts here.
+                </h2>
+                <p className="text-sm text-white/60">
+                  Take the next step in your learning journey and become an industry-ready Business Analyst.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <Button size="lg" asChild className="bg-gradient-gold hover:opacity-90 font-semibold btn-shimmer px-6">
+                <Link to="/courses">Explore Courses</Link>
+              </Button>
+              <Button size="lg" variant="outline" asChild className="border-white/20 text-white hover:bg-white/10 px-6">
+                <Link to="/contact">Talk to an Advisor</Link>
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
     </Layout>
   );
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Circular diagram component (desktop)
-// ─────────────────────────────────────────────────────────────────────────────
-const CircleDiagram = () => {
-  // Container is square. The dashed orbit lives at inset-[8%], i.e. ring
-  // radius ≈ 42% of container half-width.
-  // Cards are positioned absolutely around the dashed circle.
+/* ── Pathway staircase diagram ─────────────────────────────────── */
+const stageColors = [
+  { bg: "bg-blue-600", label: "01", title: "Foundation" },
+  { bg: "bg-teal-500", label: "02", title: "Practical\nApplication" },
+  { bg: "bg-purple-600", label: "03", title: "Domain\nSpecialisation" },
+  { bg: "bg-emerald-600", label: "04", title: "Industry Project\n& Mentorship" },
+];
+
+const PathwayDiagram = () => {
   return (
-    <div className="relative mx-auto w-full max-w-[380px] xl:max-w-[420px] aspect-square">
-      {/* Rotating dashed orbit ring (CSS animation, sits below cards) */}
-      <div
-        className="absolute inset-[8%] rounded-full border-2 border-dashed border-white/20 orbit-spin pointer-events-none z-0"
-        style={{
-          boxShadow: "0 0 40px rgba(34,197,94,0.10)",
-        }}
-      />
-
-      {/* Center image */}
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.7, ease: "easeOut" }}
-        className="absolute inset-[22%] rounded-full overflow-hidden border-4 border-white/10 shadow-[0_30px_80px_-15px_rgba(0,0,0,0.6)] z-10"
-      >
-        <img
-          src="/how-it-works-center.jpg"
-          alt="HTB Consult Academy workspace with laptop, books and coffee mug"
-          className="w-full h-full object-cover"
+    <div className="relative w-[420px] h-[240px]">
+      {/* Connecting line */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 420 240">
+        <path
+          d="M 55 195 L 120 195 L 120 145 L 185 145 L 185 95 L 250 95 L 250 45 L 375 45"
+          fill="none"
+          stroke="rgba(255,255,255,0.15)"
+          strokeWidth="2"
+          strokeDasharray="6 4"
         />
-        <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-white/10 shadow-[inset_0_0_60px_rgba(0,0,0,0.4)] pointer-events-none" />
-      </motion.div>
+        {/* Arrow at end */}
+        <path d="M 368 38 L 380 45 L 368 52" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
+      </svg>
 
-      {/* 6 satellite nodes */}
-      {steps.map((step, i) => {
-        const pos = NODE_POSITIONS[i];
-        const accent = accentClasses[step.accent as keyof typeof accentClasses];
-        const Icon = step.icon;
-        const rightAlign =
-          pos.place === "left" || pos.place === "below-left";
-
-        // Card position relative to dot
-        let cardStyle: React.CSSProperties = {};
-        switch (pos.place) {
-          case "right":
-            cardStyle = {
-              left: "calc(100% + 16px)",
-              top: "50%",
-              transform: "translateY(-50%)",
-            };
-            break;
-          case "left":
-            cardStyle = {
-              right: "calc(100% + 16px)",
-              top: "50%",
-              transform: "translateY(-50%)",
-            };
-            break;
-          case "above":
-            cardStyle = {
-              left: "50%",
-              bottom: "calc(100% + 16px)",
-              transform: "translateX(-50%)",
-            };
-            break;
-          case "below-right":
-            cardStyle = {
-              left: "calc(50% - 12px)",
-              top: "calc(100% + 16px)",
-            };
-            break;
-          case "below-left":
-            cardStyle = {
-              right: "calc(50% - 12px)",
-              top: "calc(100% + 16px)",
-            };
-            break;
-        }
-
+      {stageColors.map((s, i) => {
+        const x = i * 90;
+        const y = (3 - i) * 50;
         return (
           <motion.div
-            key={`node-${step.n}`}
+            key={s.label}
             initial={{ opacity: 0, scale: 0.7 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, delay: 0.1 + i * 0.05, ease: "easeOut" }}
-            className="absolute z-20"
-            style={{
-              left: `${pos.dotX}%`,
-              top: `${pos.dotY}%`,
-              x: "-50%",
-              y: "-50%",
-            }}
+            transition={{ duration: 0.45, delay: 0.15 + i * 0.1, ease: "easeOut" }}
+            className="absolute"
+            style={{ left: x, bottom: y }}
           >
-            {/* Card */}
-            <div className="absolute" style={cardStyle}>
-              <div className="w-[140px] xl:w-[150px] rounded-2xl bg-white shadow-[0_15px_35px_-12px_rgba(0,0,0,0.45)] border border-black/[0.04] px-3 py-2.5">
-                <p
-                  className={`text-[12px] font-bold tracking-wider mb-1 ${accent.text} ${
-                    rightAlign ? "text-right" : ""
-                  }`}
-                >
-                  {step.n}
-                </p>
-                <h4
-                  className={`text-[14px] font-bold text-[hsl(163,40%,12%)] leading-snug mb-1 ${
-                    rightAlign ? "text-right" : ""
-                  }`}
-                >
-                  {step.nodeTitle}
-                </h4>
-                <p
-                  className={`text-[11.5px] text-slate-600 leading-snug ${
-                    rightAlign ? "text-right" : ""
-                  }`}
-                >
-                  {step.nodeDesc}
-                </p>
-              </div>
-            </div>
-
-            {/* Icon dot — sits centred on the dashed orbit ring */}
-            <motion.div
-              whileHover={{ scale: 1.08 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className={`relative w-12 h-12 rounded-full ${accent.nodeBg} flex items-center justify-center shadow-[0_8px_20px_-4px_rgba(0,0,0,0.5)] ring-4 ring-[#0a2419]`}
-            >
-              <Icon size={20} className="text-white" />
-            </motion.div>
-          </motion.div>
-        );
-      })}
-    </div>
-  );
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Mobile fallback: stacked numbered cards (mirrors the circular diagram steps)
-// ─────────────────────────────────────────────────────────────────────────────
-const MobileSteps = () => {
-  return (
-    <div className="space-y-3 mt-4">
-      {steps.map((step, i) => {
-        const accent = accentClasses[step.accent as keyof typeof accentClasses];
-        const Icon = step.icon;
-        return (
-          <motion.div
-            key={`mobile-${step.n}`}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: i * 0.06 }}
-            className="rounded-2xl bg-white shadow-[0_10px_25px_-10px_rgba(0,0,0,0.4)] p-4 flex items-start gap-3.5"
-          >
-            <div
-              className={`w-11 h-11 rounded-full ${accent.nodeBg} flex items-center justify-center shrink-0 shadow-md`}
-            >
-              <Icon size={18} className="text-white" />
-            </div>
-            <div className="min-w-0">
-              <p className={`text-[11px] font-bold tracking-wider ${accent.text} mb-0.5`}>
-                {step.n}
-              </p>
-              <h4 className="text-[14px] font-bold text-[hsl(163,40%,12%)] leading-snug mb-1">
-                {step.nodeTitle}
-              </h4>
-              <p className="text-[12px] text-slate-600 leading-snug">{step.nodeDesc}</p>
+            <div className={`${s.bg} rounded-xl px-4 py-3 shadow-lg min-w-[90px] text-center`}>
+              <p className="text-white/70 text-[10px] font-bold tracking-wider mb-1">{s.label}</p>
+              <p className="text-white text-[11px] font-semibold leading-tight whitespace-pre-line">{s.title}</p>
             </div>
           </motion.div>
         );
       })}
+
+      {/* Arrow icon at top */}
+      <motion.div
+        initial={{ opacity: 0, x: 10 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: 0.7 }}
+        className="absolute top-0 right-0"
+      >
+        <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
+          <ArrowRight size={16} className="text-white/70" />
+        </div>
+      </motion.div>
     </div>
   );
 };
