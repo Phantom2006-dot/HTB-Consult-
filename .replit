@@ -56,6 +56,5 @@ NODE_ENV = "development"
 VITE_CLOUDINARY_CLOUD_NAME = "di2u0n1qj"
 VITE_CLOUDINARY_UPLOAD_PRESET = "htb_academy"
 FRONTEND_URL = "https://140a8c70-e8c1-445d-9b46-29ebc58ef4f6-00-38fw2lp0j5mko.worf.replit.dev"
-JWT_SECRET = "7eabb09b0cb6253ff94fb91ade3e6702a4064f82cc6d68d60920a75bbdeee571aa337376e30aa3c6d7fc8a7cbd2256895cf129f1197dc99685583e94005b2f57"
 
 [userenv.development]
