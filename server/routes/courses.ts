@@ -30,14 +30,14 @@ router.get("/:id", async (req, res) => {
     if (courseRows.length === 0) return res.status(404).json({ error: "Course not found" });
 
     const { rows: modules } = await pool.query(
-      "SELECT * FROM modules WHERE course_id = $1 ORDER BY position",
+      "SELECT * FROM modules WHERE course_id = $1 ORDER BY sort_order",
       [req.params.id]
     );
     const moduleIds = modules.map((m) => m.id);
     let lessons: any[] = [];
     if (moduleIds.length > 0) {
       const { rows } = await pool.query(
-        `SELECT * FROM lessons WHERE module_id = ANY($1) ORDER BY position`,
+        `SELECT * FROM lessons WHERE module_id = ANY($1) ORDER BY sort_order`,
         [moduleIds]
       );
       lessons = rows;
