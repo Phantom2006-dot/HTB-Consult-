@@ -162,8 +162,8 @@ const CourseDetail = () => {
     ...(resources && resources.length > 0 ? [{ id: "resources" as TabId, label: `Resources (${resources.length})` }] : []),
   ];
 
-  /* ── What's included list ── */
-  const included = [
+  /* ── What's included list — from DB, fallback to defaults ── */
+  const defaultIncluded = [
     "Live interactive sessions",
     "Industry case studies & datasets",
     "BA tools, templates & frameworks",
@@ -172,6 +172,10 @@ const CourseDetail = () => {
     "Community access",
     "Certificate of completion",
   ];
+  const included: string[] =
+    Array.isArray((course as any).whats_included) && (course as any).whats_included.length > 0
+      ? (course as any).whats_included
+      : defaultIncluded;
 
   /* ── Key features in overview grid ── */
   const keyFeatures = [
@@ -638,12 +642,12 @@ const CourseSidebar = ({
   enrollPending, toggleBookmark, user, included, courseType,
 }: SidebarProps) => {
   const courseDetails = [
-    { label: "Level", value: course.skill_level || "All levels" },
-    { label: "Duration", value: course.total_duration || "—" },
-    { label: "Mode", value: courseType === "live" ? "Live Online" : courseType === "book" ? "Self-paced" : "On-demand Video" },
-    { label: "Next Batch", value: "Coming soon" },
-    { label: "Schedule", value: courseType === "live" ? "Tues & Thu, 7:00 PM – 9:00 PM" : "Flexible" },
-    { label: "Certificate", value: "Certificate of Completion" },
+    { label: "Level",       value: course.skill_level || "All levels" },
+    { label: "Duration",    value: course.total_duration || "—" },
+    { label: "Mode",        value: courseType === "live" ? "Live Online" : courseType === "book" ? "Self-paced" : "On-demand Video" },
+    { label: "Next Batch",  value: (course as any).next_batch_date || "Coming soon" },
+    { label: "Schedule",    value: (course as any).schedule || (courseType === "live" ? "To be confirmed" : "Flexible") },
+    { label: "Certificate", value: (course as any).certificate_name || "Certificate of Completion" },
   ];
 
   return (

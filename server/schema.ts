@@ -246,6 +246,15 @@ export async function initSchema() {
       );
     `);
 
+    // ── Runtime migrations: add new course fields if missing ──────────────────
+    await client.query(`
+      ALTER TABLE courses ADD COLUMN IF NOT EXISTS next_batch_date TEXT DEFAULT '';
+      ALTER TABLE courses ADD COLUMN IF NOT EXISTS schedule         TEXT DEFAULT '';
+      ALTER TABLE courses ADD COLUMN IF NOT EXISTS whats_included   TEXT[] DEFAULT '{}';
+      ALTER TABLE courses ADD COLUMN IF NOT EXISTS certificate_name TEXT DEFAULT 'Certificate of Completion';
+      ALTER TABLE courses ADD COLUMN IF NOT EXISTS short_description TEXT DEFAULT '';
+    `);
+
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_user_roles_user   ON user_roles(user_id);
       CREATE INDEX IF NOT EXISTS idx_courses_published  ON courses(published);

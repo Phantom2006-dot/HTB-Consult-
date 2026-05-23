@@ -341,14 +341,24 @@ router.get("/courses", requireAdmin, async (_req, res) => {
 });
 
 router.post("/courses", requireAdmin, async (req, res) => {
-  const { title, description, category, skill_level, course_type, price, total_duration, tags, thumbnail_url, live_class_url, published } = req.body;
+  const { title, description, short_description, category, skill_level, course_type, price, total_duration,
+          tags, thumbnail_url, live_class_url, published,
+          next_batch_date, schedule, whats_included, certificate_name } = req.body;
   try {
     const tagsArr = Array.isArray(tags) ? tags : (tags || "").split(",").map((t: string) => t.trim()).filter(Boolean);
+    const includedArr = Array.isArray(whats_included)
+      ? whats_included
+      : (whats_included || "").split("\n").map((t: string) => t.trim()).filter(Boolean);
     const { rows } = await pool.query(
-      `INSERT INTO courses (title, description, category, skill_level, course_type, price, total_duration, tags, thumbnail_url, live_class_url, published)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11) RETURNING *`,
-      [title, description || "", category || "General", skill_level || "Beginner", course_type || "video",
-       parseFloat(price) || 0, total_duration || "", tagsArr, thumbnail_url || null, live_class_url || null, !!published]
+      `INSERT INTO courses (title, description, short_description, category, skill_level, course_type, price,
+        total_duration, tags, thumbnail_url, live_class_url, published,
+        next_batch_date, schedule, whats_included, certificate_name)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING *`,
+      [title, description || "", short_description || "", category || "General", skill_level || "Beginner",
+       course_type || "video", parseFloat(price) || 0, total_duration || "", tagsArr,
+       thumbnail_url || null, live_class_url || null, !!published,
+       next_batch_date || "", schedule || "", includedArr,
+       certificate_name || "Certificate of Completion"]
     );
     return res.json(rows[0]);
   } catch (err: any) {
@@ -380,10 +390,18 @@ router.patch("/courses/:id", requireAdmin, async (req, res) => {
     const tagsArr = b.tags !== undefined
       ? (Array.isArray(b.tags) ? b.tags : b.tags.split(",").map((t: string) => t.trim()).filter(Boolean))
       : c.tags;
+    const includedArr = b.whats_included !== undefined
+      ? (Array.isArray(b.whats_included)
+          ? b.whats_included
+          : b.whats_included.split("\n").map((t: string) => t.trim()).filter(Boolean))
+      : c.whats_included;
     const { rows } = await pool.query(
-      `UPDATE courses SET title=$1, description=$2, category=$3, skill_level=$4, course_type=$5,
-       price=$6, total_duration=$7, tags=$8, thumbnail_url=$9, live_class_url=$10,
-       published=$11, updated_at=now() WHERE id=$12 RETURNING *`,
+      `UPDATE courses SET
+        title=$1, description=$2, category=$3, skill_level=$4, course_type=$5,
+        price=$6, total_duration=$7, tags=$8, thumbnail_url=$9, live_class_url=$10,
+        published=$11, next_batch_date=$12, schedule=$13, whats_included=$14,
+        certificate_name=$15, short_description=$16, updated_at=now()
+       WHERE id=$17 RETURNING *`,
       [
         b.title ?? c.title,
         b.description ?? c.description,
@@ -396,6 +414,11 @@ router.patch("/courses/:id", requireAdmin, async (req, res) => {
         b.thumbnail_url !== undefined ? (b.thumbnail_url || null) : c.thumbnail_url,
         b.live_class_url !== undefined ? (b.live_class_url || null) : c.live_class_url,
         b.published !== undefined ? !!b.published : c.published,
+        b.next_batch_date !== undefined ? b.next_batch_date : (c.next_batch_date || ""),
+        b.schedule !== undefined ? b.schedule : (c.schedule || ""),
+        includedArr,
+        b.certificate_name !== undefined ? b.certificate_name : (c.certificate_name || "Certificate of Completion"),
+        b.short_description !== undefined ? b.short_description : (c.short_description || ""),
         req.params.id,
       ]
     );
