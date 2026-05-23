@@ -13,6 +13,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@google/genai": "^2.6.0",
     "@hookform/resolvers": "^3.10.0",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -56,6 +57,7 @@
     "cors": "^2.8.6",
     "date-fns": "^3.6.0",
     "dotenv": "^17.3.1",
+    "drizzle-zod": "^0.8.3",
     "embla-carousel-react": "^8.6.0",
     "express": "^5.2.1",
     "express-rate-limit": "^8.3.2",
@@ -66,6 +68,8 @@
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
     "nodemailer": "^8.0.4",
+    "p-limit": "^7.3.0",
+    "p-retry": "^7.1.1",
     "pg": "^8.20.0",
     "react": "^18.3.1",
     "react-day-picker": "^8.10.1",
@@ -80,7 +84,8 @@
     "tailwindcss-animate": "^1.0.7",
     "tsx": "^4.21.0",
     "vaul": "^0.9.9",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "zod-validation-error": "^5.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
