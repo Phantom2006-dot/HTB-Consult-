@@ -419,60 +419,151 @@ const Services = () => {
 };
 
 /* ── Pathway staircase diagram ─────────────────────────────────── */
-const stageColors = [
-  { bg: "bg-blue-600", label: "01", title: "Foundation" },
-  { bg: "bg-teal-500", label: "02", title: "Practical\nApplication" },
-  { bg: "bg-purple-600", label: "03", title: "Domain\nSpecialisation" },
-  { bg: "bg-emerald-600", label: "04", title: "Industry Project\n& Mentorship" },
+const stairSteps = [
+  {
+    num: "01",
+    label: "Foundation",
+    gradient: "linear-gradient(160deg, #1a3a6e 0%, #0f2550 100%)",
+    border: "rgba(255,255,255,0.12)",
+    delay: 0,
+    icon: BookOpen,
+  },
+  {
+    num: "02",
+    label: "Practical\nApplication",
+    gradient: "linear-gradient(160deg, #1b5e80 0%, #0d4060 100%)",
+    border: "rgba(255,255,255,0.14)",
+    delay: 0.4,
+    icon: Target,
+  },
+  {
+    num: "03",
+    label: "Domain\nSpecialisation",
+    gradient: "linear-gradient(160deg, #4a2080 0%, #2d1260 100%)",
+    border: "rgba(255,255,255,0.14)",
+    delay: 0.8,
+    icon: Brain,
+  },
+  {
+    num: "04",
+    label: "Industry Project\n& Mentorship",
+    gradient: "linear-gradient(160deg, #2d6a4f 0%, #1b4332 100%)",
+    border: "rgba(255,255,255,0.14)",
+    delay: 1.2,
+    icon: Users,
+  },
 ];
+
+const BOTTOM_OFFSETS = [0, 30, 65, 100];
+const LEFT_OFFSETS   = [0, 130, 260, 390];
 
 const PathwayDiagram = () => {
   return (
-    <div className="relative w-[420px] h-[240px]">
-      {/* Connecting line */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 420 240">
-        <path
-          d="M 55 195 L 120 195 L 120 145 L 185 145 L 185 95 L 250 95 L 250 45 L 375 45"
-          fill="none"
-          stroke="rgba(255,255,255,0.15)"
-          strokeWidth="2"
-          strokeDasharray="6 4"
-        />
-        {/* Arrow at end */}
-        <path d="M 368 38 L 380 45 L 368 52" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5" />
+    <div className="relative" style={{ width: 520, height: 230 }}>
+
+      {/* SVG — step platforms + dashed connectors + upward arrow */}
+      <svg
+        className="absolute inset-0 w-full h-full pointer-events-none"
+        viewBox="0 0 520 230"
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="none"
+      >
+        {/* Step platforms — top face */}
+        <polygon points="10,180 130,180 130,200 10,200"   fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.10)" strokeWidth="0.5"/>
+        <polygon points="10,200 130,200 130,220 10,220"   fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.06)" strokeWidth="0.5"/>
+        <polygon points="130,150 260,150 260,170 130,170" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.10)" strokeWidth="0.5"/>
+        <polygon points="130,170 260,170 260,200 130,200" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.06)" strokeWidth="0.5"/>
+        <polygon points="260,115 390,115 390,135 260,135" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.10)" strokeWidth="0.5"/>
+        <polygon points="260,135 390,135 390,170 260,170" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.06)" strokeWidth="0.5"/>
+        <polygon points="390,78 510,78 510,98 390,98"     fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.10)" strokeWidth="0.5"/>
+        <polygon points="390,98 510,98 510,135 390,135"   fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.06)" strokeWidth="0.5"/>
+
+        {/* Dashed connectors between steps */}
+        <line x1="120" y1="160" x2="140" y2="145" stroke="rgba(255,255,255,0.30)" strokeWidth="1.5" strokeDasharray="4,3"/>
+        <line x1="250" y1="128" x2="270" y2="112" stroke="rgba(255,255,255,0.30)" strokeWidth="1.5" strokeDasharray="4,3"/>
+        <line x1="380" y1="93"  x2="400" y2="77"  stroke="rgba(255,255,255,0.30)" strokeWidth="1.5" strokeDasharray="4,3"/>
+
+        {/* Upward arrow */}
+        <g transform="translate(490,10)">
+          <polygon points="0,80 8,0 16,80" fill="white" opacity="0.85"/>
+          <rect x="5" y="75" width="6" height="30" fill="white" opacity="0.85" rx="1"/>
+        </g>
       </svg>
 
-      {stageColors.map((s, i) => {
-        const x = i * 90;
-        const y = (3 - i) * 50;
+      {/* Cards — absolutely positioned at staircase offsets */}
+      {stairSteps.map((step, i) => {
+        const Icon = step.icon;
         return (
           <motion.div
-            key={s.label}
+            key={step.num}
+            className="absolute"
+            style={{ left: LEFT_OFFSETS[i], bottom: BOTTOM_OFFSETS[i] }}
             initial={{ opacity: 0, scale: 0.7 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.45, delay: 0.15 + i * 0.1, ease: "easeOut" }}
-            className="absolute"
-            style={{ left: x, bottom: y }}
+            transition={{ duration: 0.4, delay: 0.15 + i * 0.12, ease: "easeOut" }}
           >
-            <div className={`${s.bg} rounded-xl px-4 py-3 shadow-lg min-w-[90px] text-center`}>
-              <p className="text-white/70 text-[10px] font-bold tracking-wider mb-1">{s.label}</p>
-              <p className="text-white text-[11px] font-semibold leading-tight whitespace-pre-line">{s.title}</p>
-            </div>
+            <motion.div
+              animate={{ y: [0, -4, 0] }}
+              transition={{ repeat: Infinity, duration: 3, ease: "easeInOut", delay: step.delay }}
+              style={{
+                background: step.gradient,
+                border: `1px solid ${step.border}`,
+                boxShadow: i === 3
+                  ? "0 12px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12)"
+                  : "0 8px 30px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08)",
+                borderRadius: 10,
+                padding: "14px 14px 12px",
+                width: 115,
+                textAlign: "center" as const,
+              }}
+            >
+              {/* Step number */}
+              <div style={{
+                fontFamily: "inherit",
+                fontSize: 10,
+                fontWeight: 700,
+                color: "rgba(255,255,255,0.5)",
+                marginBottom: 8,
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                justifyContent: "center",
+                letterSpacing: "0.04em",
+              }}>
+                <span style={{ display:"inline-block", width:4, height:4, background:"rgba(255,255,255,0.4)", borderRadius:"50%" }}/>
+                {step.num}
+              </div>
+
+              {/* Icon */}
+              <div style={{
+                width: 42, height: 42,
+                borderRadius: 8,
+                background: "rgba(255,255,255,0.10)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                margin: "0 auto 10px",
+              }}>
+                <Icon size={20} color="white" strokeWidth={2} />
+              </div>
+
+              {/* Label */}
+              <p style={{
+                fontFamily: "inherit",
+                fontSize: 10,
+                fontWeight: 700,
+                color: "white",
+                lineHeight: 1.3,
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+                whiteSpace: "pre-line",
+                margin: 0,
+              }}>
+                {step.label}
+              </p>
+            </motion.div>
           </motion.div>
         );
       })}
-
-      {/* Arrow icon at top */}
-      <motion.div
-        initial={{ opacity: 0, x: 10 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.5, delay: 0.7 }}
-        className="absolute top-0 right-0"
-      >
-        <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
-          <ArrowRight size={16} className="text-white/70" />
-        </div>
-      </motion.div>
     </div>
   );
 };
