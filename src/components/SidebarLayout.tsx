@@ -91,10 +91,10 @@ const SidebarLayout = ({ children }: { children: ReactNode }) => {
   return (
     <div className="min-h-screen flex bg-background">
 
-      {/* Mobile overlay */}
+      {/* Mobile overlay — no backdrop-blur: causes GPU layer corruption on Android Chrome */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/75 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -195,7 +195,7 @@ const SidebarLayout = ({ children }: { children: ReactNode }) => {
       <div ref={mainRef} className="flex-1 min-h-screen overflow-y-auto flex flex-col min-w-0">
 
         {/* Top Bar */}
-        <header className="sticky top-0 z-30 bg-background/95 backdrop-blur-md border-b border-border px-4 lg:px-6 h-[64px] flex items-center justify-between gap-4 shrink-0">
+        <header className="sticky top-0 z-30 bg-background border-b border-border px-4 lg:px-6 h-[64px] flex items-center justify-between gap-4 shrink-0">
           <div className="flex items-center gap-3">
             <button
               className="lg:hidden text-foreground hover:text-primary transition-colors"

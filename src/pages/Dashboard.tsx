@@ -177,22 +177,19 @@ const Dashboard = () => {
       <div className="p-4 lg:p-6 space-y-6">
 
         {/* ── Welcome Header ──────────────────────────────────────── */}
-        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
+        <div>
           <h1 className="text-xl lg:text-2xl font-serif font-bold text-white">
             Welcome back, {displayName.split(" ")[0]}!
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             Here's what's happening with your courses and learning today.
           </p>
-        </motion.div>
+        </div>
 
         {/* ── Stat Cards ──────────────────────────────────────────── */}
-        <motion.div
-          initial="hidden" animate="visible" variants={fadeUp} custom={1}
-          className="grid grid-cols-2 xl:grid-cols-4 gap-4"
-        >
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
           {statCards.map((s, i) => (
-            <motion.div key={s.label} variants={scaleIn} custom={i * 0.08} initial="hidden" animate="visible">
+            <div key={s.label}>
               <div className={`rounded-2xl bg-card border ${s.border} p-5 flex flex-col gap-3 hover:shadow-lg transition-all duration-300 group`}>
                 <div className="flex items-start justify-between">
                   <div className={`w-11 h-11 rounded-xl ${s.iconBg} border ${s.border} flex items-center justify-center`}>
@@ -213,9 +210,9 @@ const Dashboard = () => {
                   {s.linkLabel} <ArrowRight size={11} />
                 </Link>
               </div>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
         {/* ── Main Grid ───────────────────────────────────────────── */}
         <div className="grid grid-cols-1 xl:grid-cols-[1fr_300px] gap-6">
@@ -224,7 +221,7 @@ const Dashboard = () => {
           <div className="space-y-6 min-w-0">
 
             {/* My Courses Table */}
-            <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={2}>
+            <section>
               <div className="rounded-2xl bg-card border border-border overflow-hidden">
                 <div className="flex items-center justify-between px-5 py-4 border-b border-border">
                   <h2 className="font-serif font-bold text-white text-base">My Courses</h2>
@@ -287,11 +284,9 @@ const Dashboard = () => {
                             <td className="px-4 py-3.5 w-40">
                               <div className="flex items-center gap-2">
                                 <div className="flex-1 h-1.5 rounded-full bg-white/8 overflow-hidden">
-                                  <motion.div
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${item.progress || 0}%` }}
-                                    transition={{ duration: 1, ease: "easeOut", delay: 0.3 + i * 0.05 }}
-                                    className="h-full rounded-full bg-gradient-to-r from-primary to-amber-400"
+                                  <div
+                                    className="h-full rounded-full bg-gradient-to-r from-primary to-amber-400 transition-[width] duration-700 ease-out"
+                                    style={{ width: `${item.progress || 0}%` }}
                                   />
                                 </div>
                                 <span className="text-xs font-semibold text-white/60 w-8 shrink-0">{item.progress || 0}%</span>
@@ -334,7 +329,7 @@ const Dashboard = () => {
                   </div>
                 )}
               </div>
-            </motion.section>
+            </section>
 
             {/* Charts Row — plain div, NOT motion.div: Framer Motion transforms + Recharts SVG = GPU glitch on mobile */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -471,7 +466,7 @@ const Dashboard = () => {
             </div>
 
             {/* Recent Articles / Announcements */}
-            <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={4}>
+            <section>
               <div className="rounded-2xl bg-card border border-border overflow-hidden">
                 <div className="flex items-center justify-between px-5 py-4 border-b border-border">
                   <h2 className="font-serif font-bold text-white text-base">Recent Announcements</h2>
@@ -521,7 +516,7 @@ const Dashboard = () => {
                   </div>
                 )}
               </div>
-            </motion.section>
+            </section>
 
           </div>
 
@@ -529,7 +524,7 @@ const Dashboard = () => {
           <div className="space-y-5">
 
             {/* Quick Actions */}
-            <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={2}>
+            <section>
               <div className="rounded-2xl bg-card border border-border p-5">
                 <h3 className="font-serif font-bold text-white text-base mb-4">Quick Actions</h3>
                 <div className="grid grid-cols-2 gap-2.5">
@@ -543,10 +538,10 @@ const Dashboard = () => {
                   ))}
                 </div>
               </div>
-            </motion.section>
+            </section>
 
             {/* Upcoming Sessions */}
-            <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={3}>
+            <section>
               <div className="rounded-2xl bg-card border border-border overflow-hidden">
                 <div className="flex items-center justify-between px-5 py-4 border-b border-border">
                   <h3 className="font-serif font-bold text-white text-base">Upcoming Sessions</h3>
@@ -602,10 +597,10 @@ const Dashboard = () => {
                   </Link>
                 </div>
               </div>
-            </motion.section>
+            </section>
 
             {/* Recommended Courses */}
-            <motion.section initial="hidden" animate="visible" variants={fadeUp} custom={4}>
+            <section>
               <div className="rounded-2xl bg-card border border-border overflow-hidden">
                 <div className="flex items-center justify-between px-5 py-4 border-b border-border">
                   <h3 className="font-serif font-bold text-white text-base">Recommended</h3>
@@ -650,7 +645,7 @@ const Dashboard = () => {
                   </div>
                 )}
               </div>
-            </motion.section>
+            </section>
 
           </div>
         </div>
