@@ -276,6 +276,10 @@ const AboutHTB = () => {
 
       {/* ─────────────────── WHAT WE DO (slate-50) ─────────────────── */}
       <section className="py-20 lg:py-28 bg-slate-50 border-y border-slate-200 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none" style={{
+          backgroundImage: "linear-gradient(rgba(0,0,0,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.018) 1px,transparent 1px)",
+          backgroundSize: "40px 40px",
+        }} />
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}
@@ -401,6 +405,10 @@ const AboutHTB = () => {
 
       {/* ─────────────────── OUR FOCUS (slate-50) ─────────────────── */}
       <section className="py-20 lg:py-24 bg-slate-50 border-y border-slate-200 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none" style={{
+          backgroundImage: "linear-gradient(rgba(0,0,0,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.018) 1px,transparent 1px)",
+          backgroundSize: "40px 40px",
+        }} />
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
 
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }}

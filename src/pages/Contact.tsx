@@ -175,26 +175,30 @@ const Contact = () => {
       </section>
 
       {/* ── Form + Other ways to reach ────────────────────────────────────────── */}
-      <section className="py-16 lg:py-24 bg-background">
-        <div className="container mx-auto px-4 lg:px-8">
+      <section className="py-16 lg:py-24 bg-white relative overflow-hidden border-y border-slate-200">
+        <div className="absolute inset-0 pointer-events-none" style={{
+          backgroundImage: "linear-gradient(rgba(0,0,0,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.018) 1px,transparent 1px)",
+          backgroundSize: "40px 40px",
+        }} />
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <div className="grid lg:grid-cols-[1fr_400px] gap-8 xl:gap-12">
 
             {/* Left — Contact Form */}
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true }}
-              className="bg-card border border-border rounded-2xl p-6 lg:p-8"
+              className="bg-white border border-slate-200 rounded-2xl p-6 lg:p-8 shadow-sm"
             >
-              <motion.h2 variants={fadeUp} custom={0} className="text-xl font-serif font-bold text-foreground mb-1">
+              <motion.h2 variants={fadeUp} custom={0} className="text-xl font-serif font-bold text-slate-900 mb-1">
                 Get in Touch
               </motion.h2>
-              <motion.p variants={fadeUp} custom={1} className="text-sm text-muted-foreground mb-6">
+              <motion.p variants={fadeUp} custom={1} className="text-sm text-slate-500 mb-6">
                 Fill out the form and we'll get back to you as soon as possible.
               </motion.p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <motion.div variants={fadeUp} custom={2} className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-semibold text-foreground mb-1.5 block">
+                    <label className="text-xs font-semibold text-slate-700 mb-1.5 block">
                       Full Name <span className="text-primary">*</span>
                     </label>
                     <Input
@@ -202,11 +206,11 @@ const Contact = () => {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       maxLength={100}
-                      className="bg-background border-border h-10 text-sm"
+                      className="bg-slate-50 border-slate-200 h-10 text-sm text-slate-900 placeholder:text-slate-400"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-semibold text-foreground mb-1.5 block">
+                    <label className="text-xs font-semibold text-slate-700 mb-1.5 block">
                       Email Address <span className="text-primary">*</span>
                     </label>
                     <Input
@@ -215,20 +219,20 @@ const Contact = () => {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       maxLength={255}
-                      className="bg-background border-border h-10 text-sm"
+                      className="bg-slate-50 border-slate-200 h-10 text-sm text-slate-900 placeholder:text-slate-400"
                     />
                   </div>
                 </motion.div>
 
                 <motion.div variants={fadeUp} custom={3}>
-                  <label className="text-xs font-semibold text-foreground mb-1.5 block">
+                  <label className="text-xs font-semibold text-slate-700 mb-1.5 block">
                     Subject <span className="text-primary">*</span>
                   </label>
                   <Select
                     value={formData.subject}
                     onValueChange={(v) => setFormData({ ...formData, subject: v })}
                   >
-                    <SelectTrigger className="bg-background border-border h-10 text-sm">
+                    <SelectTrigger className="bg-slate-50 border-slate-200 h-10 text-sm text-slate-900">
                       <SelectValue placeholder="Select a subject" />
                     </SelectTrigger>
                     <SelectContent>
@@ -240,7 +244,7 @@ const Contact = () => {
                 </motion.div>
 
                 <motion.div variants={fadeUp} custom={4}>
-                  <label className="text-xs font-semibold text-foreground mb-1.5 block">
+                  <label className="text-xs font-semibold text-slate-700 mb-1.5 block">
                     Message <span className="text-primary">*</span>
                   </label>
                   <Textarea
@@ -249,12 +253,12 @@ const Contact = () => {
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     maxLength={1000}
                     rows={5}
-                    className="bg-background border-border text-sm resize-none"
+                    className="bg-slate-50 border-slate-200 text-sm text-slate-900 placeholder:text-slate-400 resize-none"
                   />
                 </motion.div>
 
                 <motion.div variants={fadeUp} custom={5} className="flex items-center justify-between gap-4 pt-1">
-                  <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <p className="text-xs text-slate-400 flex items-center gap-1.5">
                     <Shield size={12} className="text-primary shrink-0" />
                     Your information is safe with us. We respect your privacy.
                   </p>
@@ -280,9 +284,9 @@ const Contact = () => {
               {/* Other Ways to Reach Us */}
               <motion.div
                 initial="hidden" whileInView="visible" viewport={{ once: true }}
-                className="bg-card border border-border rounded-2xl p-6"
+                className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm"
               >
-                <motion.h3 variants={fadeUp} custom={0} className="text-base font-serif font-bold text-foreground mb-4">
+                <motion.h3 variants={fadeUp} custom={0} className="text-base font-serif font-bold text-slate-900 mb-4">
                   Other Ways to Reach Us
                 </motion.h3>
                 <div className="space-y-3">
@@ -293,7 +297,7 @@ const Contact = () => {
                       value: "training@htbconsults.com",
                       href: "mailto:training@htbconsults.com",
                       badge: "24/7",
-                      badgeColor: "bg-emerald-500/15 text-emerald-400 border-emerald-500/20",
+                      badgeColor: "bg-emerald-50 text-emerald-600 border-emerald-200",
                     },
                     {
                       icon: Phone,
@@ -302,7 +306,7 @@ const Contact = () => {
                       href: "tel:+447862056300",
                       badge: "Mon – Fri",
                       sub: "8:00 AM – 5:00 PM (GMT)",
-                      badgeColor: "bg-blue-500/15 text-blue-400 border-blue-500/20",
+                      badgeColor: "bg-blue-50 text-blue-600 border-blue-200",
                     },
                     {
                       icon: MessageSquare,
@@ -310,7 +314,7 @@ const Contact = () => {
                       value: "Chat with our support team",
                       badge: "Mon – Fri",
                       sub: "8:00 AM – 5:00 PM (GMT)",
-                      badgeColor: "bg-blue-500/15 text-blue-400 border-blue-500/20",
+                      badgeColor: "bg-blue-50 text-blue-600 border-blue-200",
                     },
                     {
                       icon: MapPin,
@@ -318,21 +322,21 @@ const Contact = () => {
                       value: "London, United Kingdom",
                       badge: "Mon – Fri",
                       sub: "8:00 AM – 5:00 PM (GMT)",
-                      badgeColor: "bg-blue-500/15 text-blue-400 border-blue-500/20",
+                      badgeColor: "bg-blue-50 text-blue-600 border-blue-200",
                     },
                   ].map((item, i) => (
                     <motion.div
                       key={item.label}
                       variants={fadeUp}
                       custom={i + 1}
-                      className="flex items-start gap-3 p-3 rounded-xl border border-border bg-background hover:border-primary/30 transition-colors group"
+                      className="flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50 hover:border-primary/40 transition-colors group"
                     >
                       <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                         <item.icon size={16} className="text-primary" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2 mb-0.5">
-                          <p className="text-xs font-semibold text-foreground">{item.label}</p>
+                          <p className="text-xs font-semibold text-slate-700">{item.label}</p>
                           <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full border ${item.badgeColor}`}>
                             {item.badge}
                           </span>
@@ -340,15 +344,15 @@ const Contact = () => {
                         {item.href ? (
                           <a
                             href={item.href}
-                            className="text-xs text-muted-foreground hover:text-primary transition-colors truncate block"
+                            className="text-xs text-slate-500 hover:text-primary transition-colors truncate block"
                           >
                             {item.value}
                           </a>
                         ) : (
-                          <p className="text-xs text-muted-foreground truncate">{item.value}</p>
+                          <p className="text-xs text-slate-500 truncate">{item.value}</p>
                         )}
                         {item.sub && (
-                          <p className="text-[10px] text-muted-foreground/60 mt-0.5">{item.sub}</p>
+                          <p className="text-[10px] text-slate-400 mt-0.5">{item.sub}</p>
                         )}
                       </div>
                     </motion.div>
@@ -361,14 +365,14 @@ const Contact = () => {
                 initial="hidden" whileInView="visible" viewport={{ once: true }}
                 variants={fadeUp}
                 custom={5}
-                className="bg-primary/10 border border-primary/20 rounded-2xl p-5 flex items-start gap-4"
+                className="bg-primary/8 border border-primary/20 rounded-2xl p-5 flex items-start gap-4"
               >
                 <div className="w-10 h-10 rounded-xl bg-primary/15 flex items-center justify-center shrink-0">
                   <HelpCircle size={20} className="text-primary" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-foreground mb-1">Before You Contact Us</p>
-                  <p className="text-xs text-muted-foreground mb-3">
+                  <p className="text-sm font-semibold text-slate-800 mb-1">Before You Contact Us</p>
+                  <p className="text-xs text-slate-500 mb-3">
                     Try our Help Centre for quick answers to common questions.
                   </p>
                   <Button
@@ -389,28 +393,32 @@ const Contact = () => {
       </section>
 
       {/* ── Bottom CTA cards ─────────────────────────────────────────────────── */}
-      <section className="pb-12 bg-background">
-        <div className="container mx-auto px-4 lg:px-8">
+      <section className="py-12 bg-white relative overflow-hidden border-b border-slate-200">
+        <div className="absolute inset-0 pointer-events-none" style={{
+          backgroundImage: "linear-gradient(rgba(0,0,0,0.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.018) 1px,transparent 1px)",
+          backgroundSize: "40px 40px",
+        }} />
+        <div className="container mx-auto px-4 lg:px-8 relative z-10">
           <div className="grid sm:grid-cols-2 gap-5">
             {/* FAQ card */}
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true }}
               variants={fadeUp} custom={0}
-              className="bg-card border border-border rounded-2xl p-6 flex items-center gap-5"
+              className="bg-white border border-slate-200 rounded-2xl p-6 flex items-center gap-5 hover:border-primary/30 hover:shadow-md hover:shadow-primary/6 transition-all duration-300 card-lift"
             >
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                 <HelpCircle size={22} className="text-primary" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-bold text-foreground mb-1">Frequently Asked Questions</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm font-bold text-slate-900 mb-1">Frequently Asked Questions</p>
+                <p className="text-xs text-slate-500">
                   Find answers to the most common questions about courses, enrollment, payments, and more.
                 </p>
               </div>
               <Button
                 size="sm"
                 variant="outline"
-                className="shrink-0 text-xs border-border hover:border-primary/40 hover:text-primary gap-1.5"
+                className="shrink-0 text-xs border-slate-300 text-slate-600 hover:border-primary/40 hover:text-primary gap-1.5"
                 onClick={() => document.getElementById("faq-section")?.scrollIntoView({ behavior: "smooth" })}
               >
                 View FAQs <ArrowRight size={12} />
@@ -421,21 +429,21 @@ const Contact = () => {
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true }}
               variants={fadeUp} custom={1}
-              className="bg-card border border-border rounded-2xl p-6 flex items-center gap-5"
+              className="bg-white border border-slate-200 rounded-2xl p-6 flex items-center gap-5 hover:border-primary/30 hover:shadow-md hover:shadow-primary/6 transition-all duration-300 card-lift"
             >
               <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
                 <Settings size={22} className="text-primary" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-bold text-foreground mb-1">Need Technical Assistance?</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm font-bold text-slate-900 mb-1">Need Technical Assistance?</p>
+                <p className="text-xs text-slate-500">
                   Having trouble accessing the platform or experiencing technical issues?
                 </p>
               </div>
               <Button
                 size="sm"
                 variant="outline"
-                className="shrink-0 text-xs border-border hover:border-primary/40 hover:text-primary gap-1.5"
+                className="shrink-0 text-xs border-slate-300 text-slate-600 hover:border-primary/40 hover:text-primary gap-1.5"
                 asChild
               >
                 <a href="mailto:training@htbconsults.com">
