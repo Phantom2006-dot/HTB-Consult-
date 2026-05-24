@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { fadeUp, scaleIn } from "@/lib/animations";
-import Layout from "@/components/Layout";
+import SidebarLayout from "@/components/SidebarLayout";
 import { useMyBookings } from "@/hooks/use-bookings";
 
 function formatDate(d: string) {
@@ -49,11 +49,11 @@ const Sessions = () => {
 
   if (loading) {
     return (
-      <Layout>
+      <SidebarLayout>
         <div className="min-h-[60vh] flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
-      </Layout>
+      </SidebarLayout>
     );
   }
   if (!user) return null;
@@ -71,7 +71,7 @@ const Sessions = () => {
   ];
 
   return (
-    <Layout>
+    <SidebarLayout>
       <div className="p-4 lg:p-6 space-y-6 max-w-5xl mx-auto">
 
         {/* Header */}
@@ -319,7 +319,7 @@ const Sessions = () => {
         )}
 
       </div>
-    </Layout>
+    </SidebarLayout>
   );
 };
 
