@@ -4,7 +4,11 @@ import { requireAuth, requireAdmin, type AuthRequest } from "../middleware/auth.
 
 const router = Router();
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const isUUID = (v: string) => UUID_RE.test(v);
+
 router.get("/course/:courseId", async (req, res) => {
+  if (!isUUID(req.params.courseId)) return res.json([]);
   try {
     const { rows } = await pool.query(
       `SELECT r.id, r.title, r.file_url, r.file_type, r.file_size, r.created_at,
@@ -22,6 +26,7 @@ router.get("/course/:courseId", async (req, res) => {
 });
 
 router.post("/course/:courseId", requireAuth, requireAdmin, async (req: AuthRequest, res) => {
+  if (!isUUID(req.params.courseId)) return res.status(404).json({ error: "Course not found" });
   try {
     const { title, file_url, file_type, file_size } = req.body;
     if (!title || !file_url) {
@@ -40,6 +45,7 @@ router.post("/course/:courseId", requireAuth, requireAdmin, async (req: AuthRequ
 });
 
 router.patch("/:id", requireAuth, requireAdmin, async (req: AuthRequest, res) => {
+  if (!isUUID(req.params.id)) return res.status(404).json({ error: "Not found" });
   try {
     const { title } = req.body;
     const { rows } = await pool.query(
@@ -53,9 +59,10 @@ router.patch("/:id", requireAuth, requireAdmin, async (req: AuthRequest, res) =>
   }
 });
 
-router.delete("/:id", requireAuth, requireAdmin, async (_req, res) => {
+router.delete("/:id", requireAuth, requireAdmin, async (req, res) => {
+  if (!isUUID(req.params.id)) return res.status(404).json({ error: "Not found" });
   try {
-    await pool.query("DELETE FROM course_resources WHERE id = $1", [_req.params.id]);
+    await pool.query("DELETE FROM course_resources WHERE id = $1", [req.params.id]);
     return res.json({ success: true });
   } catch (err: any) {
     return res.status(500).json({ error: err.message });

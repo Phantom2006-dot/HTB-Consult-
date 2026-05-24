@@ -4,6 +4,9 @@ import { requireAuth, requireAdmin, type AuthRequest } from "../middleware/auth.
 
 const router = Router();
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const isUUID = (v: string) => UUID_RE.test(v);
+
 router.get("/", async (_req, res) => {
   try {
     const { rows } = await pool.query(
@@ -25,6 +28,7 @@ router.get("/admin/all", requireAdmin, async (_req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
+  if (!isUUID(req.params.id)) return res.status(404).json({ error: "Course not found" });
   try {
     const { rows: courseRows } = await pool.query("SELECT * FROM courses WHERE id = $1", [req.params.id]);
     if (courseRows.length === 0) return res.status(404).json({ error: "Course not found" });
@@ -69,6 +73,7 @@ router.post("/admin", requireAdmin, async (req, res) => {
 });
 
 router.patch("/admin/:id", requireAdmin, async (req, res) => {
+  if (!isUUID(req.params.id)) return res.status(404).json({ error: "Course not found" });
   const { title, description, category, skill_level, course_type, price, total_duration, tags, thumbnail_url, live_class_url, published } = req.body;
   try {
     const tagsArr = Array.isArray(tags) ? tags : (tags || "").split(",").map((t: string) => t.trim()).filter(Boolean);
@@ -87,6 +92,7 @@ router.patch("/admin/:id", requireAdmin, async (req, res) => {
 });
 
 router.patch("/admin/:id/lock", requireAdmin, async (req, res) => {
+  if (!isUUID(req.params.id)) return res.status(404).json({ error: "Course not found" });
   const { is_locked } = req.body;
   if (typeof is_locked !== "boolean") return res.status(400).json({ error: "is_locked (boolean) required" });
   try {
@@ -102,6 +108,7 @@ router.patch("/admin/:id/lock", requireAdmin, async (req, res) => {
 });
 
 router.delete("/admin/:id", requireAdmin, async (req, res) => {
+  if (!isUUID(req.params.id)) return res.status(404).json({ error: "Course not found" });
   try {
     await pool.query("DELETE FROM courses WHERE id = $1", [req.params.id]);
     return res.json({ success: true });
