@@ -378,7 +378,7 @@ const Contact = () => {
                   <Button
                     size="sm"
                     variant="outline"
-                    className="h-7 text-xs border-primary/30 text-primary hover:bg-primary/10 gap-1.5"
+                    className="h-7 text-xs bg-white border-primary/30 text-primary hover:bg-primary/10 gap-1.5"
                     asChild
                   >
                     <a href="/courses">
@@ -418,7 +418,7 @@ const Contact = () => {
               <Button
                 size="sm"
                 variant="outline"
-                className="shrink-0 text-xs border-slate-300 text-slate-600 hover:border-primary/40 hover:text-primary gap-1.5"
+                className="shrink-0 text-xs bg-white border-slate-300 text-slate-700 hover:border-primary/40 hover:text-primary gap-1.5"
                 onClick={() => document.getElementById("faq-section")?.scrollIntoView({ behavior: "smooth" })}
               >
                 View FAQs <ArrowRight size={12} />
@@ -443,7 +443,7 @@ const Contact = () => {
               <Button
                 size="sm"
                 variant="outline"
-                className="shrink-0 text-xs border-slate-300 text-slate-600 hover:border-primary/40 hover:text-primary gap-1.5"
+                className="shrink-0 text-xs bg-white border-slate-300 text-slate-700 hover:border-primary/40 hover:text-primary gap-1.5"
                 asChild
               >
                 <a href="mailto:training@htbconsults.com">
