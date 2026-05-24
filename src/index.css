@@ -128,6 +128,19 @@ svg, svg * {
     --orange-light: 30 90% 56%;
     --gold: 36 70% 48%;
     --gold-light: 36 60% 58%;
+
+    /* Semantic vars so sidebar-page CTA/section blocks render light */
+    --hero-overlay: 210 40% 95%;
+    --hero-gradient-from: 210 40% 94%;
+    --section-alt: 210 40% 95%;
+    --footer-bg: 210 40% 92%;
+    --accent-glow: rgba(234, 119, 0, 0.18);
+    --accent-glow-soft: rgba(234, 119, 0, 0.06);
+    --gradient-accent: linear-gradient(135deg, hsl(30, 100%, 46%), hsl(36, 70%, 48%));
+    --gradient-cta-bg: linear-gradient(135deg, #f0f4f8 0%, #e8edf2 100%);
+    --green-dark: 210 40% 93%;
+    --green-darker: 210 40% 91%;
+    --green-light: 210 40% 96%;
   }
 
   /* ── BLUE THEME ── */
@@ -189,6 +202,60 @@ svg, svg * {
     --gradient-accent: linear-gradient(135deg, hsl(217, 91%, 56%), hsl(217, 85%, 48%));
     --gradient-cta-bg: linear-gradient(135deg, #0d1f50 0%, #06112e 100%);
   }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   LIGHT MODE: Fix hardcoded white/dark classes inside sidebar pages.
+   Scoped to `main` so the dark sidebar is completely unaffected.
+   Uses attribute-substring selectors to catch ALL opacity variants
+   (text-white/40, bg-white/8, border-white/15, etc.) in one rule each.
+───────────────────────────────────────────────────────────────────────── */
+
+/* Primary text: text-white → foreground colour */
+[data-mode="light"] main .text-white {
+  color: hsl(var(--foreground)) !important;
+}
+
+/* Secondary / muted text: text-white/XX → muted-foreground */
+[data-mode="light"] main [class*="text-white/"] {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+/* Subtle overlays: bg-white/X → muted background */
+[data-mode="light"] main [class*="bg-white/"] {
+  background-color: hsl(var(--muted)) !important;
+}
+
+/* Hover overlays */
+[data-mode="light"] main [class*="hover:bg-white/"]:hover {
+  background-color: hsl(var(--muted)) !important;
+}
+
+/* Borders */
+[data-mode="light"] main [class*="border-white/"] {
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Dividers */
+[data-mode="light"] main [class*="divide-white/"] > * + * {
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Hardcoded dark-green arbitrary bg values (e.g. bg-[hsl(163,...)]) */
+[data-mode="light"] main [class*="bg-[hsl(163"] {
+  background-color: hsl(var(--muted)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Placeholder text inside dark-bg inputs */
+[data-mode="light"] main [class*="placeholder:text-white"]::placeholder {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+/* Opacity-dimmed sections (e.g. past sessions) — keep opacity, just fix colour cascade */
+[data-mode="light"] main .opacity-70,
+[data-mode="light"] main .opacity-50 {
+  /* intentional opacity variants — leave untouched */
 }
 
 @layer base {
