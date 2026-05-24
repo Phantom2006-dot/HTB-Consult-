@@ -114,15 +114,17 @@ const Explore = () => {
             alt=""
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-[hsl(163,36%,10%)]/92 backdrop-blur-[2px]" />
+          {/* No backdrop-blur — causes GPU compositing glitch on mobile */}
+          <div className="absolute inset-0 bg-[hsl(163,36%,10%)]/93" />
           <div className="absolute inset-0 bg-gradient-to-r from-[hsl(163,40%,8%)]/80 via-[hsl(163,40%,8%)]/40 to-transparent" />
           <div className="absolute inset-0 grid-pattern opacity-25" />
         </div>
-        <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-primary/8 blur-[80px]" />
-        <div className="absolute bottom-0 left-1/3 w-48 h-48 rounded-full bg-blue-500/8 blur-[60px]" />
+        {/* Decorative blurs hidden on mobile — GPU glitch culprits */}
+        <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-primary/8 blur-[80px] hidden lg:block" />
+        <div className="absolute bottom-0 left-1/3 w-48 h-48 rounded-full bg-blue-500/8 blur-[60px] hidden lg:block" />
         <div className="relative z-10 px-4 lg:px-8 py-8">
           <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center backdrop-blur-md">
+            <div className="w-9 h-9 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center">
               <Compass size={18} className="text-primary" />
             </div>
             <div>
