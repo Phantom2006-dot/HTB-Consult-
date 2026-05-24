@@ -53,8 +53,8 @@ externalPort = 3000
 [userenv.shared]
 SERVER_PORT = "3001"
 NODE_ENV = "development"
-VITE_CLOUDINARY_CLOUD_NAME = "di2u0n1qj"
-VITE_CLOUDINARY_UPLOAD_PRESET = "htb_academy"
 FRONTEND_URL = "https://140a8c70-e8c1-445d-9b46-29ebc58ef4f6-00-38fw2lp0j5mko.worf.replit.dev"
+CLOUDINARY_CLOUD_NAME = "di2u0n1qj"
+CLOUDINARY_UPLOAD_PRESET = "htb_academy"
 
 [userenv.development]
