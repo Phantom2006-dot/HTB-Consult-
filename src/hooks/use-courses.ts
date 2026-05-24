@@ -52,5 +52,10 @@ export function useCourseDetail(id: string | undefined) {
     queryKey: ["course", id],
     enabled: !!id,
     queryFn: () => api.get<{ course: Course; modules: Module[] }>(`/api/courses/${id}`),
+    retry: (failureCount, error: any) => {
+      if (error?.status === 404) return false;
+      return failureCount < 3;
+    },
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 8000),
   });
 }

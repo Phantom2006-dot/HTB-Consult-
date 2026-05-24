@@ -38,7 +38,7 @@ const CourseDetail = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const { data, isLoading } = useCourseDetail(id);
+  const { data, isLoading, isError, error } = useCourseDetail(id);
   const toggleBookmark = useToggleBookmark();
   const enroll = useEnroll();
   const { data: bookmarksData } = useBookmarks();
@@ -99,12 +99,36 @@ const CourseDetail = () => {
     );
   }
 
+  if (isError) {
+    const is404 = (error as any)?.status === 404;
+    return (
+      <SidebarLayout>
+        <div className="max-w-5xl mx-auto px-4 lg:px-8 py-20 text-center">
+          <h1 className="text-xl font-bold text-foreground mb-2">
+            {is404 ? "Course not found" : "Something went wrong"}
+          </h1>
+          <p className="text-muted-foreground mb-6">
+            {is404
+              ? "This course doesn't exist or has been removed."
+              : "We couldn't load this course. Please try again."}
+          </p>
+          <div className="flex items-center justify-center gap-3">
+            {!is404 && (
+              <Button onClick={() => window.location.reload()}>Try Again</Button>
+            )}
+            <Button variant="outline" onClick={() => navigate("/courses")}>Browse Courses</Button>
+          </div>
+        </div>
+      </SidebarLayout>
+    );
+  }
+
   if (!data) {
     return (
       <SidebarLayout>
         <div className="max-w-5xl mx-auto px-4 lg:px-8 py-20 text-center">
           <h1 className="text-xl font-bold text-foreground mb-2">Course not found</h1>
-          <p className="text-muted-foreground mb-4">This course doesn't exist or isn't published yet.</p>
+          <p className="text-muted-foreground mb-4">This course doesn't exist or has been removed.</p>
           <Button onClick={() => navigate("/courses")}>Browse Courses</Button>
         </div>
       </SidebarLayout>
