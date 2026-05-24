@@ -5,7 +5,7 @@ import { requireAuth, requireAdmin, type AuthRequest } from "../middleware/auth.
 const router = Router();
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const isUUID = (v: string) => UUID_RE.test(v);
+const isUUID = (v: string | string[]) => typeof v === "string" && UUID_RE.test(v);
 
 router.get("/", async (_req, res) => {
   try {
