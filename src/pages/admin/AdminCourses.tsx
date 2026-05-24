@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Plus, Pencil, Trash2, Eye, EyeOff, Presentation, Lock, LockOpen, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, Presentation, Lock, LockOpen, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -435,6 +435,11 @@ const AdminCourses = () => {
                     >
                       {course.is_locked ? <Lock size={14} /> : <LockOpen size={14} />}
                     </Button>
+                    <Link to={`/course/${course.id}`} target="_blank" rel="noopener noreferrer">
+                      <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-blue-400" title="Preview course page">
+                        <ExternalLink size={14} />
+                      </Button>
+                    </Link>
                     <Link to={`/admin/courses/${course.id}/resources`}>
                       <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-primary" title="Manage resources">
                         <Presentation size={14} />
