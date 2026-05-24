@@ -33,19 +33,50 @@ router.get("/:id", async (req, res) => {
     const { rows: courseRows } = await pool.query("SELECT * FROM courses WHERE id = $1", [req.params.id]);
     if (courseRows.length === 0) return res.status(404).json({ error: "Course not found" });
 
-    const { rows: modules } = await pool.query(
-      "SELECT * FROM modules WHERE course_id = $1 ORDER BY sort_order",
-      [req.params.id]
-    );
+    // ── Try sort_order first (new schema), fallback to position (old schema) ──
+    let modules: any[] = [];
+    try {
+      const { rows } = await pool.query(
+        "SELECT * FROM modules WHERE course_id = $1 ORDER BY sort_order",
+        [req.params.id]
+      );
+      modules = rows;
+    } catch (sortOrderErr: any) {
+      // If sort_order doesn't exist, try position (legacy schema)
+      if (sortOrderErr.message?.includes("sort_order")) {
+        const { rows } = await pool.query(
+          "SELECT * FROM modules WHERE course_id = $1 ORDER BY position",
+          [req.params.id]
+        );
+        modules = rows;
+      } else {
+        throw sortOrderErr;
+      }
+    }
+
     const moduleIds = modules.map((m) => m.id);
     let lessons: any[] = [];
     if (moduleIds.length > 0) {
-      const { rows } = await pool.query(
-        `SELECT * FROM lessons WHERE module_id = ANY($1) ORDER BY sort_order`,
-        [moduleIds]
-      );
-      lessons = rows;
+      try {
+        const { rows } = await pool.query(
+          `SELECT * FROM lessons WHERE module_id = ANY($1) ORDER BY sort_order`,
+          [moduleIds]
+        );
+        lessons = rows;
+      } catch (sortOrderErr: any) {
+        // If sort_order doesn't exist, try position (legacy schema)
+        if (sortOrderErr.message?.includes("sort_order")) {
+          const { rows } = await pool.query(
+            `SELECT * FROM lessons WHERE module_id = ANY($1) ORDER BY position`,
+            [moduleIds]
+          );
+          lessons = rows;
+        } else {
+          throw sortOrderErr;
+        }
+      }
     }
+
     const modulesWithLessons = modules.map((m) => ({
       ...m,
       lessons: lessons.filter((l) => l.module_id === m.id),
@@ -102,18 +133,8 @@ router.patch("/admin/:id/lock", requireAdmin, async (req, res) => {
     );
     if (rows.length === 0) return res.status(404).json({ error: "Course not found" });
     return res.json(rows[0]);
-  } catch (err) {
-    return res.status(500).json({ error: "Failed to update course lock status" });
-  }
-});
-
-router.delete("/admin/:id", requireAdmin, async (req, res) => {
-  if (!isUUID(req.params.id)) return res.status(404).json({ error: "Course not found" });
-  try {
-    await pool.query("DELETE FROM courses WHERE id = $1", [req.params.id]);
-    return res.json({ success: true });
-  } catch (err) {
-    return res.status(500).json({ error: "Failed to delete course" });
+  } catch (err: any) {
+    return res.status(500).json({ error: err.message || "Failed to update course lock status" });
   }
 });
 
