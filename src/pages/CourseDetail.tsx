@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import PaymentModal from "@/components/PaymentModal";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Clock, Star, Users, BookOpen, Play, CheckCircle2, Award,
   Bookmark, ExternalLink, Video, Download, Presentation, FileText,
   FileType, FileSpreadsheet, File, Lock, ChevronRight, Home,
   Monitor, Laptop, UserCheck, ChevronDown, ChevronUp, BarChart3,
-  Shield, Share2, Linkedin, Twitter, Mail, Heart,
+  Shield, Share2, Linkedin, Twitter, Mail, Heart, CreditCard,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ const CourseDetail = () => {
   const { data: enrollmentsData } = useEnrollments();
   const [activeTab, setActiveTab] = useState<TabId>("overview");
   const [openModules, setOpenModules] = useState<Set<string>>(new Set());
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
   const isBookmarked = (bookmarksData || []).some((b: any) => b.course_id === id);
   const isEnrolled = (enrollmentsData || []).some((e: any) => e.course_id === id);
@@ -55,15 +57,21 @@ const CourseDetail = () => {
     enabled: !!id,
   });
 
-  const handleEnroll = async () => {
+  const handleEnroll = useCallback(async () => {
     if (!user) { navigate("/auth?tab=signup"); return; }
+    if (!data) return;
+    const courseData = data.course;
+    if (Number(courseData.price) > 0) {
+      setPaymentModalOpen(true);
+      return;
+    }
     try {
       await enroll.mutateAsync(id!);
       toast({ title: "Enrolled!", description: "You've been enrolled in this course." });
     } catch {
       toast({ title: "Error", description: "Could not enroll. You may already be enrolled.", variant: "destructive" });
     }
-  };
+  }, [user, data, id, enroll, navigate, toast]);
 
   const toggleModule = (moduleId: string) => {
     setOpenModules(prev => {
@@ -140,7 +148,8 @@ const CourseDetail = () => {
   const courseType = (course as any).course_type || "video";
 
   /* ── Locked state ── */
-  if ((course as any).is_locked) {
+  if ((course as any).is_locked && !isEnrolled) {
+    const isPaid = Number(course.price) > 0;
     return (
       <SidebarLayout>
         <div className="min-h-[80vh] flex items-center justify-center px-4">
@@ -148,34 +157,87 @@ const CourseDetail = () => {
             initial={{ opacity: 0, scale: 0.92, y: 24 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 22 }}
-            className="bg-card border border-amber-500/30 rounded-2xl shadow-2xl max-w-md w-full p-10 text-center"
+            className={`bg-card border rounded-2xl shadow-2xl max-w-md w-full p-10 text-center ${
+              isPaid ? "border-primary/30" : "border-amber-500/30"
+            }`}
           >
             <div className="flex justify-center mb-6">
               <div className="relative">
-                <div className="w-20 h-20 rounded-full bg-amber-500/10 border-2 border-amber-500/30 flex items-center justify-center">
-                  <Lock size={36} className="text-amber-500" />
+                <div className={`w-20 h-20 rounded-full flex items-center justify-center ${
+                  isPaid ? "bg-primary/10 border-2 border-primary/30" : "bg-amber-500/10 border-2 border-amber-500/30"
+                }`}>
+                  <Lock size={36} className={isPaid ? "text-primary" : "text-amber-500"} />
                 </div>
                 <motion.div
-                  className="absolute inset-0 rounded-full border-2 border-amber-500/20"
+                  className={`absolute inset-0 rounded-full border-2 ${isPaid ? "border-primary/20" : "border-amber-500/20"}`}
                   animate={{ scale: [1, 1.35, 1], opacity: [0.5, 0, 0.5] }}
                   transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
                 />
               </div>
             </div>
-            <Badge variant="outline" className="text-[10px] border-amber-500/40 text-amber-500 mb-3">{course.category}</Badge>
-            <h1 className="text-xl font-serif font-bold text-foreground mb-2">This Course is Currently Locked</h1>
+
+            <Badge variant="outline" className={`text-[10px] mb-3 ${isPaid ? "border-primary/40 text-primary" : "border-amber-500/40 text-amber-500"}`}>
+              {course.category}
+            </Badge>
+
+            <h1 className="text-xl font-serif font-bold text-foreground mb-2">
+              {isPaid ? "Unlock This Course" : "Access Required"}
+            </h1>
             <p className="text-sm font-medium text-muted-foreground mb-1">"{course.title}"</p>
-            <p className="text-sm text-muted-foreground leading-relaxed mt-3 mb-8">
-              Our team is preparing this course for you. It will be available again soon.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button variant="outline" className="gap-2" onClick={() => navigate(-1)}>← Go Back</Button>
-              <Button className="bg-gradient-gold hover:opacity-90 gap-2" onClick={() => navigate("/courses")}>
-                <BookOpen size={14} /> Browse Courses
-              </Button>
-            </div>
+
+            {isPaid ? (
+              <>
+                <div className="my-6 py-4 px-6 rounded-xl bg-primary/5 border border-primary/15">
+                  <p className="text-3xl font-bold text-foreground">£{Number(course.price).toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground mt-1">One-time payment · Lifetime access</p>
+                </div>
+                <ul className="text-sm text-muted-foreground space-y-2 text-left mb-7">
+                  {["Full course access", "Downloadable resources", "Certificate of completion", "Expert mentorship", "30-day money-back guarantee"].map(f => (
+                    <li key={f} className="flex items-center gap-2">
+                      <CheckCircle2 size={13} className="text-primary shrink-0" /> {f}
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex flex-col gap-3">
+                  <Button
+                    className="w-full bg-gradient-gold hover:opacity-90 font-semibold btn-shimmer gap-2"
+                    size="lg"
+                    onClick={() => {
+                      if (!user) { navigate("/auth?tab=signup"); return; }
+                      setPaymentModalOpen(true);
+                    }}
+                  >
+                    <CreditCard size={15} /> Pay & Enroll Now
+                  </Button>
+                  <Button variant="outline" className="w-full gap-2" onClick={() => navigate("/courses")}>
+                    <BookOpen size={14} /> Browse Free Courses
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground leading-relaxed mt-3 mb-8">
+                  This course requires admin approval to access. Contact our team to request access.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <Button variant="outline" className="gap-2" onClick={() => navigate(-1)}>← Go Back</Button>
+                  <Button className="bg-gradient-gold hover:opacity-90 gap-2" onClick={() => navigate("/contact")}>
+                    Request Access
+                  </Button>
+                </div>
+              </>
+            )}
           </motion.div>
         </div>
+
+        {isPaid && (
+          <PaymentModal
+            open={paymentModalOpen}
+            onClose={() => setPaymentModalOpen(false)}
+            onSuccess={() => navigate(`/course/${id}`)}
+            course={{ id: id!, title: course.title, price: Number(course.price), thumbnail_url: course.thumbnail_url, category: course.category }}
+          />
+        )}
       </SidebarLayout>
     );
   }
@@ -644,6 +706,15 @@ const CourseDetail = () => {
         </div>
 
       </div>
+
+      {Number(course.price) > 0 && (
+        <PaymentModal
+          open={paymentModalOpen}
+          onClose={() => setPaymentModalOpen(false)}
+          onSuccess={() => {}}
+          course={{ id: id!, title: course.title, price: Number(course.price), thumbnail_url: course.thumbnail_url, category: course.category }}
+        />
+      )}
     </SidebarLayout>
   );
 };

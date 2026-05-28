@@ -39,6 +39,7 @@ import AdminArticleEditor from "./pages/admin/AdminArticleEditor";
 import AdminCourseResources from "./pages/admin/AdminCourseResources";
 import AdminResources from "./pages/admin/AdminResources";
 import AdminCertificates from "./pages/admin/AdminCertificates";
+import AdminPayments from "./pages/admin/AdminPayments";
 import AdminMentorDetail from "./pages/admin/AdminMentorDetail";
 import Blog from "./pages/Blog";
 import ArticleReader from "./pages/ArticleReader";
@@ -82,6 +83,7 @@ function AppRoutes() {
             <Route path="/admin/courses" element={<AdminCourses />} />
             <Route path="/admin/resources" element={<AdminResources />} />
             <Route path="/admin/certificates" element={<AdminCertificates />} />
+            <Route path="/admin/payments" element={<AdminPayments />} />
             <Route path="/admin/courses/:courseId/resources" element={<AdminCourseResources />} />
             <Route path="/admin/categories" element={<AdminCategories />} />
             <Route path="/admin/mentors" element={<AdminMentors />} />

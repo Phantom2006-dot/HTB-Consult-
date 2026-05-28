@@ -25,6 +25,7 @@ import resourcesRoutes from "./routes/resources.js";
 import certificatesRoutes from "./routes/certificates.js";
 import dashboardRoutes from "./routes/dashboard.js";
 import uploadRoutes from "./routes/upload.js";
+import paymentsRoutes from "./routes/payments.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -146,6 +147,7 @@ app.use("/api/resources", resourcesRoutes);
 app.use("/api/certificates", certificatesRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/payments", paymentsRoutes);
 
 // ── Static files (production) ─────────────────────────────────────────────────
 if (process.env.NODE_ENV === "production") {

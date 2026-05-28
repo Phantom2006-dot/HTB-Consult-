@@ -51,6 +51,27 @@ export async function runMigrations() {
       ALTER TABLE courses ADD COLUMN IF NOT EXISTS is_locked BOOLEAN DEFAULT false;
     `);
 
+    // Course payments
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS course_payments (
+        id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id             UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        course_id           UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        amount              NUMERIC NOT NULL,
+        currency            TEXT NOT NULL DEFAULT 'GBP',
+        tx_ref              TEXT NOT NULL UNIQUE,
+        flw_transaction_id  TEXT,
+        flw_amount          NUMERIC,
+        flw_currency        TEXT,
+        status              TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','successful','failed')),
+        created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS idx_course_payments_user    ON course_payments(user_id);
+      CREATE INDEX IF NOT EXISTS idx_course_payments_course  ON course_payments(course_id);
+      CREATE INDEX IF NOT EXISTS idx_course_payments_status  ON course_payments(status);
+    `);
+
     // Notification read-tracking
     await client.query(`
       ALTER TABLE users ADD COLUMN IF NOT EXISTS last_notifications_viewed_at TIMESTAMPTZ;
