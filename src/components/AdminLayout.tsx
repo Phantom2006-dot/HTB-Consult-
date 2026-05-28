@@ -2,7 +2,7 @@ import { ReactNode, useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, BookOpen, Users, GraduationCap, FolderOpen,
-  ChevronLeft, Shield, UserCog, CalendarDays, Menu, X, Newspaper
+  ChevronLeft, Shield, UserCog, CalendarDays, Menu, X, Newspaper, FileText
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/use-admin";
@@ -12,6 +12,7 @@ const adminLinks = [
   { icon: LayoutDashboard, label: "Overview", path: "/admin" },
   { icon: FolderOpen, label: "Categories", path: "/admin/categories" },
   { icon: BookOpen, label: "Courses", path: "/admin/courses" },
+  { icon: FileText, label: "Resources", path: "/admin/resources" },
   { icon: Users, label: "Mentors", path: "/admin/mentors" },
   { icon: UserCog, label: "Users", path: "/admin/users" },
   { icon: CalendarDays, label: "Enrollments", path: "/admin/enrollments" },
