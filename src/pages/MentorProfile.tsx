@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  Star, CalendarDays, Briefcase, Users, MessageSquare, Check
+  Star, CalendarDays, Briefcase, Users, Check, ArrowLeft
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -64,11 +64,12 @@ const MentorProfile = () => {
     return (
       <SidebarLayout>
         <div className="px-4 lg:px-8 py-6 max-w-5xl mx-auto space-y-6">
-          <div className="flex gap-6">
-            <Skeleton className="w-24 h-24 rounded-full" />
+          {/* Loading skeleton — stacks on mobile */}
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+            <Skeleton className="w-20 h-20 rounded-full shrink-0 mx-auto sm:mx-0" />
             <div className="space-y-3 flex-1">
-              <Skeleton className="h-6 w-48" />
-              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-6 w-48 mx-auto sm:mx-0" />
+              <Skeleton className="h-4 w-32 mx-auto sm:mx-0" />
               <Skeleton className="h-20 w-full" />
             </div>
           </div>
@@ -80,7 +81,7 @@ const MentorProfile = () => {
   if (!data) {
     return (
       <SidebarLayout>
-        <div className="px-4 lg:px-8 py-6 max-w-5xl mx-auto text-center py-20">
+        <div className="px-4 lg:px-8 py-20 max-w-5xl mx-auto text-center">
           <h1 className="text-xl font-bold text-foreground mb-2">Mentor not found</h1>
           <Button onClick={() => navigate("/mentors")}>Browse Mentors</Button>
         </div>
@@ -97,26 +98,35 @@ const MentorProfile = () => {
     return acc;
   }, {} as Record<string, { start: string; end: string }[]>);
 
-  // Get available slots for the selected date
   const selectedDayName = selectedDate ? dayNames[selectedDate.getDay()] : null;
   const availableSlotsForDay = selectedDayName ? (slotsByDay[selectedDayName] || []) : [];
-
-  // Only allow dates that have availability
   const availableDayNumbers = slots.map(s => s.day_of_week);
   const isDateAvailable = (date: Date) => {
     if (date < new Date(new Date().toDateString())) return false;
     return availableDayNumbers.includes(date.getDay());
   };
-
   const availableDayNames = [...new Set(slots.map(s => dayNames[s.day_of_week]))];
 
   return (
     <SidebarLayout>
-      <div className="px-4 lg:px-8 py-6 max-w-5xl mx-auto space-y-8">
-        {/* Header */}
-        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="px-4 lg:px-8 py-6 max-w-5xl mx-auto space-y-6">
+
+        {/* Back link */}
+        <button
+          onClick={() => navigate("/mentors")}
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft size={13} /> Back to Mentors
+        </button>
+
+        {/* ── Header: avatar + info + session card ── */}
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}
+          className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+          {/* Left: avatar + bio summary */}
           <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-start gap-5">
+            {/* Avatar row — stacks cleanly on mobile */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
               {mentor.avatar_url ? (
                 <img
                   src={mentor.avatar_url}
@@ -128,21 +138,30 @@ const MentorProfile = () => {
                   {getInitials(mentor.name)}
                 </div>
               )}
-              <div className="space-y-2">
-                <h1 className="text-2xl font-serif font-bold text-foreground">{mentor.name}</h1>
+              <div className="space-y-1.5">
+                <h1 className="text-xl sm:text-2xl font-serif font-bold text-foreground">{mentor.name}</h1>
                 <p className="text-sm text-muted-foreground">{mentor.title}</p>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
-                  <span className="flex items-center gap-1"><Star size={14} className="text-amber-500 fill-amber-500" /> {parseFloat(mentor.rating || 0).toFixed(1)}</span>
-                  <span className="flex items-center gap-1"><Briefcase size={14} /> {mentor.years_experience} yrs exp</span>
-                  <span className="flex items-center gap-1"><Users size={14} /> {mentor.total_sessions} sessions</span>
+                <div className="flex items-center justify-center sm:justify-start gap-3 sm:gap-4 text-sm text-muted-foreground flex-wrap">
+                  <span className="flex items-center gap-1">
+                    <Star size={13} className="text-amber-500 fill-amber-500" />
+                    {parseFloat(mentor.rating || "0").toFixed(1)}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Briefcase size={13} />
+                    {mentor.years_experience} yrs exp
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Users size={13} />
+                    {mentor.total_sessions} sessions
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Quick Info Card */}
+          {/* Right: Session info card */}
           <Card className="border-border bg-card">
-            <CardContent className="p-5 space-y-3">
+            <CardContent className="p-4 sm:p-5 space-y-3">
               <h3 className="font-semibold text-sm text-foreground">Session Info</h3>
               <div className="text-sm space-y-2">
                 <div className="flex justify-between">
@@ -152,7 +171,8 @@ const MentorProfile = () => {
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Rating</span>
                   <span className="text-foreground font-medium flex items-center gap-1">
-                    <Star size={12} className="text-amber-500 fill-amber-500" /> {parseFloat(mentor.rating || 0).toFixed(1)}
+                    <Star size={12} className="text-amber-500 fill-amber-500" />
+                    {parseFloat(mentor.rating || "0").toFixed(1)}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -171,9 +191,9 @@ const MentorProfile = () => {
           </Card>
         </motion.div>
 
-        {/* About */}
-        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={1} className="space-y-4">
-          <h2 className="text-lg font-serif font-bold text-foreground">About</h2>
+        {/* ── About ── */}
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={1} className="space-y-3">
+          <h2 className="text-base sm:text-lg font-serif font-bold text-foreground">About</h2>
           <p className="text-sm text-muted-foreground leading-relaxed">{mentor.bio}</p>
           <Separator />
           <div>
@@ -188,15 +208,15 @@ const MentorProfile = () => {
 
         <Separator />
 
-        {/* Booking Section */}
-        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={2} className="space-y-6">
-          <h2 className="text-lg font-serif font-bold text-foreground flex items-center gap-2">
-            <CalendarDays size={20} className="text-primary" /> Book a Session
+        {/* ── Booking Section ── */}
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={2} className="space-y-5">
+          <h2 className="text-base sm:text-lg font-serif font-bold text-foreground flex items-center gap-2">
+            <CalendarDays size={18} className="text-primary" /> Book a Session
           </h2>
 
           {bookingStep === "done" ? (
             <Card className="border-primary/30 bg-primary/5">
-              <CardContent className="p-6 text-center space-y-3">
+              <CardContent className="p-5 sm:p-6 text-center space-y-3">
                 <div className="w-12 h-12 rounded-full bg-primary/15 text-primary flex items-center justify-center mx-auto">
                   <Check size={24} />
                 </div>
@@ -205,24 +225,36 @@ const MentorProfile = () => {
                   Your session with {mentor.name} on {selectedDate && format(selectedDate, "MMM d, yyyy")} at {selectedSlot?.start.slice(0, 5)} has been confirmed.
                   The mentor will be notified.
                 </p>
-                <Button variant="outline" onClick={() => { setBookingStep("select"); setSelectedDate(undefined); setSelectedSlot(null); setNotes(""); }}>
+                <Button variant="outline" onClick={() => {
+                  setBookingStep("select");
+                  setSelectedDate(undefined);
+                  setSelectedSlot(null);
+                  setNotes("");
+                }}>
                   Book Another Session
                 </Button>
               </CardContent>
             </Card>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {/* Calendar */}
               <Card className="border-border bg-card">
                 <CardContent className="p-4">
                   <h3 className="font-semibold text-sm text-foreground mb-3">1. Pick a date</h3>
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={(date) => { setSelectedDate(date); setSelectedSlot(null); setBookingStep("select"); }}
-                    disabled={(date) => !isDateAvailable(date)}
-                    className="rounded-md"
-                  />
+                  {/* Calendar centered on mobile */}
+                  <div className="flex justify-center lg:justify-start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(date) => {
+                        setSelectedDate(date);
+                        setSelectedSlot(null);
+                        setBookingStep("select");
+                      }}
+                      disabled={(date) => !isDateAvailable(date)}
+                      className="rounded-md w-full max-w-[320px] lg:max-w-none"
+                    />
+                  </div>
                 </CardContent>
               </Card>
 
@@ -232,7 +264,7 @@ const MentorProfile = () => {
                   <CardContent className="p-4 space-y-3">
                     <h3 className="font-semibold text-sm text-foreground">2. Choose a time slot</h3>
                     {!selectedDate ? (
-                      <p className="text-xs text-muted-foreground">Select a date first</p>
+                      <p className="text-xs text-muted-foreground italic">Select a date first</p>
                     ) : availableSlotsForDay.length === 0 ? (
                       <p className="text-xs text-muted-foreground">No slots available on this day</p>
                     ) : (
@@ -244,7 +276,7 @@ const MentorProfile = () => {
                             variant={selectedSlot?.start === slot.start ? "default" : "outline"}
                             onClick={() => { setSelectedSlot(slot); setBookingStep("confirm"); }}
                           >
-                            {slot.start.slice(0, 5)} - {slot.end.slice(0, 5)}
+                            {slot.start.slice(0, 5)} – {slot.end.slice(0, 5)}
                           </Button>
                         ))}
                       </div>
@@ -258,11 +290,11 @@ const MentorProfile = () => {
                       <h3 className="font-semibold text-sm text-foreground">3. Confirm booking</h3>
                       <div className="text-sm text-muted-foreground space-y-1">
                         <p>Date: <span className="text-foreground">{format(selectedDate, "EEEE, MMM d, yyyy")}</span></p>
-                        <p>Time: <span className="text-foreground">{selectedSlot.start.slice(0, 5)} - {selectedSlot.end.slice(0, 5)}</span></p>
+                        <p>Time: <span className="text-foreground">{selectedSlot.start.slice(0, 5)} – {selectedSlot.end.slice(0, 5)}</span></p>
                         <p>Mentor: <span className="text-foreground">{mentor.name}</span></p>
                       </div>
                       <Textarea
-                        placeholder="Add any notes for the mentor (optional)..."
+                        placeholder="Add any notes for the mentor (optional)…"
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         className="text-sm"
@@ -273,7 +305,7 @@ const MentorProfile = () => {
                         onClick={handleBook}
                         disabled={createBooking.isPending}
                       >
-                        {createBooking.isPending ? "Booking..." : "Confirm Booking"}
+                        {createBooking.isPending ? "Booking…" : "Confirm Booking"}
                       </Button>
                     </CardContent>
                   </Card>

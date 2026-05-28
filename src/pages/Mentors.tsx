@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Star, CalendarDays, Briefcase, Search, Users, Award } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fadeUp, scaleIn } from "@/lib/animations";
 import SidebarLayout from "@/components/SidebarLayout";
@@ -47,7 +46,7 @@ const Mentors = () => {
         <div className="absolute bottom-0 left-1/3 w-40 h-40 rounded-full bg-primary/6 blur-[60px]" />
         <div className="relative z-10 px-4 lg:px-8 py-8">
           <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0} className="flex items-center gap-3 mb-4">
-            <div className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center backdrop-blur-md">
+            <div className="w-9 h-9 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center backdrop-blur-md shrink-0">
               <Users size={18} className="text-purple-400" />
             </div>
             <div>
@@ -62,7 +61,7 @@ const Mentors = () => {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search mentors by name or specialization..."
+              placeholder="Search by name or specialization…"
               className="w-full pl-10 pr-4 py-2.5 bg-[hsl(163,40%,8%)]/70 backdrop-blur-md border border-white/15 rounded-xl text-sm text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-500/40 transition-all"
             />
           </motion.div>
@@ -70,27 +69,31 @@ const Mentors = () => {
       </div>
 
       <div className="px-4 lg:px-8 py-6 max-w-5xl mx-auto">
-        {/* Stats bar */}
+        {/* Stats bar — wraps on mobile */}
         {!isLoading && mentors && (
           <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}
-            className="flex items-center gap-6 mb-8 p-4 glass rounded-xl border border-white/8">
+            className="flex flex-wrap items-center gap-3 sm:gap-6 mb-8 p-3 sm:p-4 glass rounded-xl border border-white/8">
             <div className="flex items-center gap-2">
-              <Users size={16} className="text-purple-400" />
-              <span className="text-sm text-white/60"><span className="text-white font-semibold">{mentors.length}</span> mentors available</span>
+              <Users size={15} className="text-purple-400 shrink-0" />
+              <span className="text-xs sm:text-sm text-white/60">
+                <span className="text-white font-semibold">{mentors.length}</span> mentors
+              </span>
             </div>
+            <div className="w-px h-4 bg-white/10 hidden sm:block" />
             <div className="flex items-center gap-2">
-              <Award size={16} className="text-amber-400" />
-              <span className="text-sm text-white/60">Expert professionals</span>
+              <Award size={15} className="text-amber-400 shrink-0" />
+              <span className="text-xs sm:text-sm text-white/60">Expert professionals</span>
             </div>
+            <div className="w-px h-4 bg-white/10 hidden sm:block" />
             <div className="flex items-center gap-2">
-              <CalendarDays size={16} className="text-emerald-400" />
-              <span className="text-sm text-white/60">1-on-1 sessions</span>
+              <CalendarDays size={15} className="text-emerald-400 shrink-0" />
+              <span className="text-xs sm:text-sm text-white/60">1-on-1 sessions</span>
             </div>
           </motion.div>
         )}
 
         <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={1}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {isLoading ? (
             Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="glass rounded-xl border border-white/8 p-5 flex flex-col items-center space-y-3">
@@ -105,7 +108,7 @@ const Mentors = () => {
               <div className="w-14 h-14 rounded-2xl glass border border-white/10 flex items-center justify-center mx-auto mb-3">
                 <Search size={22} className="text-white/20" />
               </div>
-              <p className="text-white/40">No mentors found matching "{search}"</p>
+              <p className="text-white/40 text-sm">No mentors found matching "{search}"</p>
             </div>
           ) : (
             filtered.map((m, i) => {
@@ -114,13 +117,12 @@ const Mentors = () => {
               return (
                 <motion.div key={m.id} initial="hidden" animate="visible" variants={scaleIn} custom={i % 6} className="card-lift">
                   <Link to={`/mentor/${m.id}`}>
-                    <div className={`glass rounded-xl border ${border} hover:border-opacity-60 transition-all duration-300 h-full overflow-hidden`}
-                      style={{ boxShadow: "none" }}>
+                    <div className={`glass rounded-xl border ${border} hover:border-opacity-60 transition-all duration-300 h-full overflow-hidden`}>
 
                       {/* Gradient accent top bar */}
                       <div className={`h-1.5 bg-gradient-to-r ${gradFrom} ${gradTo}`} />
 
-                      <div className="p-5 flex flex-col items-center text-center space-y-3">
+                      <div className="p-4 sm:p-5 flex flex-col items-center text-center space-y-3">
                         {/* Avatar with rings */}
                         <div className="relative mt-2">
                           <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${gradFrom} ${gradTo} border-2 ${border} ${textColor} flex items-center justify-center text-xl font-bold`}>
@@ -132,7 +134,7 @@ const Mentors = () => {
 
                         <div>
                           <h3 className="font-semibold text-sm text-white">{m.name}</h3>
-                          <p className="text-xs text-white/45">{m.title}</p>
+                          <p className="text-xs text-white/45 mt-0.5">{m.title}</p>
                         </div>
 
                         <div className="flex items-center gap-3 text-xs text-white/40">
