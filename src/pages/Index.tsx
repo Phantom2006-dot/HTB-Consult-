@@ -231,8 +231,8 @@ const Index = () => {
                 transition={{ delay: 0.3, duration: 0.55 }}
                 className="text-base lg:text-lg text-white/60 mb-8 leading-[1.85] font-light"
               >
-                Practical learning. Real projects. Industry mentorship.<br />
-                Build the BA career you want.
+                Practical training<span className="text-primary">.</span> Real project simulation<span className="text-primary">.</span><br />
+                Industry readiness<span className="text-primary">.</span>
               </motion.p>
 
               {/* CTA Buttons */}
@@ -283,7 +283,7 @@ const Index = () => {
             transition={{ delay: 0.75, duration: 0.5 }}
             className="self-end mt-10 lg:mt-0"
           >
-            <div className="glass border border-white/15 rounded-2xl px-5 py-4 text-right">
+            <Link to="/auth" className="block glass border border-white/15 rounded-2xl px-5 py-4 text-right hover:border-primary/40 transition-colors duration-200">
               <p className="text-sm font-semibold text-white mb-0.5">Join a community of</p>
               <p className="text-xs text-white/50 mb-3">aspiring and practising Business Analysts</p>
               <div className="flex items-center justify-end gap-2">
@@ -302,7 +302,7 @@ const Index = () => {
                   +2K
                 </span>
               </div>
-            </div>
+            </Link>
           </motion.div>
 
         </div>

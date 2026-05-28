@@ -123,7 +123,7 @@ const Navbar = () => {
                 <Button asChild size="sm"
                   className="bg-gradient-gold hover:opacity-90 font-semibold px-5 text-sm shadow-md btn-shimmer"
                 >
-                  <Link to="/auth?tab=signup">Register</Link>
+                  <Link to="/auth?tab=signup">Explore Pathways</Link>
                 </Button>
               </>
             )}

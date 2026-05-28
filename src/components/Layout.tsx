@@ -4,7 +4,6 @@ import SidebarLayout from "./SidebarLayout";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import WhatsAppButton from "./WhatsAppButton";
-import ThemeToggle from "./ThemeToggle";
 
 const PublicLayout = ({ children }: { children: ReactNode }) => (
   <div className="min-h-screen flex flex-col bg-background">
@@ -12,7 +11,6 @@ const PublicLayout = ({ children }: { children: ReactNode }) => (
     <main className="flex-1 pt-[72px]">{children}</main>
     <Footer />
     <WhatsAppButton />
-    <ThemeToggle />
   </div>
 );
 
@@ -31,7 +29,6 @@ const Layout = ({ children }: { children: ReactNode }) => {
     return (
       <SidebarLayout>
         {children}
-        <ThemeToggle />
       </SidebarLayout>
     );
   }
