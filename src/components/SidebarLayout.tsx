@@ -146,6 +146,33 @@ const SidebarLayout = ({ children }: { children: ReactNode }) => {
 
         {/* Nav */}
         <nav className="flex-1 py-3 overflow-y-auto space-y-0.5 scrollbar-none">
+
+          {/* Profile card — mobile only, above Dashboard */}
+          <div className="lg:hidden mx-2 mb-3 px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3">
+            <Link
+              to="/profile"
+              onClick={() => setSidebarOpen(false)}
+              className="flex items-center gap-3 flex-1 min-w-0"
+            >
+              <div className="w-9 h-9 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold text-sm shrink-0 overflow-hidden">
+                {user?.avatar_url
+                  ? <img src={user.avatar_url} alt={displayName} className="w-full h-full object-cover" />
+                  : initials}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-white truncate leading-tight">{displayName}</p>
+                <p className="text-[10px] text-white/40 capitalize">{userRole}</p>
+              </div>
+            </Link>
+            <Link
+              to="/profile"
+              onClick={() => setSidebarOpen(false)}
+              className="shrink-0 text-white/30 hover:text-primary transition-colors"
+            >
+              <User size={15} />
+            </Link>
+          </div>
+
           <p className="px-5 pb-1.5 pt-1 text-[9px] font-bold text-white/20 uppercase tracking-widest">
             Main Menu
           </p>
