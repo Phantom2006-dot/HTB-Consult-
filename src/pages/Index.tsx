@@ -372,10 +372,10 @@ const Index = () => {
                     <div className={`w-11 h-11 rounded-xl ${step.iconBg} flex items-center justify-center mb-4 mx-auto`}>
                       <step.icon size={19} />
                     </div>
-                    <h3 className="font-serif text-sm font-normal text-slate-900 mb-2 leading-snug">
+                    <h3 className="font-serif text-base font-normal text-slate-900 mb-2 leading-snug">
                       {step.title}
                     </h3>
-                    <p className="text-xs text-slate-500 leading-relaxed mb-4">{step.desc}</p>
+                    <p className="text-sm text-slate-500 leading-relaxed mb-4">{step.desc}</p>
                     <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border ${step.tagColor}`}>
                       {step.tag}
                     </span>
@@ -448,8 +448,8 @@ const Index = () => {
                   <div className={`w-10 h-10 rounded-xl ${step.iconBg} flex items-center justify-center mb-3`}>
                     <step.icon size={17} />
                   </div>
-                  <h3 className="font-serif text-sm font-normal text-slate-900 mb-1.5 leading-snug">{step.title}</h3>
-                  <p className="text-xs text-slate-500 leading-relaxed mb-3">{step.desc}</p>
+                  <h3 className="font-serif text-base font-normal text-slate-900 mb-1.5 leading-snug">{step.title}</h3>
+                  <p className="text-sm text-slate-500 leading-relaxed mb-3">{step.desc}</p>
                   <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border ${step.tagColor}`}>
                     {step.tag}
                   </span>
