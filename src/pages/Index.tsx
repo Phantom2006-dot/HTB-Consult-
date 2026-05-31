@@ -178,7 +178,7 @@ const Index = () => {
         {/* Background image */}
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=1920&q=80&auto=format&fit=crop"
+            src="/hero-bg.png"
             alt=""
             className="w-full h-full object-cover object-center"
           />
