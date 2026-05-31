@@ -282,6 +282,26 @@ export async function initSchema() {
     `);
 
     await client.query(`
+      CREATE TABLE IF NOT EXISTS course_payments (
+        id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id             UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        course_id           UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        amount              NUMERIC NOT NULL,
+        currency            TEXT NOT NULL DEFAULT 'GBP',
+        tx_ref              TEXT NOT NULL UNIQUE,
+        status              TEXT NOT NULL DEFAULT 'pending',
+        flw_transaction_id  TEXT,
+        flw_amount          NUMERIC,
+        flw_currency        TEXT,
+        created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS idx_course_payments_user   ON course_payments(user_id);
+      CREATE INDEX IF NOT EXISTS idx_course_payments_course ON course_payments(course_id);
+      CREATE INDEX IF NOT EXISTS idx_course_payments_tx_ref ON course_payments(tx_ref);
+    `);
+
+    await client.query(`
       INSERT INTO categories (name) VALUES
         ('Business Analysis'),
         ('Digital Transformation'),
