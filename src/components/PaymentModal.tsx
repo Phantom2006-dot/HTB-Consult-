@@ -176,8 +176,12 @@ const PaymentModal = ({ open, onClose, onSuccess, course }: PaymentModalProps) =
                   <span className="font-semibold text-foreground text-sm">Complete Enrollment</span>
                 </div>
                 {step !== "processing" && (
-                  <button onClick={onClose} className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors">
-                    <X size={15} />
+                  <button
+                    onClick={onClose}
+                    className="w-9 h-9 rounded-xl flex items-center justify-center text-foreground/60 hover:text-foreground hover:bg-muted transition-colors border border-border hover:border-foreground/20"
+                    title="Close"
+                  >
+                    <X size={18} strokeWidth={2} />
                   </button>
                 )}
               </div>
