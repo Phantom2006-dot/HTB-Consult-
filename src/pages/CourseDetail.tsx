@@ -7,7 +7,7 @@ import {
   Bookmark, ExternalLink, Video, Download, Presentation, FileText,
   FileType, FileSpreadsheet, File, Lock, ChevronRight, Home,
   Monitor, Laptop, UserCheck, ChevronDown, ChevronUp, BarChart3,
-  Shield, Share2, Linkedin, Twitter, Mail, Heart, CreditCard,
+  Shield, Share2, Linkedin, Twitter, Mail, Heart, CreditCard, X,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -157,10 +157,17 @@ const CourseDetail = () => {
             initial={{ opacity: 0, scale: 0.92, y: 24 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ type: "spring", stiffness: 260, damping: 22 }}
-            className={`bg-card border rounded-2xl shadow-2xl max-w-md w-full p-10 text-center ${
+            className={`relative bg-card border rounded-2xl shadow-2xl max-w-md w-full p-10 text-center ${
               isPaid ? "border-primary/30" : "border-amber-500/30"
             }`}
           >
+            <button
+              onClick={() => navigate(-1)}
+              className="absolute top-4 right-4 w-9 h-9 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors border border-border hover:border-foreground/20"
+              title="Go back"
+            >
+              <X size={18} strokeWidth={2} />
+            </button>
             <div className="flex justify-center mb-6">
               <div className="relative">
                 <div className={`w-20 h-20 rounded-full flex items-center justify-center ${
