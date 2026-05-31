@@ -2,8 +2,7 @@ import { ReactNode, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard, BookOpen, GraduationCap, Route, Video,
-  ClipboardList, FolderOpen, Users, TrendingUp, Award,
-  Globe, HelpCircle, Compass, Bookmark, MessageSquare,
+  FolderOpen, Users, HelpCircle, Compass, Bookmark, MessageSquare,
   Settings, Shield, Briefcase, Newspaper, LogOut,
   Search, Bell, Mail, Menu, X, Sun, Moon,
   ChevronDown, ChevronRight, User,
@@ -26,12 +25,8 @@ const PRIMARY_NAV = [
   { icon: GraduationCap,   label: "Courses",           path: "/courses" },
   { icon: Route,           label: "Learning Pathways", path: "/services" },
   { icon: Video,           label: "Live Sessions",     path: "/sessions" },
-  { icon: ClipboardList,   label: "Assignments",       path: "/my-learning" },
   { icon: FolderOpen,      label: "Resources",         path: "/blog" },
   { icon: Users,           label: "Mentorship",        path: "/mentors" },
-  { icon: TrendingUp,      label: "Progress",          path: "/my-learning" },
-  { icon: Award,           label: "Certificates",      path: "/my-learning" },
-  { icon: Globe,           label: "Community",         path: "/blog" },
   { icon: HelpCircle,      label: "Support",           path: "/contact" },
 ];
 
