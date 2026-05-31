@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Clock, ArrowRight, BookOpen, SlidersHorizontal, ArrowDownAZ, ArrowUpAZ, Hash, Lock, X, Bell, GraduationCap } from "lucide-react";
+import { Clock, ArrowRight, BookOpen, SlidersHorizontal, ArrowDownAZ, ArrowUpAZ, Hash, Lock, X, Bell, GraduationCap, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -12,6 +12,8 @@ import {
 import Layout from "@/components/Layout";
 import { fadeUp, scaleIn } from "@/lib/animations";
 import { useCourses } from "@/hooks/use-courses";
+import { useEnrollments } from "@/hooks/use-enrollments";
+import { useAuth } from "@/contexts/AuthContext";
 
 type SortOption = "numeric" | "az" | "za";
 
@@ -33,10 +35,17 @@ function extractLeadingNumber(title: string): number {
 }
 
 const Courses = () => {
+  const { user } = useAuth();
   const { data: courses, isLoading } = useCourses();
+  const { data: enrollmentsData } = useEnrollments();
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [sortBy, setSortBy] = useState<SortOption>("numeric");
   const [lockedCourse, setLockedCourse] = useState<{ title: string; category: string } | null>(null);
+
+  const enrolledIds = useMemo(
+    () => new Set((enrollmentsData || []).map((e: any) => e.course_id)),
+    [enrollmentsData]
+  );
 
   const categories = useMemo(() => {
     if (!courses) return [];
@@ -232,11 +241,17 @@ const Courses = () => {
                         <span className="text-xl font-bold text-gradient-gold">
                           {(course as any).price > 0 ? `£${(course as any).price}` : "Free"}
                         </span>
-                        {isLocked ? (
-                          <Button size="sm" variant="outline" className="text-xs gap-1.5 border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
-                            onClick={() => setLockedCourse({ title: course.title, category: course.category })}>
-                            <Lock size={12} /> Locked
-                          </Button>
+                        {isLocked && !enrolledIds.has(course.id) ? (
+                          (course as any).price > 0 ? (
+                            <Button size="sm" asChild className="bg-gradient-gold hover:opacity-90 text-xs gap-1.5 btn-shimmer">
+                              <Link to={`/course/${course.id}`}><CreditCard size={12} /> Pay to Access</Link>
+                            </Button>
+                          ) : (
+                            <Button size="sm" variant="outline" className="text-xs gap-1.5 border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
+                              onClick={() => setLockedCourse({ title: course.title, category: course.category })}>
+                              <Lock size={12} /> Locked
+                            </Button>
+                          )
                         ) : (
                           <Button size="sm" asChild className="bg-gradient-gold hover:opacity-90 text-xs gap-1 btn-shimmer">
                             <Link to={`/course/${course.id}`}>View Course <ArrowRight size={13} /></Link>
@@ -279,7 +294,7 @@ const Courses = () => {
               <h2 className="text-xl font-serif font-normal text-white mb-2">This Course is Currently Locked</h2>
               <p className="text-sm text-white/50 font-medium mb-1">"{lockedCourse.title}"</p>
               <p className="text-sm text-white/40 leading-relaxed mt-3 mb-6">
-                Our team is preparing this course for you. It will be available again soon.
+                This course has been temporarily locked by an admin. Access will be restored once it is unlocked.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button variant="outline" className="gap-2 border-white/10 text-white/60 hover:text-white text-sm" onClick={() => setLockedCourse(null)}>
