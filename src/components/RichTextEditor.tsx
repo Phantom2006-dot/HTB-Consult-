@@ -1,4 +1,4 @@
-import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
+import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
@@ -6,7 +6,7 @@ import Image from "@tiptap/extension-image";
 import TextAlign from "@tiptap/extension-text-align";
 import Placeholder from "@tiptap/extension-placeholder";
 import Highlight from "@tiptap/extension-highlight";
-import TextStyle from "@tiptap/extension-text-style";
+import { TextStyle } from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 import FontFamily from "@tiptap/extension-font-family";
 import CharacterCount from "@tiptap/extension-character-count";
@@ -382,36 +382,6 @@ export function RichTextEditor({
           </PopoverContent>
         </Popover>
       </div>
-
-      {/* Inline bubble menu for quick formatting */}
-      <BubbleMenu
-        editor={editor}
-        tippyOptions={{ duration: 100 }}
-        className="flex items-center gap-0.5 bg-popover border border-border rounded-lg shadow-xl px-1.5 py-1"
-      >
-        <ToolBtn title="Bold" active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()}>
-          <Bold size={12} />
-        </ToolBtn>
-        <ToolBtn title="Italic" active={editor.isActive("italic")} onClick={() => editor.chain().focus().toggleItalic().run()}>
-          <Italic size={12} />
-        </ToolBtn>
-        <ToolBtn title="Underline" active={editor.isActive("underline")} onClick={() => editor.chain().focus().toggleUnderline().run()}>
-          <UnderlineIcon size={12} />
-        </ToolBtn>
-        <ToolBtn title="Highlight" active={editor.isActive("highlight")} onClick={() => editor.chain().focus().toggleHighlight({ color: "#fef08a" }).run()}>
-          <Highlighter size={12} />
-        </ToolBtn>
-        <div className="w-px h-4 bg-border mx-0.5" />
-        <ToolBtn title="Link" active={editor.isActive("link")} onClick={() => setLinkOpen(true)}>
-          <LinkIcon size={12} />
-        </ToolBtn>
-        <ToolBtn title="H2" active={editor.isActive("heading", { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}>
-          <Heading2 size={12} />
-        </ToolBtn>
-        <ToolBtn title="Quote" active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
-          <Quote size={12} />
-        </ToolBtn>
-      </BubbleMenu>
 
       {/* Content area */}
       <div className="relative px-6 py-5" style={{ minHeight }}>
