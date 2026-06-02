@@ -12,6 +12,10 @@ import SidebarLayout from "@/components/SidebarLayout";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 
+function isMarkdown(content: string) {
+  return /^#{1,6}\s|^\*\*|^\*[^*]|\[.+\]\(.+\)|^>\s|^- /.test(content.trim());
+}
+
 interface Article {
   id: string;
   title: string;
@@ -226,24 +230,31 @@ const ArticleReader = () => {
             <ShareBar title={article.title} url={articleUrl} />
           </div>
 
-          <div className="prose prose-invert prose-sm max-w-none
-            prose-headings:font-serif prose-headings:text-foreground
-            prose-h1:text-2xl prose-h1:mt-8 prose-h1:mb-4
-            prose-h2:text-xl prose-h2:mt-7 prose-h2:mb-3
-            prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-2
-            prose-p:text-muted-foreground prose-p:leading-[1.85] prose-p:my-4
-            prose-strong:text-foreground prose-strong:font-semibold
-            prose-em:text-muted-foreground
-            prose-a:text-primary prose-a:underline-offset-4 hover:prose-a:opacity-80
-            prose-blockquote:border-primary/40 prose-blockquote:text-muted-foreground prose-blockquote:italic
-            prose-li:text-muted-foreground prose-li:leading-relaxed
-            prose-ul:my-4 prose-ol:my-4
-            prose-hr:border-border prose-hr:my-8
-            prose-img:rounded-lg prose-img:shadow-md
-            prose-code:text-primary prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
-            prose-pre:bg-muted prose-pre:rounded-lg prose-pre:border prose-pre:border-border">
-            <ReactMarkdown>{article.content}</ReactMarkdown>
-          </div>
+          {isMarkdown(article.content) ? (
+            <div className="prose prose-invert prose-sm max-w-none
+              prose-headings:font-serif prose-headings:text-foreground
+              prose-h1:text-2xl prose-h1:mt-8 prose-h1:mb-4
+              prose-h2:text-xl prose-h2:mt-7 prose-h2:mb-3
+              prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-2
+              prose-p:text-muted-foreground prose-p:leading-[1.85] prose-p:my-4
+              prose-strong:text-foreground prose-strong:font-semibold
+              prose-em:text-muted-foreground
+              prose-a:text-primary prose-a:underline-offset-4 hover:prose-a:opacity-80
+              prose-blockquote:border-primary/40 prose-blockquote:text-muted-foreground prose-blockquote:italic
+              prose-li:text-muted-foreground prose-li:leading-relaxed
+              prose-ul:my-4 prose-ol:my-4
+              prose-hr:border-border prose-hr:my-8
+              prose-img:rounded-lg prose-img:shadow-md
+              prose-code:text-primary prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
+              prose-pre:bg-muted prose-pre:rounded-lg prose-pre:border prose-pre:border-border">
+              <ReactMarkdown>{article.content}</ReactMarkdown>
+            </div>
+          ) : (
+            <div
+              className="article-html-content"
+              dangerouslySetInnerHTML={{ __html: article.content }}
+            />
+          )}
 
           <div id="article-end" className="h-4 mt-8" />
 
