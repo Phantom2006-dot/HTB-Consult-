@@ -84,7 +84,7 @@ svg, svg * {
 
   /* ── LIGHT MODE (applied via data-mode="light" on SidebarLayout root) ── */
   [data-mode="light"] {
-    --background: 210 40% 97%;
+    --background: 0 0% 97%;
     --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
@@ -96,11 +96,11 @@ svg, svg * {
     --primary: 30 100% 46%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 94%;
+    --secondary: 0 0% 95%;
     --secondary-foreground: 222 47% 11%;
 
-    --muted: 210 40% 93%;
-    --muted-foreground: 215 25% 42%;
+    --muted: 0 0% 93%;
+    --muted-foreground: 220 14% 46%;
 
     --accent: 30 100% 46%;
     --accent-foreground: 0 0% 100%;
@@ -108,8 +108,8 @@ svg, svg * {
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 89%;
-    --input: 214 32% 89%;
+    --border: 0 0% 87%;
+    --input: 0 0% 87%;
     --ring: 30 100% 46%;
 
     --radius: 0.5rem;
@@ -130,17 +130,17 @@ svg, svg * {
     --gold-light: 36 60% 58%;
 
     /* Semantic vars so sidebar-page CTA/section blocks render light */
-    --hero-overlay: 210 40% 95%;
-    --hero-gradient-from: 210 40% 94%;
-    --section-alt: 210 40% 95%;
-    --footer-bg: 210 40% 92%;
+    --hero-overlay: 0 0% 96%;
+    --hero-gradient-from: 0 0% 95%;
+    --section-alt: 0 0% 95%;
+    --footer-bg: 0 0% 92%;
     --accent-glow: rgba(234, 119, 0, 0.18);
     --accent-glow-soft: rgba(234, 119, 0, 0.06);
     --gradient-accent: linear-gradient(135deg, hsl(30, 100%, 46%), hsl(36, 70%, 48%));
-    --gradient-cta-bg: linear-gradient(135deg, #f0f4f8 0%, #e8edf2 100%);
-    --green-dark: 210 40% 93%;
-    --green-darker: 210 40% 91%;
-    --green-light: 210 40% 96%;
+    --gradient-cta-bg: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+    --green-dark: 0 0% 93%;
+    --green-darker: 0 0% 91%;
+    --green-light: 0 0% 96%;
   }
 
   /* ── BLUE THEME ── */
@@ -449,6 +449,36 @@ svg, svg * {
       backdrop-filter: none;
       -webkit-backdrop-filter: none;
     }
+  }
+
+  /* ── Light mode utility overrides ── */
+  [data-mode="light"] .glass {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border)) !important;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  [data-mode="light"] .glass-dark {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid hsl(var(--border)) !important;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  [data-mode="light"] .grid-pattern {
+    background-image:
+      linear-gradient(hsl(0 0% 0% / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(0 0% 0% / 0.04) 1px, transparent 1px);
+  }
+
+  [data-mode="light"] .dot-pattern {
+    background-image: radial-gradient(hsl(0 0% 0% / 0.07) 1px, transparent 1px);
+  }
+
+  [data-mode="light"] .card-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.12), 0 0 20px -6px rgba(234, 119, 0, 0.12) !important;
   }
 
   /* Glow effects */
