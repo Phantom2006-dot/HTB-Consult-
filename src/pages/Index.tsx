@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowRight, BookOpen, Target, CheckCircle, Star, Lightbulb,
   UserCheck, Briefcase, Brain, BarChart3, Quote, LogIn,
   LayoutDashboard, Sparkles, TrendingUp, Award, ChevronRight,
-  Users, Clock, Shield, Rocket, GraduationCap, Building2, Search
+  Users, Clock, Shield, Rocket, GraduationCap, Building2, Search, X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCourses } from "@/hooks/use-courses";
 
 /* ── Animation helpers ── */
 const fadeUp = {
@@ -181,14 +182,40 @@ const Index = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [showResults, setShowResults] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const { data: courses } = useCourses();
+
+  const searchResults = searchQuery.trim().length >= 2
+    ? (courses || []).filter((c) => {
+        const q = searchQuery.toLowerCase();
+        return (
+          c.title.toLowerCase().includes(q) ||
+          c.description.toLowerCase().includes(q) ||
+          c.category.toLowerCase().includes(q) ||
+          (c.tags || []).some((t: string) => t.toLowerCase().includes(q))
+        );
+      }).slice(0, 6)
+    : [];
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowResults(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    const q = searchQuery.trim();
-    if (q) {
-      navigate(`/courses?search=${encodeURIComponent(q)}`);
-    } else {
-      navigate("/courses");
+    if (searchResults.length === 1) {
+      navigate(`/course/${searchResults[0].id}`);
+      setShowResults(false);
+    } else if (searchQuery.trim()) {
+      navigate(`/courses?search=${encodeURIComponent(searchQuery.trim())}`);
+      setShowResults(false);
     }
   };
 
@@ -238,7 +265,7 @@ const Index = () => {
             initial={{ opacity: 0, y: 32 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-            className="text-5xl md:text-6xl xl:text-7xl font-bold text-white leading-[1.05] mb-5 tracking-tight"
+            className="text-4xl md:text-5xl xl:text-[3.5rem] font-bold text-white leading-[1.1] mb-5 tracking-tight max-w-3xl"
           >
             Find the perfect{" "}
             <span className="text-gradient-gold">course</span>{" "}
@@ -250,38 +277,108 @@ const Index = () => {
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35, duration: 0.5 }}
-            className="text-base lg:text-lg text-white/60 mb-10 leading-relaxed font-light max-w-2xl"
+            className="text-sm lg:text-base text-white/55 mb-10 leading-relaxed font-light max-w-xl"
           >
             Find the right training for your professional goals — practical, industry-aligned, and delivered by real consulting experts.
           </motion.p>
 
-          {/* Search bar */}
-          <motion.form
-            onSubmit={handleSearch}
+          {/* Search bar + inline results */}
+          <motion.div
+            ref={searchRef}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.45, duration: 0.5 }}
-            className="flex items-center w-full max-w-2xl mb-8"
+            className="relative w-full max-w-2xl mb-8"
           >
-            <div className="flex flex-1 items-center bg-white rounded-l-full shadow-2xl overflow-hidden border border-white/20">
-              <Search size={18} className="ml-5 text-slate-400 shrink-0" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for any course..."
-                className="flex-1 px-4 py-4 text-slate-800 text-base bg-transparent outline-none placeholder:text-slate-400"
-              />
-            </div>
-            <button
-              type="submit"
-              className="h-[56px] px-7 rounded-r-full font-semibold text-white text-sm transition-opacity hover:opacity-90 shrink-0 flex items-center gap-2"
-              style={{ background: "hsl(var(--primary))" }}
-            >
-              <Search size={16} />
-              <span className="hidden sm:inline">Search</span>
-            </button>
-          </motion.form>
+            <form onSubmit={handleSearch} className="flex items-center w-full">
+              <div className="flex flex-1 items-center bg-white rounded-l-full shadow-2xl overflow-hidden">
+                <Search size={17} className="ml-5 text-slate-400 shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setShowResults(true);
+                  }}
+                  onFocus={() => setShowResults(true)}
+                  placeholder="Search for any course..."
+                  className="flex-1 px-4 py-4 text-slate-800 text-sm bg-transparent outline-none placeholder:text-slate-400"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => { setSearchQuery(""); setShowResults(false); }}
+                    className="mr-3 text-slate-300 hover:text-slate-500 transition-colors"
+                  >
+                    <X size={15} />
+                  </button>
+                )}
+              </div>
+              <button
+                type="submit"
+                className="h-[52px] px-6 rounded-r-full font-semibold text-white text-sm transition-opacity hover:opacity-90 shrink-0 flex items-center gap-2"
+                style={{ background: "hsl(var(--primary))" }}
+              >
+                <Search size={15} />
+                <span className="hidden sm:inline">Search</span>
+              </button>
+            </form>
+
+            {/* Inline results dropdown */}
+            {showResults && searchQuery.trim().length >= 2 && (
+              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
+                {searchResults.length > 0 ? (
+                  <>
+                    <ul>
+                      {searchResults.map((course) => (
+                        <li key={course.id}>
+                          <Link
+                            to={`/course/${course.id}`}
+                            onClick={() => { setShowResults(false); setSearchQuery(""); }}
+                            className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors group"
+                          >
+                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                              <BookOpen size={14} className="text-primary" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-slate-800 truncate group-hover:text-primary transition-colors">
+                                {course.title}
+                              </p>
+                              <p className="text-xs text-slate-400 truncate">{course.category}</p>
+                            </div>
+                            <ArrowRight size={13} className="text-slate-300 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="border-t border-slate-100 px-5 py-3 bg-slate-50">
+                      <Link
+                        to={`/courses?search=${encodeURIComponent(searchQuery.trim())}`}
+                        onClick={() => setShowResults(false)}
+                        className="text-xs font-semibold flex items-center gap-1.5"
+                        style={{ color: "hsl(var(--primary))" }}
+                      >
+                        View all {searchResults.length >= 6 ? "results" : `${searchResults.length} result${searchResults.length !== 1 ? "s" : ""}`} for "{searchQuery.trim()}"
+                        <ArrowRight size={12} />
+                      </Link>
+                    </div>
+                  </>
+                ) : (
+                  <div className="px-5 py-5 text-center">
+                    <p className="text-sm text-slate-500">No courses found for <strong className="text-slate-700">"{searchQuery}"</strong></p>
+                    <Link
+                      to="/courses"
+                      onClick={() => setShowResults(false)}
+                      className="text-xs mt-1 inline-block"
+                      style={{ color: "hsl(var(--primary))" }}
+                    >
+                      Browse all courses →
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
+          </motion.div>
 
           {/* Popular categories */}
           <motion.div
@@ -290,12 +387,12 @@ const Index = () => {
             transition={{ delay: 0.58, duration: 0.45 }}
             className="flex flex-wrap items-center gap-2"
           >
-            <span className="text-white/45 text-sm font-medium mr-1">Popular:</span>
+            <span className="text-white/40 text-xs font-medium mr-1">Popular:</span>
             {POPULAR_CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 onClick={() => handleCategoryClick(cat)}
-                className="px-4 py-1.5 rounded-full border border-white/20 text-white/75 text-xs font-medium hover:border-primary/60 hover:text-primary hover:bg-primary/10 transition-all duration-200 glass"
+                className="px-3.5 py-1.5 rounded-full border border-white/20 text-white/65 text-xs font-medium hover:border-primary/60 hover:text-primary hover:bg-primary/10 transition-all duration-200 glass"
               >
                 {cat}
               </button>
