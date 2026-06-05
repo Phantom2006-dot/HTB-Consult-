@@ -246,7 +246,7 @@ const Index = () => {
         <div className="absolute top-1/3 left-1/4 w-[600px] h-[600px] rounded-full blur-[140px] pointer-events-none"
           style={{ background: "hsl(var(--primary) / 0.06)" }} />
 
-        <div className="container mx-auto px-6 lg:px-16 relative z-10 py-20 lg:py-28 max-w-5xl">
+        <div className="container mx-auto px-4 lg:px-8 relative z-10 py-20 lg:py-28">
 
           {/* Top badge */}
           <motion.div
