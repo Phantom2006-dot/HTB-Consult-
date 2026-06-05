@@ -265,7 +265,7 @@ const Index = () => {
             initial={{ opacity: 0, y: 32 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-            className="text-4xl md:text-5xl xl:text-[3.5rem] font-bold text-white leading-[1.1] mb-5 tracking-tight max-w-3xl"
+            className="text-4xl md:text-5xl xl:text-[3.5rem] font-serif font-normal text-white leading-[1.1] mb-5 tracking-display max-w-3xl"
           >
             Find the perfect{" "}
             <span className="text-gradient-gold">course</span>{" "}
