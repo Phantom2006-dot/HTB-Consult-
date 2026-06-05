@@ -7,13 +7,13 @@ FROM base AS build
 # Install build dependencies
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential pkg-config python-is-python3
-# Copy config files
-COPY package-lock.json package.json tsconfig*.json vite.config.ts ./
-# Install ALL dependencies (including devDependencies for build)
+# Copy ALL package files first to leverage cache
+COPY package*.json ./
+# Install ALL dependencies (including devDependencies) for the build
 RUN npm install --legacy-peer-deps
-# Copy application code
+# Copy the rest of the application code
 COPY . .
-# Build application
+# Build the application
 RUN npm run build
 # Remove development dependencies and reinstall only production ones
 RUN rm -rf node_modules && \
