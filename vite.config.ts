@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
+import react from "@vitejs/plugin-react";
 import path from "path";
 
 export default defineConfig(({ mode }) => ({
@@ -27,8 +27,12 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     include: ["@tanstack/react-query", "react", "react-dom"],
     force: true,
+    esbuildOptions: {
+      sourcemap: false,
+    },
   },
   build: {
     outDir: "dist/public",
+    sourcemap: false,
   },
 }));
