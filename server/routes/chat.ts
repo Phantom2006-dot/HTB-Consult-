@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { GoogleGenAI } from "@google/genai";
 import { pool } from "../db.js";
 import { requireAuth, type AuthRequest } from "../middleware/auth.js";
 import { logger } from "../lib/logger.js";
@@ -14,100 +15,65 @@ const SYSTEM_PROMPT = `You are the HTB Consults AI Assistant — a helpful, prof
 
 Be concise, encouraging, and professional. Use markdown formatting for clarity. If asked about pricing or bookings, direct users to the Services or Courses pages.`;
 
-type AIProvider = { url: string; key: string; model: string; provider: string };
-
-function getAllProviders(): AIProvider[] {
-  const providers: AIProvider[] = [];
-  if (process.env.GROQ_API_KEY) {
-    providers.push({
-      url: "https://api.groq.com/openai/v1/chat/completions",
-      key: process.env.GROQ_API_KEY,
-      model: "llama-3.1-8b-instant",
-      provider: "Groq",
-    });
-  }
-  if (process.env.GEMINI_API_KEY) {
-    providers.push({
-      url: "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-      key: process.env.GEMINI_API_KEY,
-      model: "gemini-1.5-flash",
-      provider: "Google Gemini",
-    });
-  }
-  if (process.env.OPENAI_API_KEY) {
-    providers.push({
-      url: "https://api.openai.com/v1/chat/completions",
-      key: process.env.OPENAI_API_KEY,
-      model: "gpt-4o-mini",
-      provider: "OpenAI",
-    });
-  }
-  return providers;
-}
+// Replit AI Integrations — Gemini access with no API key required from user
+const ai = new GoogleGenAI({
+  apiKey: process.env.AI_INTEGRATIONS_GEMINI_API_KEY,
+  httpOptions: {
+    apiVersion: "",
+    baseUrl: process.env.AI_INTEGRATIONS_GEMINI_BASE_URL,
+  },
+});
 
 // ── AI stream ────────────────────────────────────────────────────────────────
 router.post("/", async (req, res) => {
   const { messages } = req.body;
 
-  const providers = getAllProviders();
-  if (providers.length === 0) {
-    return res.status(500).json({ error: "No AI API key configured." });
+  if (!Array.isArray(messages) || messages.length === 0) {
+    return res.status(400).json({ error: "messages array is required." });
   }
 
-  const payload = [
-    { role: "system", content: SYSTEM_PROMPT },
-    ...messages.map((m: any) => ({ role: m.role, content: m.content })),
-  ];
+  logger.info("AI chat request", { messageCount: messages.length });
 
-  let lastError = "AI service unavailable";
-  logger.info("AI chat request", { messageCount: messages.length, providers: providers.map(p => p.provider) });
+  try {
+    // Build Gemini contents: system prompt as first user turn, then history
+    const contents = [
+      { role: "user" as const, parts: [{ text: SYSTEM_PROMPT }] },
+      { role: "model" as const, parts: [{ text: "Understood. I'm the HTB Consults AI Assistant and I'm ready to help." }] },
+      ...messages.map((m: any) => ({
+        role: (m.role === "assistant" ? "model" : "user") as "user" | "model",
+        parts: [{ text: m.content }],
+      })),
+    ];
 
-  for (const provider of providers) {
-    logger.info(`Trying AI provider: ${provider.provider}`, { model: provider.model });
-    try {
-      const response = await fetch(provider.url, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${provider.key}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: provider.model, messages: payload, stream: true }),
-      });
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        logger.warn(`${provider.provider} responded with error`, { status: response.status, body: errorText.slice(0, 300) });
-        if (response.status === 429 || response.status === 503) {
-          lastError = `${provider.provider} rate limit reached`;
-          logger.warn(`Rate limited by ${provider.provider}, falling back`);
-          continue;
-        }
-        lastError = `${provider.provider} unavailable (${response.status})`;
-        continue;
+    const stream = await ai.models.generateContentStream({
+      model: "gemini-2.5-flash",
+      contents,
+      config: { maxOutputTokens: 8192 },
+    });
+
+    for await (const chunk of stream) {
+      const text = chunk.text || "";
+      if (text) {
+        // Emit as SSE data line so existing frontend SSE parsers work
+        res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: text } }] })}\n\n`);
       }
-
-      logger.info(`Streaming response from ${provider.provider}`);
-      res.setHeader("Content-Type", "text/event-stream");
-      res.setHeader("Cache-Control", "no-cache");
-      res.setHeader("Connection", "keep-alive");
-
-      const reader = response.body!.getReader();
-      const decoder = new TextDecoder();
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        res.write(decoder.decode(value, { stream: true }));
-      }
-      res.end();
-      logger.info(`AI response complete via ${provider.provider}`);
-      return;
-    } catch (err: any) {
-      logger.error(`${provider.provider} fetch failed`, { error: err.message });
-      lastError = err.message || "Network error";
-      continue;
     }
-  }
 
-  logger.error("All AI providers exhausted", { lastError });
-  if (!res.headersSent) {
-    res.status(429).json({ error: "All AI providers are currently rate-limited. Please try again in a moment." });
+    res.write("data: [DONE]\n\n");
+    res.end();
+    logger.info("AI response complete via Replit Gemini");
+  } catch (err: any) {
+    logger.error("Gemini AI error", { error: err.message });
+    if (!res.headersSent) {
+      res.status(500).json({ error: "AI service error. Please try again." });
+    } else {
+      res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+      res.end();
+    }
   }
 });
 
