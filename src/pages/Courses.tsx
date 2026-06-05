@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { useState, useMemo, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Clock, ArrowRight, BookOpen, SlidersHorizontal, ArrowDownAZ, ArrowUpAZ, Hash, Lock, X, Bell, GraduationCap, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -38,9 +38,18 @@ const Courses = () => {
   const { user } = useAuth();
   const { data: courses, isLoading } = useCourses();
   const { data: enrollmentsData } = useEnrollments();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState<string>("All");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortBy, setSortBy] = useState<SortOption>("numeric");
   const [lockedCourse, setLockedCourse] = useState<{ title: string; category: string } | null>(null);
+
+  useEffect(() => {
+    const cat = searchParams.get("category");
+    const search = searchParams.get("search");
+    if (cat) setActiveCategory(cat);
+    if (search) setSearchQuery(search);
+  }, [searchParams]);
 
   const enrolledIds = useMemo(
     () => new Set((enrollmentsData || []).map((e: any) => e.course_id)),
@@ -56,14 +65,23 @@ const Courses = () => {
 
   const filtered = useMemo(() => {
     if (!courses) return [];
-    const base = activeCategory === "All" ? courses : courses.filter((c) => c.category === activeCategory);
+    let base = activeCategory === "All" ? courses : courses.filter((c) => c.category === activeCategory);
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      base = base.filter((c) =>
+        c.title.toLowerCase().includes(q) ||
+        c.description.toLowerCase().includes(q) ||
+        c.category.toLowerCase().includes(q) ||
+        (c.tags || []).some((t: string) => t.toLowerCase().includes(q))
+      );
+    }
     return [...base].sort((a, b) => {
       if (sortBy === "numeric") return extractLeadingNumber(a.title) - extractLeadingNumber(b.title);
       if (sortBy === "az") return a.title.localeCompare(b.title);
       if (sortBy === "za") return b.title.localeCompare(a.title);
       return 0;
     });
-  }, [courses, activeCategory, sortBy]);
+  }, [courses, activeCategory, searchQuery, sortBy]);
 
   return (
     <Layout>
