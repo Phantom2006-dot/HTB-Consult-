@@ -1,16 +1,14 @@
-import { useState, useRef, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowRight, BookOpen, Target, CheckCircle, Star, Lightbulb,
   UserCheck, Briefcase, Brain, BarChart3, Quote, LogIn,
   LayoutDashboard, Sparkles, TrendingUp, Award, ChevronRight,
-  Users, Clock, Shield, Rocket, GraduationCap, Building2, Search, X
+  Users, Clock, Shield, Rocket, GraduationCap, Building2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
-import { useCourses } from "@/hooks/use-courses";
 
 /* ── Animation helpers ── */
 const fadeUp = {
@@ -169,65 +167,14 @@ const trustBadges = [
 
 /* ═══════════════════════════════════════════════════════════ */
 
-const POPULAR_CATEGORIES = [
-  "Business Analysis",
-  "Project Delivery",
-  "Digital Transformation",
-  "Business Strategy",
-  "Bid Writing",
-  "Consulting & Leadership",
-];
-
 const Index = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showResults, setShowResults] = useState(false);
-  const searchRef = useRef<HTMLDivElement>(null);
-  const { data: courses } = useCourses();
-
-  const searchResults = searchQuery.trim().length >= 2
-    ? (courses || []).filter((c) => {
-        const q = searchQuery.toLowerCase();
-        return (
-          c.title.toLowerCase().includes(q) ||
-          c.description.toLowerCase().includes(q) ||
-          c.category.toLowerCase().includes(q) ||
-          (c.tags || []).some((t: string) => t.toLowerCase().includes(q))
-        );
-      }).slice(0, 6)
-    : [];
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setShowResults(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchResults.length === 1) {
-      navigate(`/course/${searchResults[0].id}`);
-      setShowResults(false);
-    } else if (searchQuery.trim()) {
-      navigate(`/courses?search=${encodeURIComponent(searchQuery.trim())}`);
-      setShowResults(false);
-    }
-  };
-
-  const handleCategoryClick = (cat: string) => {
-    navigate(`/courses?category=${encodeURIComponent(cat)}`);
-  };
 
   return (
     <Layout>
 
       {/* ─────────────────────── HERO ─────────────────────── */}
-      <section className="relative overflow-hidden min-h-[92vh] flex items-center -mt-[72px] pt-[72px]">
+      <section className="relative overflow-hidden min-h-[100vh] flex items-center -mt-[72px] pt-[72px]">
         {/* Background image */}
         <div className="absolute inset-0">
           <img
@@ -238,171 +185,130 @@ const Index = () => {
         </div>
 
         {/* Overlays */}
-        <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--background)/0.92) 50%, hsl(var(--background)/0.80) 100%)" }} />
-        <div className="absolute inset-0" style={{ background: "linear-gradient(to top, hsl(var(--background)) 0%, transparent 35%)" }} />
-        <div className="absolute inset-0 grid-pattern opacity-15" />
+        <div className="absolute inset-0"
+          style={{ background: "linear-gradient(to right, hsl(var(--hero-overlay)) 45%, hsl(var(--hero-overlay) / 0.6) 75%, transparent)" }} />
+        <div className="absolute inset-0"
+          style={{ background: "linear-gradient(to top, hsl(var(--background)) 0%, transparent 40%)" }} />
+        <div className="absolute inset-0 grid-pattern opacity-20" />
 
-        {/* Glow blob */}
-        <div className="absolute top-1/3 left-1/4 w-[600px] h-[600px] rounded-full blur-[140px] pointer-events-none"
-          style={{ background: "hsl(var(--primary) / 0.06)" }} />
+        {/* Glow blobs */}
+        <div className="absolute top-1/4 left-1/5 w-[500px] h-[500px] rounded-full blur-[120px] animate-[pulse-glow_8s_ease-in-out_infinite]"
+          style={{ background: "hsl(var(--primary) / 0.07)" }} />
 
-        <div className="container mx-auto px-4 lg:px-8 relative z-10 py-20 lg:py-28">
+        <div className="container mx-auto px-6 lg:px-12 relative z-10 flex flex-col min-h-[calc(100vh-72px)] justify-between py-16 lg:py-24">
 
           {/* Top badge */}
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.45 }}
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest glass border border-primary/30 mb-8"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="inline-flex self-start items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-widest glass border border-primary/25 mb-10"
             style={{ color: "hsl(var(--primary))" }}
           >
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "hsl(var(--primary))" }} />
-            More visibility. More skills. More impact.
+            Business Analysis. Real Training. Real Impact.
           </motion.div>
 
-          {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 32 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-            className="text-4xl md:text-5xl xl:text-[3.5rem] font-serif font-normal text-white leading-[1.1] mb-5 tracking-display max-w-3xl"
-          >
-            Find the perfect{" "}
-            <span className="text-gradient-gold">course</span>{" "}
-            for your career
-          </motion.h1>
+          {/* Main row */}
+          <div className="flex-1 flex items-center">
+            <div className="w-full lg:max-w-[55%]">
 
-          {/* Subtitle */}
-          <motion.p
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.5 }}
-            className="text-sm lg:text-base text-white/55 mb-10 leading-relaxed font-light max-w-xl"
-          >
-            Find the right training for your professional goals — practical, industry-aligned, and delivered by real consulting experts.
-          </motion.p>
+              {/* Headline */}
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+                className="text-5xl md:text-6xl xl:text-7xl font-serif font-normal text-white leading-[1.05] mb-6 tracking-display text-shadow-lg"
+              >
+                Become a Future Ready{" "}
+                <em className="not-italic text-gradient-gold">Business Analyst</em>
+              </motion.h1>
 
-          {/* Search bar + inline results */}
+              {/* Subtitle */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.55 }}
+                className="text-base lg:text-lg text-white/60 mb-8 leading-[1.85] font-light"
+              >
+                Practical training<span className="text-primary">.</span> Real project simulation<span className="text-primary">.</span><br />
+                Industry readiness<span className="text-primary">.</span>
+              </motion.p>
+
+              {/* CTA Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45, duration: 0.5 }}
+                className="flex flex-wrap gap-3 mb-10"
+              >
+                <Button size="lg" asChild
+                  className="bg-gradient-gold hover:opacity-90 font-semibold px-8 h-12 shadow-orange btn-shimmer text-sm"
+                >
+                  <Link to="/services">Explore Pathways <ArrowRight className="ml-2" size={16} /></Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild
+                  className="font-semibold px-8 h-12 glass border-white/20 hover:bg-white/10 text-white text-sm"
+                >
+                  <Link to="/courses">View Courses</Link>
+                </Button>
+              </motion.div>
+
+              {/* Trust badges — 4 items in a row below buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4 border-t border-white/10 pt-8"
+              >
+                {trustBadges.map((b, i) => (
+                  <div key={b.label} className="flex items-start gap-2.5">
+                    <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
+                      <b.icon size={14} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-white leading-tight">{b.label}</p>
+                      <p className="text-[10px] text-white/45 leading-snug mt-0.5">{b.sub}</p>
+                    </div>
+                  </div>
+                ))}
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Community badge — bottom right */}
           <motion.div
-            ref={searchRef}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.45, duration: 0.5 }}
-            className="relative w-full max-w-2xl mb-8"
+            transition={{ delay: 0.75, duration: 0.5 }}
+            className="self-end mt-10 lg:mt-0"
           >
-            <form onSubmit={handleSearch} className="flex items-center w-full">
-              <div className="flex flex-1 items-center bg-white rounded-l-full shadow-2xl overflow-hidden">
-                <Search size={17} className="ml-5 text-slate-400 shrink-0" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setShowResults(true);
-                  }}
-                  onFocus={() => setShowResults(true)}
-                  placeholder="Search for any course..."
-                  className="flex-1 px-4 py-4 text-slate-800 text-sm bg-transparent outline-none placeholder:text-slate-400"
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => { setSearchQuery(""); setShowResults(false); }}
-                    className="mr-3 text-slate-300 hover:text-slate-500 transition-colors"
-                  >
-                    <X size={15} />
-                  </button>
-                )}
-              </div>
-              <button
-                type="submit"
-                className="h-[52px] px-6 rounded-r-full font-semibold text-white text-sm transition-opacity hover:opacity-90 shrink-0 flex items-center gap-2"
-                style={{ background: "hsl(var(--primary))" }}
-              >
-                <Search size={15} />
-                <span className="hidden sm:inline">Search</span>
-              </button>
-            </form>
-
-            {/* Inline results dropdown */}
-            {showResults && searchQuery.trim().length >= 2 && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
-                {searchResults.length > 0 ? (
-                  <>
-                    <ul>
-                      {searchResults.map((course) => (
-                        <li key={course.id}>
-                          <Link
-                            to={`/course/${course.id}`}
-                            onClick={() => { setShowResults(false); setSearchQuery(""); }}
-                            className="flex items-center gap-3 px-5 py-3.5 hover:bg-slate-50 transition-colors group"
-                          >
-                            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                              <BookOpen size={14} className="text-primary" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-slate-800 truncate group-hover:text-primary transition-colors">
-                                {course.title}
-                              </p>
-                              <p className="text-xs text-slate-400 truncate">{course.category}</p>
-                            </div>
-                            <ArrowRight size={13} className="text-slate-300 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="border-t border-slate-100 px-5 py-3 bg-slate-50">
-                      <Link
-                        to={`/courses?search=${encodeURIComponent(searchQuery.trim())}`}
-                        onClick={() => setShowResults(false)}
-                        className="text-xs font-semibold flex items-center gap-1.5"
-                        style={{ color: "hsl(var(--primary))" }}
-                      >
-                        View all {searchResults.length >= 6 ? "results" : `${searchResults.length} result${searchResults.length !== 1 ? "s" : ""}`} for "{searchQuery.trim()}"
-                        <ArrowRight size={12} />
-                      </Link>
-                    </div>
-                  </>
-                ) : (
-                  <div className="px-5 py-5 text-center">
-                    <p className="text-sm text-slate-500">No courses found for <strong className="text-slate-700">"{searchQuery}"</strong></p>
-                    <Link
-                      to="/courses"
-                      onClick={() => setShowResults(false)}
-                      className="text-xs mt-1 inline-block"
-                      style={{ color: "hsl(var(--primary))" }}
+            <Link to="/auth" className="block glass border border-white/15 rounded-2xl px-5 py-4 text-right hover:border-primary/40 transition-colors duration-200">
+              <p className="text-sm font-semibold text-white mb-0.5">Join a community of</p>
+              <p className="text-xs text-white/50 mb-3">aspiring and practising Business Analysts</p>
+              <div className="flex items-center justify-end gap-2">
+                <div className="flex -space-x-2">
+                  {["A", "K", "S", "R", "M"].map((l, i) => (
+                    <div
+                      key={i}
+                      className="w-8 h-8 rounded-full bg-gradient-gold flex items-center justify-center text-xs font-bold text-white border-2"
+                      style={{ borderColor: "hsl(var(--background))" }}
                     >
-                      Browse all courses →
-                    </Link>
-                  </div>
-                )}
+                      {l}
+                    </div>
+                  ))}
+                </div>
+                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-primary/20 text-primary border border-primary/30">
+                  +2K
+                </span>
               </div>
-            )}
-          </motion.div>
-
-          {/* Popular categories */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.58, duration: 0.45 }}
-            className="flex flex-wrap items-center gap-2"
-          >
-            <span className="text-white/40 text-xs font-medium mr-1">Popular:</span>
-            {POPULAR_CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => handleCategoryClick(cat)}
-                className="px-3.5 py-1.5 rounded-full border border-white/20 text-white/65 text-xs font-medium hover:border-primary/60 hover:text-primary hover:bg-primary/10 transition-all duration-200 glass"
-              >
-                {cat}
-              </button>
-            ))}
+            </Link>
           </motion.div>
 
         </div>
 
         {/* Bottom fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-32"
+        <div className="absolute bottom-0 left-0 right-0 h-28"
           style={{ background: "linear-gradient(to top, hsl(var(--background)), transparent)" }} />
       </section>
 
