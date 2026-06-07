@@ -54,22 +54,36 @@ export async function runMigrations() {
     // Course payments
     await client.query(`
       CREATE TABLE IF NOT EXISTS course_payments (
-        id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id             UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        course_id           UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
-        amount              NUMERIC NOT NULL,
-        currency            TEXT NOT NULL DEFAULT 'GBP',
-        tx_ref              TEXT NOT NULL UNIQUE,
-        flw_transaction_id  TEXT,
-        flw_amount          NUMERIC,
-        flw_currency        TEXT,
-        status              TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','successful','failed')),
-        created_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
-        updated_at          TIMESTAMPTZ NOT NULL DEFAULT now()
+        id                     UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id                UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        course_id              UUID NOT NULL REFERENCES courses(id) ON DELETE CASCADE,
+        amount                 NUMERIC NOT NULL,
+        currency               TEXT NOT NULL DEFAULT 'GBP',
+        tx_ref                 TEXT NOT NULL UNIQUE,
+        gateway_transaction_id TEXT,
+        gateway_amount         NUMERIC,
+        gateway_currency       TEXT,
+        status                 TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending','successful','failed')),
+        created_at             TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at             TIMESTAMPTZ NOT NULL DEFAULT now()
       );
       CREATE INDEX IF NOT EXISTS idx_course_payments_user    ON course_payments(user_id);
       CREATE INDEX IF NOT EXISTS idx_course_payments_course  ON course_payments(course_id);
       CREATE INDEX IF NOT EXISTS idx_course_payments_status  ON course_payments(status);
+    `);
+
+    // Migrate: rename Flutterwave-specific columns to gateway-agnostic names
+    await client.query(`
+      DO $$ BEGIN
+        IF EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'course_payments' AND column_name = 'flw_transaction_id'
+        ) THEN
+          ALTER TABLE course_payments RENAME COLUMN flw_transaction_id TO gateway_transaction_id;
+          ALTER TABLE course_payments RENAME COLUMN flw_amount TO gateway_amount;
+          ALTER TABLE course_payments RENAME COLUMN flw_currency TO gateway_currency;
+        END IF;
+      END $$;
     `);
 
     // Notification read-tracking

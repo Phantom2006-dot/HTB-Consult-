@@ -4,7 +4,7 @@ import { requireAuth, requireAdmin, type AuthRequest } from "../middleware/auth.
 
 const router = Router();
 
-// ── Create a payment record and return tx_ref ─────────────────────────────────
+// ── Initiate payment: create a pending record and return a unique reference ───
 router.post("/initiate", requireAuth, async (req: AuthRequest, res) => {
   const { course_id, amount, currency } = req.body;
   if (!course_id || !amount || !currency) {
@@ -17,77 +17,88 @@ router.post("/initiate", requireAuth, async (req: AuthRequest, res) => {
     );
     if (courseRow.rows.length === 0) return res.status(404).json({ error: "Course not found" });
 
-    const tx_ref = `HTB-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
+    // Generate a unique payment reference (Paystack-compatible format)
+    const reference = `HTB-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 
     const { rows } = await pool.query(
       `INSERT INTO course_payments (user_id, course_id, amount, currency, tx_ref, status)
        VALUES ($1, $2, $3, $4, $5, 'pending')
        RETURNING *`,
-      [req.user!.id, course_id, amount, currency, tx_ref]
+      [req.user!.id, course_id, amount, currency, reference]
     );
-    return res.status(201).json({ tx_ref, payment_id: rows[0].id });
+    return res.status(201).json({ reference, payment_id: rows[0].id });
   } catch (err: any) {
     return res.status(500).json({ error: err.message || "Failed to initiate payment" });
   }
 });
 
-// ── Verify payment with Flutterwave and enroll if successful ──────────────────
+// ── Verify payment with Paystack and auto-enroll on success ──────────────────
 router.post("/verify", requireAuth, async (req: AuthRequest, res) => {
-  const { tx_ref, transaction_id } = req.body;
-  if (!tx_ref || !transaction_id) {
-    return res.status(400).json({ error: "tx_ref and transaction_id are required" });
+  const { reference } = req.body;
+  if (!reference) {
+    return res.status(400).json({ error: "reference is required" });
+  }
+
+  const secretKey = process.env.PAYSTACK_SECRET_KEY;
+  if (!secretKey) {
+    return res.status(500).json({ error: "Payment gateway not configured. Contact support." });
   }
 
   try {
-    // Verify with Flutterwave API
-    const flwRes = await fetch(
-      `https://api.flutterwave.com/v3/transactions/${transaction_id}/verify`,
+    // Verify transaction with Paystack API
+    const psRes = await fetch(
+      `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
       {
         headers: {
-          Authorization: `Bearer ${process.env.FLW_SECRET_KEY}`,
+          Authorization: `Bearer ${secretKey}`,
           "Content-Type": "application/json",
         },
       }
     );
-    const flwData = (await flwRes.json()) as any;
+    const psData = (await psRes.json()) as any;
 
-    if (!flwRes.ok || flwData.status !== "success") {
+    if (!psRes.ok || !psData.status) {
       await pool.query(
-        `UPDATE course_payments SET status = 'failed', flw_transaction_id = $1, updated_at = now()
-         WHERE tx_ref = $2`,
-        [String(transaction_id), tx_ref]
+        `UPDATE course_payments SET status = 'failed', updated_at = now() WHERE tx_ref = $1`,
+        [reference]
       );
-      return res.status(400).json({ error: "Payment verification failed", details: flwData.message });
+      return res.status(400).json({ error: "Payment verification failed", details: psData.message });
     }
 
-    const txData = flwData.data;
+    const txData = psData.data;
 
-    // Double-check tx_ref matches and payment is complete
-    if (txData.tx_ref !== tx_ref || txData.status !== "successful") {
+    // Confirm the transaction is actually successful
+    if (txData.status !== "success") {
       await pool.query(
-        `UPDATE course_payments SET status = 'failed', flw_transaction_id = $1, updated_at = now()
+        `UPDATE course_payments
+         SET status = 'failed', gateway_transaction_id = $1, updated_at = now()
          WHERE tx_ref = $2`,
-        [String(transaction_id), tx_ref]
+        [String(txData.id), reference]
       );
-      return res.status(400).json({ error: "Payment reference mismatch or not successful" });
+      return res.status(400).json({ error: "Transaction was not successful", details: txData.gateway_response });
     }
 
-    // Fetch our payment record
+    // Fetch our pending payment record
     const paymentRow = await pool.query(
       `SELECT * FROM course_payments WHERE tx_ref = $1 AND user_id = $2`,
-      [tx_ref, req.user!.id]
+      [reference, req.user!.id]
     );
     if (paymentRow.rows.length === 0) {
       return res.status(404).json({ error: "Payment record not found" });
     }
     const payment = paymentRow.rows[0];
 
-    // Mark payment as successful
+    // Mark payment as successful with Paystack gateway details
+    // Paystack returns amount in kobo/cents — store the raw gateway values
     await pool.query(
       `UPDATE course_payments
-       SET status = 'successful', flw_transaction_id = $1, flw_amount = $2, flw_currency = $3, updated_at = now()
+       SET status = 'successful',
+           gateway_transaction_id = $1,
+           gateway_amount = $2,
+           gateway_currency = $3,
+           updated_at = now()
        WHERE tx_ref = $4`,
-      [String(transaction_id), txData.amount, txData.currency, tx_ref]
+      [String(txData.id), txData.amount / 100, txData.currency, reference]
     );
 
     // Auto-enroll the student
@@ -99,15 +110,19 @@ router.post("/verify", requireAuth, async (req: AuthRequest, res) => {
     );
 
     // Send in-app notification
-    const courseRow = await pool.query(`SELECT title FROM courses WHERE id = $1`, [payment.course_id]);
+    const courseRow = await pool.query(
+      `SELECT title FROM courses WHERE id = $1`,
+      [payment.course_id]
+    );
     const courseTitle = courseRow.rows[0]?.title || "the course";
+    const paidAmount = (txData.amount / 100).toLocaleString();
     await pool.query(
       `INSERT INTO user_notifications (user_id, type, title, body, link)
        VALUES ($1, 'success', $2, $3, $4)`,
       [
         req.user!.id,
         "🎉 Payment Confirmed — You're Enrolled!",
-        `Your payment of ${txData.currency} ${txData.amount} was successful. You are now enrolled in "${courseTitle}". Start learning today!`,
+        `Your payment of ${txData.currency} ${paidAmount} was successful. You are now enrolled in "${courseTitle}". Start learning today!`,
         `/course/${payment.course_id}`,
       ]
     );
@@ -118,12 +133,12 @@ router.post("/verify", requireAuth, async (req: AuthRequest, res) => {
   }
 });
 
-// ── Admin: get all payments ───────────────────────────────────────────────────
+// ── Admin: list all payments ──────────────────────────────────────────────────
 router.get("/admin", requireAdmin, async (_req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT p.id, p.tx_ref, p.flw_transaction_id, p.amount, p.currency,
-              p.flw_amount, p.flw_currency, p.status, p.created_at, p.updated_at,
+      `SELECT p.id, p.tx_ref, p.gateway_transaction_id, p.amount, p.currency,
+              p.gateway_amount, p.gateway_currency, p.status, p.created_at, p.updated_at,
               u.full_name, u.email,
               c.title AS course_title, c.thumbnail_url,
               e.id AS enrollment_id
@@ -139,7 +154,7 @@ router.get("/admin", requireAdmin, async (_req, res) => {
   }
 });
 
-// ── Admin: manually enroll after verifying payment offline ───────────────────
+// ── Admin: manually confirm enrollment for offline/bank-transfer payments ─────
 router.post("/admin/manual-enroll", requireAdmin, async (req: AuthRequest, res) => {
   const { payment_id } = req.body;
   if (!payment_id) return res.status(400).json({ error: "payment_id required" });
@@ -168,7 +183,7 @@ router.post("/admin/manual-enroll", requireAdmin, async (req: AuthRequest, res) 
       [
         p.user_id,
         "✅ Enrollment Confirmed by Admin",
-        `Your enrollment in "${courseTitle}" has been confirmed manually by our team. You can now access the course.`,
+        `Your enrollment in "${courseTitle}" has been confirmed by our team. You can now access the course.`,
         `/course/${p.course_id}`,
       ]
     );

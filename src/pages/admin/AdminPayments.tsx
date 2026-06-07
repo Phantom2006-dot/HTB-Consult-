@@ -46,7 +46,7 @@ const AdminPayments = () => {
     (acc, p) => {
       if (p.status === "successful") {
         acc.paid++;
-        // sum in GBP equivalent — use actual flw_amount and currency
+        // sum in GBP equivalent — use actual gateway_amount and currency
         acc.revenue += Number(p.amount || 0);
       }
       if (p.status === "pending") acc.pending++;
@@ -195,7 +195,7 @@ const AdminPayments = () => {
                         {/* Amount + ref */}
                         <div className="text-right shrink-0 hidden sm:block">
                           <p className="text-sm font-bold text-foreground">
-                            {payment.flw_currency || payment.currency} {Number(payment.flw_amount || payment.amount).toLocaleString()}
+                            {payment.gateway_currency || payment.currency} {Number(payment.gateway_amount || payment.amount).toLocaleString()}
                           </p>
                           <p className="text-[10px] text-muted-foreground font-mono mt-0.5">{payment.tx_ref}</p>
                           <p className="text-[10px] text-muted-foreground mt-0.5">
@@ -225,7 +225,7 @@ const AdminPayments = () => {
                       <div className="mt-2 pt-2 border-t border-border sm:hidden flex items-center justify-between text-xs text-muted-foreground">
                         <span className="font-mono">{payment.tx_ref}</span>
                         <span className="font-bold text-foreground">
-                          {payment.flw_currency || payment.currency} {Number(payment.flw_amount || payment.amount).toLocaleString()}
+                          {payment.gateway_currency || payment.currency} {Number(payment.gateway_amount || payment.amount).toLocaleString()}
                         </span>
                       </div>
                     </CardContent>

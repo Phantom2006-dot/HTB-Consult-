@@ -48,6 +48,7 @@ Vite proxies `/api/*` requests to `http://localhost:3001`.
 - `GROQ_API_KEY` — Optional. Enables AI chat via Groq (llama-3.1-8b-instant).
 - `GEMINI_API_KEY` — Optional. Enables AI chat via Google Gemini.
 - `OPENAI_API_KEY` — Optional. Enables AI chat via OpenAI.
+- `PAYSTACK_SECRET_KEY` — Required for payments. Paystack secret key (sk_live_... or sk_test_...).
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` — Optional. Enables transactional email (verification, password reset). Without these, emails are logged to console only.
 
 ### Shared Env Vars (.replit)
@@ -55,6 +56,7 @@ Vite proxies `/api/*` requests to `http://localhost:3001`.
 - `NODE_ENV=development`
 - `VITE_CLOUDINARY_CLOUD_NAME` — For image uploads
 - `VITE_CLOUDINARY_UPLOAD_PRESET` — For image uploads
+- `VITE_PAYSTACK_PUBLIC_KEY` — Paystack public key for the frontend checkout (pk_live_... or pk_test_...)
 
 ## Database
 

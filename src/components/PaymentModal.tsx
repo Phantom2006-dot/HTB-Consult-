@@ -27,7 +27,6 @@ const CURRENCIES = [
   { code: "USD", symbol: "$", name: "US Dollar" },
   { code: "NGN", symbol: "₦", name: "Nigerian Naira" },
   { code: "ZAR", symbol: "R", name: "South African Rand" },
-  { code: "EUR", symbol: "€", name: "Euro" },
   { code: "KES", symbol: "KSh", name: "Kenyan Shilling" },
   { code: "GHS", symbol: "₵", name: "Ghanaian Cedi" },
 ];
@@ -38,14 +37,15 @@ const GBP_RATES: Record<string, number> = {
   USD: 1.27,
   NGN: 2050,
   ZAR: 23.8,
-  EUR: 1.17,
   KES: 163,
   GHS: 19.5,
 };
 
 declare global {
   interface Window {
-    FlutterwaveCheckout: (config: any) => void;
+    PaystackPop: {
+      setup: (config: any) => { openIframe: () => void };
+    };
   }
 }
 
@@ -61,18 +61,19 @@ const PaymentModal = ({ open, onClose, onSuccess, course }: PaymentModalProps) =
   // Convert price from GBP to selected currency
   const convertedPrice = Math.round(course.price * GBP_RATES[currency.code]);
 
-  // Load Flutterwave script
+  // Load Paystack inline script
   useEffect(() => {
     if (!open) return;
-    if (document.getElementById("flw-script")) { setScriptLoaded(true); return; }
+    if (document.getElementById("paystack-script")) { setScriptLoaded(true); return; }
     const script = document.createElement("script");
-    script.id = "flw-script";
-    script.src = "https://checkout.flutterwave.com/v3.js";
+    script.id = "paystack-script";
+    script.src = "https://js.paystack.co/v1/inline.js";
     script.onload = () => setScriptLoaded(true);
+    script.onerror = () => setErrorMsg("Failed to load payment gateway. Please refresh and try again.");
     document.body.appendChild(script);
   }, [open]);
 
-  // Reset on open
+  // Reset state on open
   useEffect(() => {
     if (open) { setStep("select"); setErrorMsg(""); }
   }, [open]);
@@ -83,59 +84,52 @@ const PaymentModal = ({ open, onClose, onSuccess, course }: PaymentModalProps) =
     setErrorMsg("");
 
     try {
-      // Create payment record and get tx_ref
-      const { tx_ref } = await api.post<{ tx_ref: string; payment_id: string }>(
+      // Create payment record and get a unique reference
+      const { reference } = await api.post<{ reference: string; payment_id: string }>(
         "/api/payments/initiate",
         { course_id: course.id, amount: convertedPrice, currency: currency.code }
       );
 
-      // Launch Flutterwave popup
-      window.FlutterwaveCheckout({
-        public_key: import.meta.env.VITE_FLW_PUBLIC_KEY,
-        tx_ref,
-        amount: convertedPrice,
+      // Paystack amount must be in the smallest currency unit (kobo, cents, pesewas…)
+      const paystackAmount = convertedPrice * 100;
+
+      // Launch Paystack popup
+      const handler = window.PaystackPop.setup({
+        key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
+        email: user.email,
+        amount: paystackAmount,
         currency: currency.code,
-        payment_options: "card,mobilemoney,ussd,banktransfer",
-        customer: {
-          email: user.email,
-          name: user.full_name || user.email,
-        },
-        meta: {
+        ref: reference,
+        metadata: {
           course_id: course.id,
           user_id: user.id,
+          custom_fields: [
+            {
+              display_name: "Course",
+              variable_name: "course_title",
+              value: course.title,
+            },
+          ],
         },
-        customizations: {
-          title: "HTB Consults Academy",
-          description: course.title,
-          logo: "https://res.cloudinary.com/di2u0n1qj/image/upload/v1/htb-academy/logo",
-        },
-        callback: async (response: any) => {
-          // response comes back even if closed — only process if successful
-          if (response.status === "successful" || response.status === "completed") {
-            setStep("processing");
-            try {
-              await api.post("/api/payments/verify", {
-                tx_ref: response.tx_ref,
-                transaction_id: response.transaction_id,
-              });
-              // Invalidate enrollments so the UI updates immediately
-              qc.invalidateQueries({ queryKey: ["enrollments"] });
-              qc.invalidateQueries({ queryKey: ["my-certificates"] });
-              setStep("success");
-            } catch (err: any) {
-              setErrorMsg(err.message || "Payment verification failed. Please contact support.");
-              setStep("error");
-            }
-          } else {
-            setErrorMsg("Payment was not completed. You have not been charged.");
+        callback: async (response: { reference: string }) => {
+          setStep("processing");
+          try {
+            await api.post("/api/payments/verify", { reference: response.reference });
+            qc.invalidateQueries({ queryKey: ["enrollments"] });
+            qc.invalidateQueries({ queryKey: ["my-certificates"] });
+            setStep("success");
+          } catch (err: any) {
+            setErrorMsg(err.message || "Payment verification failed. Please contact support.");
             setStep("error");
           }
         },
-        onclose: () => {
-          // If still on processing, user closed without paying
+        onClose: () => {
+          // Only revert to "select" if we haven't already moved to success/error
           setStep(s => s === "processing" ? "select" : s);
         },
       });
+
+      handler.openIframe();
     } catch (err: any) {
       setErrorMsg(err.message || "Failed to start payment. Please try again.");
       setStep("error");
@@ -288,7 +282,7 @@ const PaymentModal = ({ open, onClose, onSuccess, course }: PaymentModalProps) =
 
                     <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                       <Shield size={11} />
-                      <span>Secured by Flutterwave · 256-bit SSL encryption</span>
+                      <span>Secured by Paystack · 256-bit SSL encryption</span>
                     </div>
                   </div>
                 )}
