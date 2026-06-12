@@ -97,6 +97,18 @@ export async function runMigrations() {
       ALTER TABLE users ADD COLUMN IF NOT EXISTS locked_until TIMESTAMPTZ;
     `);
 
+    // Sync to the 6 official course pathways
+    await client.query(`
+      INSERT INTO categories (name) VALUES
+        ('Business Analysis Foundation Bootcamp'),
+        ('Personal and Leadership Development'),
+        ('Mindset Before Skillset®'),
+        ('Agile and Scrum'),
+        ('Product Ownership'),
+        ('Domain Specific Pathways')
+      ON CONFLICT (name) DO NOTHING;
+    `);
+
     // Email verification — mark existing users as already verified so they aren't locked out
     await client.query(`
       ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT false;

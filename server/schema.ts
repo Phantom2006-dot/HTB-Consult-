@@ -303,13 +303,12 @@ export async function initSchema() {
 
     await client.query(`
       INSERT INTO categories (name) VALUES
-        ('Business Analysis'),
-        ('Digital Transformation'),
-        ('Business Strategy'),
-        ('Project Delivery'),
-        ('Bid Writing'),
-        ('Consulting & Leadership'),
-        ('General')
+        ('Business Analysis Foundation Bootcamp'),
+        ('Personal and Leadership Development'),
+        ('Mindset Before Skillset®'),
+        ('Agile and Scrum'),
+        ('Product Ownership'),
+        ('Domain Specific Pathways')
       ON CONFLICT (name) DO NOTHING;
     `);
 

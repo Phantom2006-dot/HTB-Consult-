@@ -180,15 +180,15 @@ const Index = () => {
           <img
             src="/hero-bg.png"
             alt=""
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover object-center brightness-110 contrast-105"
           />
         </div>
 
-        {/* Overlays */}
+        {/* Overlays — left text area covered, trainer on right kept clear */}
         <div className="absolute inset-0"
-          style={{ background: "linear-gradient(to right, hsl(var(--hero-overlay)) 45%, hsl(var(--hero-overlay) / 0.6) 75%, transparent)" }} />
+          style={{ background: "linear-gradient(to right, hsl(var(--hero-overlay)) 38%, hsl(var(--hero-overlay) / 0.18) 58%, transparent 70%)" }} />
         <div className="absolute inset-0"
-          style={{ background: "linear-gradient(to top, hsl(var(--background)) 0%, transparent 40%)" }} />
+          style={{ background: "linear-gradient(to top, hsl(var(--background)) 0%, transparent 22%)" }} />
         <div className="absolute inset-0 grid-pattern opacity-20" />
 
         {/* Glow blobs */}
