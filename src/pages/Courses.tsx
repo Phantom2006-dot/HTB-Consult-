@@ -277,19 +277,19 @@ const Courses = () => {
               >
                 {/* Global search */}
                 <div className="relative max-w-lg mb-10">
-                  <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" />
+                  <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/30" />
                   <input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search across all pathways…"
-                    className="w-full pl-11 pr-4 py-3 bg-card border border-white/10 rounded-xl text-sm placeholder:text-white/25 text-white/80 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
+                    className="w-full pl-11 pr-4 py-3 bg-card border border-border rounded-xl text-sm placeholder:text-foreground/30 text-foreground/80 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
                   />
                 </div>
 
                 {/* Section label */}
                 <div className="flex items-center gap-3 mb-8">
                   <div className="w-1 h-6 rounded-full bg-gradient-to-b from-primary to-primary/30" />
-                  <h2 className="text-xl font-semibold text-white/90">Choose Your Learning Pathway</h2>
+                  <h2 className="text-xl font-semibold text-foreground/90">Choose Your Learning Pathway</h2>
                 </div>
 
                 {/* Folder card grid */}
@@ -332,18 +332,18 @@ const Courses = () => {
                               </div>
 
                               {/* Title */}
-                              <h3 className="text-base font-semibold text-white leading-snug mb-2 group-hover:text-white/90 transition-colors">
+                              <h3 className="text-base font-semibold text-foreground leading-snug mb-2 group-hover:text-foreground/90 transition-colors">
                                 {folder.label}
                               </h3>
 
                               {/* Description */}
-                              <p className="text-xs text-white/40 leading-relaxed flex-1">
+                              <p className="text-xs text-foreground/40 leading-relaxed flex-1">
                                 {folder.description}
                               </p>
 
                               {/* Footer */}
-                              <div className="flex items-center justify-between mt-5 pt-4 border-t border-white/8">
-                                <span className="text-xs text-white/30 flex items-center gap-1.5">
+                              <div className="flex items-center justify-between mt-5 pt-4 border-t border-border">
+                                <span className="text-xs text-foreground/30 flex items-center gap-1.5">
                                   <BookOpen size={11} />
                                   {count === 0 ? "No modules yet" : `${count} module${count !== 1 ? "s" : ""}`}
                                 </span>
@@ -378,9 +378,9 @@ const Courses = () => {
                   {/* Back + breadcrumb */}
                   <button
                     onClick={closeFolder}
-                    className="flex items-center gap-2 text-sm text-white/50 hover:text-white transition-colors shrink-0 group"
+                    className="flex items-center gap-2 text-sm text-foreground/50 hover:text-foreground transition-colors shrink-0 group"
                   >
-                    <div className="w-7 h-7 rounded-lg border border-white/15 flex items-center justify-center group-hover:border-primary/40 transition-colors">
+                    <div className="w-7 h-7 rounded-lg border border-border flex items-center justify-center group-hover:border-primary/40 transition-colors">
                       <ArrowLeft size={13} />
                     </div>
                     {isSearching && !selectedFolder ? (
@@ -388,8 +388,8 @@ const Courses = () => {
                     ) : (
                       <span className="flex items-center gap-1.5">
                         All Pathways
-                        <ChevronRight size={12} className="text-white/25" />
-                        <span className="text-white/80">{activeFolderMeta?.label}</span>
+                        <ChevronRight size={12} className="text-foreground/25" />
+                        <span className="text-foreground/80">{activeFolderMeta?.label}</span>
                       </span>
                     )}
                   </button>
@@ -397,19 +397,19 @@ const Courses = () => {
                   <div className="flex-1 flex items-center gap-2 sm:justify-end">
                     {/* Inline search */}
                     <div className="relative flex-1 sm:max-w-xs">
-                      <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25" />
+                      <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/30" />
                       <input
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search…"
-                        className="w-full pl-8 pr-3 py-2 bg-card border border-white/10 rounded-lg text-xs placeholder:text-white/25 text-white/75 focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/35 transition-all"
+                        className="w-full pl-8 pr-3 py-2 bg-card border border-border rounded-lg text-xs placeholder:text-foreground/30 text-foreground/75 focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/35 transition-all"
                       />
                     </div>
 
                     {/* Sort */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-card border border-white/10 text-white/50 hover:text-white hover:border-primary/30 transition-all whitespace-nowrap shrink-0">
+                        <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-card border border-border text-foreground/50 hover:text-foreground hover:border-primary/30 transition-all whitespace-nowrap shrink-0">
                           {sortBy === "numeric" && <Hash size={12} />}
                           {sortBy === "az" && <ArrowDownAZ size={12} />}
                           {sortBy === "za" && <ArrowUpAZ size={12} />}
@@ -435,15 +435,15 @@ const Courses = () => {
                       <activeFolderMeta.icon size={18} className={activeFolderMeta.iconColor} />
                     </div>
                     <div>
-                      <h2 className="text-xl font-semibold text-white leading-tight">{activeFolderMeta.label}</h2>
-                      <p className="text-xs text-white/40 mt-0.5">{activeFolderMeta.description}</p>
+                      <h2 className="text-xl font-semibold text-foreground leading-tight">{activeFolderMeta.label}</h2>
+                      <p className="text-xs text-foreground/40 mt-0.5">{activeFolderMeta.description}</p>
                     </div>
                   </div>
                 )}
 
                 {isSearching && (
                   <div className="mb-6">
-                    <h2 className="text-lg font-semibold text-white/80">
+                    <h2 className="text-lg font-semibold text-foreground/80">
                       {filteredCourses.length} result{filteredCourses.length !== 1 ? "s" : ""} for &ldquo;{searchQuery}&rdquo;
                     </h2>
                   </div>
@@ -452,10 +452,10 @@ const Courses = () => {
                 {/* Empty state */}
                 {!isLoading && filteredCourses.length === 0 && (
                   <div className="text-center py-16">
-                    <div className="w-16 h-16 rounded-2xl bg-card border border-white/8 flex items-center justify-center mx-auto mb-4">
-                      <BookOpen size={28} className="text-white/20" />
+                    <div className="w-16 h-16 rounded-2xl bg-card border border-border flex items-center justify-center mx-auto mb-4">
+                      <BookOpen size={28} className="text-foreground/20" />
                     </div>
-                    <p className="text-white/40 mb-2">
+                    <p className="text-foreground/40 mb-2">
                       {isSearching ? "No courses match your search." : "No courses in this pathway yet."}
                     </p>
                     <button onClick={closeFolder} className="text-primary text-sm hover:underline mt-1">
@@ -489,7 +489,7 @@ const Courses = () => {
                             variants={fadeUp}
                             className="card-lift"
                           >
-                            <div className={`bg-card rounded-xl border overflow-hidden h-full flex flex-col transition-all duration-300 ${isLocked ? "border-white/5 opacity-75" : "border-white/8 hover:border-primary/40 hover:shadow-[0_20px_60px_-15px_rgba(234,119,0,0.25)]"}`}>
+                            <div className={`bg-card rounded-xl border overflow-hidden h-full flex flex-col transition-all duration-300 ${isLocked ? "border-border/40 opacity-75" : "border-border hover:border-primary/40 hover:shadow-[0_20px_60px_-15px_rgba(234,119,0,0.25)]"}`}>
                               {/* Thumbnail */}
                               <div className="h-44 bg-muted overflow-hidden shrink-0 relative">
                                 {(course as any).thumbnail_url ? (
@@ -531,14 +531,14 @@ const Courses = () => {
                                     </span>
                                   )}
                                 </div>
-                                <h3 className="font-serif text-lg font-normal text-white mb-2 leading-snug">{course.title}</h3>
-                                <p className="text-xs text-white/40 leading-relaxed mb-4 line-clamp-3 flex-1">{course.description}</p>
-                                <div className="flex items-center gap-4 text-xs text-white/35">
+                                <h3 className="font-serif text-lg font-normal text-foreground mb-2 leading-snug">{course.title}</h3>
+                                <p className="text-xs text-foreground/40 leading-relaxed mb-4 line-clamp-3 flex-1">{course.description}</p>
+                                <div className="flex items-center gap-4 text-xs text-foreground/35">
                                   <span className="flex items-center gap-1"><Clock size={12} /> {course.total_duration}</span>
                                 </div>
                                 <div className="flex flex-wrap gap-1 mt-3">
                                   {(course.tags || []).slice(0, 3).map((t: string) => (
-                                    <span key={t} className="px-1.5 py-0.5 rounded text-[10px] bg-white/5 text-white/35 border border-white/8">{t}</span>
+                                    <span key={t} className="px-1.5 py-0.5 rounded text-[10px] bg-foreground/5 text-foreground/35 border border-border">{t}</span>
                                   ))}
                                 </div>
                               </div>
