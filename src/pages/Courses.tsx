@@ -259,7 +259,7 @@ const Courses = () => {
       </section>
 
       {/* ── Main Content Area ────────────────────────────────── */}
-      <section className="py-12 lg:py-16 relative bg-secondary min-h-[50vh]">
+      <section className="py-12 lg:py-16 relative bg-background min-h-[50vh]">
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
 
           <AnimatePresence mode="wait">
