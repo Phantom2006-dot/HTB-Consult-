@@ -52,7 +52,6 @@ NODE_ENV = "development"
 FRONTEND_URL = "https://140a8c70-e8c1-445d-9b46-29ebc58ef4f6-00-38fw2lp0j5mko.worf.replit.dev"
 CLOUDINARY_CLOUD_NAME = "di2u0n1qj"
 CLOUDINARY_UPLOAD_PRESET = "htb_academy"
-VITE_FLW_PUBLIC_KEY = "FLWPUBK_TEST-c193cd94b573e36b81a5c65bdfd84e3c-X"
 JWT_SECRET = "58c0ed6c45177cea90f7b6637e9f0b5f6bdefa0fb0cda4a6cba6086e9bde391c9ffad7857c8949f490be024b0562c078"
 
 [userenv.development]
