@@ -100,7 +100,7 @@ export async function runMigrations() {
     // Sync to the 6 official course pathways (insert new, remove legacy)
     await client.query(`
       INSERT INTO categories (name) VALUES
-        ('Business Analysis Foundation Bootcamp'),
+        ('Business Analysis'),
         ('Personal and Leadership Development'),
         ('Mindset Before Skillset®'),
         ('Agile and Scrum'),
@@ -109,21 +109,19 @@ export async function runMigrations() {
       ON CONFLICT (name) DO NOTHING;
 
       DELETE FROM categories WHERE name IN (
-        'Business Analysis','Digital Transformation','Business Strategy',
+        'Business Analysis Foundation Bootcamp','Digital Transformation','Business Strategy',
         'Project Delivery','Bid Writing','Consulting & Leadership','General'
       );
     `);
 
     // Remap any courses that still carry legacy category names
     await client.query(`
-      UPDATE courses SET category = 'Business Analysis Foundation Bootcamp'
-        WHERE category IN ('Business Analysis');
+      UPDATE courses SET category = 'Business Analysis'
+        WHERE category IN ('Business Analysis Foundation Bootcamp','General');
       UPDATE courses SET category = 'Personal and Leadership Development'
         WHERE category IN ('Consulting & Leadership');
       UPDATE courses SET category = 'Domain Specific Pathways'
         WHERE category IN ('Digital Transformation','Business Strategy','Project Delivery','Bid Writing');
-      UPDATE courses SET category = 'Business Analysis Foundation Bootcamp'
-        WHERE category = 'General';
     `);
 
     // Email verification — mark existing users as already verified so they aren't locked out
