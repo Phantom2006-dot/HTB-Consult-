@@ -40,7 +40,7 @@ interface CourseForm {
 
 const emptyCourse: CourseForm = {
   title: "", short_description: "", description: "",
-  category: "Business Analysis", skill_level: "Beginner", course_type: "live",
+  category: "Business Analysis Foundation Bootcamp", skill_level: "Beginner", course_type: "live",
   price: "0", total_duration: "", next_batch_date: "", schedule: "",
   certificate_name: "Certificate of Completion",
   whats_included: "Live interactive sessions\nIndustry case studies & datasets\nBA tools, templates & frameworks\nSimulation exercises\nExpert feedback & guidance\nCommunity access\nCertificate of completion",

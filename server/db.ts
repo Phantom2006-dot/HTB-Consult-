@@ -97,7 +97,7 @@ export async function runMigrations() {
       ALTER TABLE users ADD COLUMN IF NOT EXISTS locked_until TIMESTAMPTZ;
     `);
 
-    // Sync to the 6 official course pathways
+    // Sync to the 6 official course pathways (insert new, remove legacy)
     await client.query(`
       INSERT INTO categories (name) VALUES
         ('Business Analysis Foundation Bootcamp'),
@@ -107,6 +107,23 @@ export async function runMigrations() {
         ('Product Ownership'),
         ('Domain Specific Pathways')
       ON CONFLICT (name) DO NOTHING;
+
+      DELETE FROM categories WHERE name IN (
+        'Business Analysis','Digital Transformation','Business Strategy',
+        'Project Delivery','Bid Writing','Consulting & Leadership','General'
+      );
+    `);
+
+    // Remap any courses that still carry legacy category names
+    await client.query(`
+      UPDATE courses SET category = 'Business Analysis Foundation Bootcamp'
+        WHERE category IN ('Business Analysis');
+      UPDATE courses SET category = 'Personal and Leadership Development'
+        WHERE category IN ('Consulting & Leadership');
+      UPDATE courses SET category = 'Domain Specific Pathways'
+        WHERE category IN ('Digital Transformation','Business Strategy','Project Delivery','Bid Writing');
+      UPDATE courses SET category = 'Business Analysis Foundation Bootcamp'
+        WHERE category = 'General';
     `);
 
     // Email verification — mark existing users as already verified so they aren't locked out
