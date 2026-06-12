@@ -22,7 +22,7 @@ import { useAuth } from "@/contexts/AuthContext";
 /* ── Category folder metadata (hardcoded to the 6 official pathways) ── */
 const FOLDERS = [
   {
-    key: "Business Analysis Foundation Bootcamp",
+    key: "Business Analysis",
     label: "BA Foundation Bootcamp",
     description:
       "Build strong foundations in Business Analysis — principles, techniques, elicitation, modelling and real-world deliverables.",
