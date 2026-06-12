@@ -259,7 +259,7 @@ const Courses = () => {
       </section>
 
       {/* ── Main Content Area ────────────────────────────────── */}
-      <section className="py-12 lg:py-16 relative bg-background min-h-[50vh]">
+      <section className="py-12 lg:py-16 relative bg-white min-h-[50vh]">
         <div className="container mx-auto px-4 lg:px-8 relative z-10">
 
           <AnimatePresence mode="wait">
@@ -277,19 +277,19 @@ const Courses = () => {
               >
                 {/* Global search */}
                 <div className="relative max-w-lg mb-10">
-                  <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground/30" />
+                  <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search across all pathways…"
-                    className="w-full pl-11 pr-4 py-3 bg-card border border-border rounded-xl text-sm placeholder:text-foreground/30 text-foreground/80 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
+                    className="w-full pl-11 pr-4 py-3 bg-gray-100 border border-gray-200 rounded-xl text-sm placeholder:text-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all"
                   />
                 </div>
 
                 {/* Section label */}
                 <div className="flex items-center gap-3 mb-8">
                   <div className="w-1 h-6 rounded-full bg-gradient-to-b from-primary to-primary/30" />
-                  <h2 className="text-xl font-semibold text-foreground/90">Choose Your Learning Pathway</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">Choose Your Learning Pathway</h2>
                 </div>
 
                 {/* Folder card grid */}
@@ -378,9 +378,9 @@ const Courses = () => {
                   {/* Back + breadcrumb */}
                   <button
                     onClick={closeFolder}
-                    className="flex items-center gap-2 text-sm text-foreground/50 hover:text-foreground transition-colors shrink-0 group"
+                    className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors shrink-0 group"
                   >
-                    <div className="w-7 h-7 rounded-lg border border-border flex items-center justify-center group-hover:border-primary/40 transition-colors">
+                    <div className="w-7 h-7 rounded-lg border border-gray-200 flex items-center justify-center group-hover:border-primary/40 transition-colors">
                       <ArrowLeft size={13} />
                     </div>
                     {isSearching && !selectedFolder ? (
@@ -388,8 +388,8 @@ const Courses = () => {
                     ) : (
                       <span className="flex items-center gap-1.5">
                         All Pathways
-                        <ChevronRight size={12} className="text-foreground/25" />
-                        <span className="text-foreground/80">{activeFolderMeta?.label}</span>
+                        <ChevronRight size={12} className="text-gray-300" />
+                        <span className="text-gray-700">{activeFolderMeta?.label}</span>
                       </span>
                     )}
                   </button>
@@ -397,19 +397,19 @@ const Courses = () => {
                   <div className="flex-1 flex items-center gap-2 sm:justify-end">
                     {/* Inline search */}
                     <div className="relative flex-1 sm:max-w-xs">
-                      <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/30" />
+                      <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                       <input
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search…"
-                        className="w-full pl-8 pr-3 py-2 bg-card border border-border rounded-lg text-xs placeholder:text-foreground/30 text-foreground/75 focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/35 transition-all"
+                        className="w-full pl-8 pr-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-xs placeholder:text-gray-400 text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/35 transition-all"
                       />
                     </div>
 
                     {/* Sort */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-card border border-border text-foreground/50 hover:text-foreground hover:border-primary/30 transition-all whitespace-nowrap shrink-0">
+                        <button className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-gray-100 border border-gray-200 text-gray-500 hover:text-gray-900 hover:border-primary/30 transition-all whitespace-nowrap shrink-0">
                           {sortBy === "numeric" && <Hash size={12} />}
                           {sortBy === "az" && <ArrowDownAZ size={12} />}
                           {sortBy === "za" && <ArrowUpAZ size={12} />}
@@ -435,15 +435,15 @@ const Courses = () => {
                       <activeFolderMeta.icon size={18} className={activeFolderMeta.iconColor} />
                     </div>
                     <div>
-                      <h2 className="text-xl font-semibold text-foreground leading-tight">{activeFolderMeta.label}</h2>
-                      <p className="text-xs text-foreground/40 mt-0.5">{activeFolderMeta.description}</p>
+                      <h2 className="text-xl font-semibold text-gray-900 leading-tight">{activeFolderMeta.label}</h2>
+                      <p className="text-xs text-gray-500 mt-0.5">{activeFolderMeta.description}</p>
                     </div>
                   </div>
                 )}
 
                 {isSearching && (
                   <div className="mb-6">
-                    <h2 className="text-lg font-semibold text-foreground/80">
+                    <h2 className="text-lg font-semibold text-gray-800">
                       {filteredCourses.length} result{filteredCourses.length !== 1 ? "s" : ""} for &ldquo;{searchQuery}&rdquo;
                     </h2>
                   </div>
@@ -452,10 +452,10 @@ const Courses = () => {
                 {/* Empty state */}
                 {!isLoading && filteredCourses.length === 0 && (
                   <div className="text-center py-16">
-                    <div className="w-16 h-16 rounded-2xl bg-card border border-border flex items-center justify-center mx-auto mb-4">
-                      <BookOpen size={28} className="text-foreground/20" />
+                    <div className="w-16 h-16 rounded-2xl bg-gray-100 border border-gray-200 flex items-center justify-center mx-auto mb-4">
+                      <BookOpen size={28} className="text-gray-300" />
                     </div>
-                    <p className="text-foreground/40 mb-2">
+                    <p className="text-gray-500 mb-2">
                       {isSearching ? "No courses match your search." : "No courses in this pathway yet."}
                     </p>
                     <button onClick={closeFolder} className="text-primary text-sm hover:underline mt-1">
