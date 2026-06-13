@@ -220,8 +220,8 @@ const Index = () => {
                 transition={{ delay: 0.15, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
                 className="text-5xl md:text-6xl xl:text-7xl font-serif font-normal text-white leading-[1.05] mb-6 tracking-display text-shadow-lg"
               >
-                Become a Future Ready{" "}
-                <em className="not-italic text-gradient-gold">Business Analyst</em>
+                Build Capability for the Future{" "}
+                <em className="not-italic text-gradient-gold">of Work</em>
               </motion.h1>
 
               {/* Subtitle */}
