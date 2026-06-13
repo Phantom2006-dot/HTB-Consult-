@@ -159,10 +159,10 @@ const stats = [
 ];
 
 const trustBadges = [
-  { icon: BarChart3, label: "Business Analysis & Digital Transformation", sub: "Learn to analyse, improve and transform business with practical frameworks." },
-  { icon: UserCheck, label: "Leadership & Professional Development", sub: "Strengthen mindset, communication, influence and leadership for career growth." },
-  { icon: Rocket, label: "Agile, Product & Delivery Management", sub: "Build capability in Agile, Scrum, Product Ownership and delivery excellence." },
-  { icon: Building2, label: "Industry & Domain Specialisation", sub: "Apply your skills across real world industries and professional domains." },
+  { icon: BarChart3, label: "Business Analysis & Digital Transformation", sub: "Learn to analyse, improve and transform business with practical frameworks.", iconBg: "bg-orange-500/20", iconColor: "text-orange-400" },
+  { icon: UserCheck, label: "Leadership & Professional Development", sub: "Strengthen mindset, communication, influence and leadership for career growth.", iconBg: "bg-emerald-500/20", iconColor: "text-emerald-400" },
+  { icon: Rocket, label: "Agile, Product & Delivery Management", sub: "Build capability in Agile, Scrum, Product Ownership and delivery excellence.", iconBg: "bg-blue-500/20", iconColor: "text-blue-400" },
+  { icon: Building2, label: "Industry & Domain Specialisation", sub: "Apply your skills across real world industries and professional domains.", iconBg: "bg-purple-500/20", iconColor: "text-purple-400" },
 ];
 
 /* ═══════════════════════════════════════════════════════════ */
@@ -268,8 +268,8 @@ const Index = () => {
               >
                 {trustBadges.map((b, i) => (
                   <div key={b.label} className="flex items-start gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-primary/20 flex items-center justify-center shrink-0 mt-0.5">
-                      <b.icon size={14} className="text-primary" />
+                    <div className={`w-7 h-7 rounded-lg ${b.iconBg} flex items-center justify-center shrink-0 mt-0.5`}>
+                      <b.icon size={14} className={b.iconColor} />
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-white leading-tight">{b.label}</p>
