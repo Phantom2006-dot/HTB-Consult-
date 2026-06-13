@@ -159,10 +159,10 @@ const stats = [
 ];
 
 const trustBadges = [
-  { icon: BookOpen, label: "Practical Learning", sub: "Hands-on projects & simulations" },
-  { icon: UserCheck, label: "Industry Mentorship", sub: "Learn from experienced BA professionals" },
-  { icon: Rocket, label: "Structured Pathway", sub: "From foundation to industry readiness" },
-  { icon: TrendingUp, label: "Career Growth", sub: "Build skills that get you hired" },
+  { icon: BarChart3, label: "Business Analysis & Digital Transformation", sub: "Learn to analyse, improve and transform business with practical frameworks." },
+  { icon: UserCheck, label: "Leadership & Professional Development", sub: "Strengthen mindset, communication, influence and leadership for career growth." },
+  { icon: Rocket, label: "Agile, Product & Delivery Management", sub: "Build capability in Agile, Scrum, Product Ownership and delivery excellence." },
+  { icon: Building2, label: "Industry & Domain Specialisation", sub: "Apply your skills across real world industries and professional domains." },
 ];
 
 /* ═══════════════════════════════════════════════════════════ */
@@ -206,7 +206,7 @@ const Index = () => {
             style={{ color: "hsl(var(--primary))" }}
           >
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "hsl(var(--primary))" }} />
-            Business Analysis. Real Training. Real Impact.
+            Build Skills. Grow Mindset. Create Impact.
           </motion.div>
 
           {/* Main row */}
@@ -225,15 +225,20 @@ const Index = () => {
               </motion.h1>
 
               {/* Subtitle */}
-              <motion.p
+              <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.55 }}
-                className="text-base lg:text-lg text-white/60 mb-8 leading-[1.85] font-light"
+                className="mb-8"
               >
-                Practical training<span className="text-primary">.</span> Real project simulation<span className="text-primary">.</span><br />
-                Industry readiness<span className="text-primary">.</span>
-              </motion.p>
+                <p className="text-base lg:text-lg text-white font-semibold mb-2 leading-snug">
+                  Business Analysis<span className="text-primary">.</span> Digital Transformation<span className="text-primary">.</span> Leadership<span className="text-primary">.</span> Industry Readiness<span className="text-primary">.</span>
+                </p>
+                <p className="text-sm lg:text-base text-white/55 leading-[1.8] font-light">
+                  Practical learning. Real project simulation. Industry readiness.<br />
+                  Develop the skills, mindset and confidence to excel in today's workplace.
+                </p>
+              </motion.div>
 
               {/* CTA Buttons */}
               <motion.div
