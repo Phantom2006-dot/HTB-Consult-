@@ -303,13 +303,23 @@ export async function initSchema() {
 
     await client.query(`
       INSERT INTO categories (name) VALUES
-        ('Business Analysis Foundation Bootcamp'),
-        ('Personal and Leadership Development'),
-        ('Mindset Before Skillset®'),
-        ('Agile and Scrum'),
-        ('Product Ownership'),
-        ('Domain Specific Pathways')
+        ('Business Analysis & Digital Transformation'),
+        ('Leadership & Professional Development'),
+        ('Agile, Product & Delivery Management'),
+        ('Industry & Domain Specialisation')
       ON CONFLICT (name) DO NOTHING;
+    `);
+    /* Remove old categories that no longer exist */
+    await client.query(`
+      DELETE FROM categories WHERE name IN (
+        'Business Analysis Foundation Bootcamp',
+        'Business Analysis',
+        'Personal and Leadership Development',
+        'Mindset Before Skillset®',
+        'Agile and Scrum',
+        'Product Ownership',
+        'Domain Specific Pathways'
+      );
     `);
 
     logger.info("Schema: all tables and indexes ready");
