@@ -97,31 +97,40 @@ export async function runMigrations() {
       ALTER TABLE users ADD COLUMN IF NOT EXISTS locked_until TIMESTAMPTZ;
     `);
 
-    // Sync to the 6 official course pathways (insert new, remove legacy)
+    // Sync to the 4 official course pathways (insert new, remove all legacy names)
     await client.query(`
       INSERT INTO categories (name) VALUES
-        ('Business Analysis'),
-        ('Personal and Leadership Development'),
-        ('Mindset Before Skillset®'),
-        ('Agile and Scrum'),
-        ('Product Ownership'),
-        ('Domain Specific Pathways')
+        ('Business Analysis & Digital Transformation'),
+        ('Leadership & Professional Development'),
+        ('Agile, Product & Delivery Management'),
+        ('Industry & Domain Specialisation')
       ON CONFLICT (name) DO NOTHING;
 
       DELETE FROM categories WHERE name IN (
-        'Business Analysis Foundation Bootcamp','Digital Transformation','Business Strategy',
-        'Project Delivery','Bid Writing','Consulting & Leadership','General'
+        'Business Analysis Foundation Bootcamp','Business Analysis',
+        'Personal and Leadership Development','Mindset Before Skillset®',
+        'Agile and Scrum','Product Ownership','Domain Specific Pathways',
+        'Digital Transformation','Business Strategy','Project Delivery',
+        'Bid Writing','Consulting & Leadership','General'
       );
     `);
 
-    // Remap any courses that still carry legacy category names
+    // Remap any courses that still carry legacy category names to the new ones
     await client.query(`
-      UPDATE courses SET category = 'Business Analysis'
-        WHERE category IN ('Business Analysis Foundation Bootcamp','General');
-      UPDATE courses SET category = 'Personal and Leadership Development'
-        WHERE category IN ('Consulting & Leadership');
-      UPDATE courses SET category = 'Domain Specific Pathways'
-        WHERE category IN ('Digital Transformation','Business Strategy','Project Delivery','Bid Writing');
+      UPDATE courses SET category = 'Business Analysis & Digital Transformation'
+        WHERE category IN (
+          'Business Analysis Foundation Bootcamp','Business Analysis',
+          'Digital Transformation','Business Strategy','General'
+        );
+      UPDATE courses SET category = 'Leadership & Professional Development'
+        WHERE category IN (
+          'Personal and Leadership Development','Mindset Before Skillset®',
+          'Consulting & Leadership'
+        );
+      UPDATE courses SET category = 'Agile, Product & Delivery Management'
+        WHERE category IN ('Agile and Scrum','Product Ownership','Project Delivery');
+      UPDATE courses SET category = 'Industry & Domain Specialisation'
+        WHERE category IN ('Domain Specific Pathways','Bid Writing');
     `);
 
     // Email verification — mark existing users as already verified so they aren't locked out
