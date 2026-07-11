@@ -120,10 +120,15 @@ const Navbar = () => {
                 >
                   <Link to="/auth">Log In</Link>
                 </Button>
+                <Button variant="ghost" asChild size="sm"
+                  className="text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 border border-white/20"
+                >
+                  <Link to="/auth?tab=signup">Register</Link>
+                </Button>
                 <Button asChild size="sm"
                   className="bg-gradient-gold hover:opacity-90 font-semibold px-5 text-sm shadow-md btn-shimmer"
                 >
-                  <Link to="/auth?tab=signup">Explore Pathways</Link>
+                  <Link to="/courses">Explore Pathways</Link>
                 </Button>
               </>
             )}
