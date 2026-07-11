@@ -5,6 +5,7 @@ import {
   Clock, ArrowRight, BookOpen, ArrowDownAZ, ArrowUpAZ, Hash, Lock, X, Bell,
   GraduationCap, CreditCard, ChevronRight, ArrowLeft, Brain, Users, Target,
   Building2, Search, RefreshCw, Layers, ChevronDown, BarChart3,
+  Video, Award, FileText, CheckCircle2, CalendarDays, UserCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,44 @@ const FOLDERS = [
     glow: "hover:shadow-[0_20px_60px_-15px_rgba(234,119,0,0.22)]",
     tag: "Analysis",
     tagCls: "bg-orange-500/15 text-orange-400 border-orange-500/25",
+    programme: {
+      type: "foundation" as const,
+      badge: "Foundation Programme",
+      subtitle:
+        "Master the fundamentals of Business Analysis and Digital Transformation through structured learning, practical exercises, real project simulations and a live Bootcamp. Build the confidence and capability required to operate effectively in real project environments.",
+      phases: [
+        {
+          title: "Phase 1: Foundation Learning",
+          intro: "Complete the 10 structured learning modules covering:",
+          items: [
+            "Introduction to Business Analysis",
+            "Business Analysis in the SDLC",
+            "Requirements Engineering",
+            "Stakeholder Management",
+            "Process Modelling",
+            "Documentation & Business Analysis Artefacts",
+            "Agile Business Analysis",
+            "User Acceptance Testing",
+            "BA Tools & Techniques",
+            "End to End Project Simulation",
+          ],
+        },
+        {
+          title: "Phase 2: Live Practical Bootcamp",
+          intro: "Apply everything you've learned through instructor-led workshops including:",
+          items: [
+            "Live Zoom Sessions",
+            "Real Project Simulation",
+            "Group Workshops",
+            "Stakeholder Role Play",
+            "Documentation Reviews",
+            "CV & Portfolio Development",
+            "Interview Preparation",
+            "Career Coaching",
+          ],
+        },
+      ],
+    },
   },
   {
     key: "Leadership & Professional Development",
@@ -50,6 +89,41 @@ const FOLDERS = [
     glow: "hover:shadow-[0_20px_60px_-15px_rgba(16,185,129,0.18)]",
     tag: "Leadership",
     tagCls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
+    programme: {
+      type: "live" as const,
+      badge: "Live Instructor-Led Programme",
+      subtitle:
+        "Develop the mindset, leadership and communication skills needed to influence others, lead with confidence and create lasting professional impact. This live programme combines practical learning, reflection and real world application through interactive Zoom sessions.",
+      learn: [
+        "Leadership Foundations",
+        "Emotional Intelligence",
+        "Effective Communication",
+        "Influencing & Stakeholder Management",
+        "Decision Making",
+        "Personal Effectiveness",
+        "Mindset Before Skillset® Principles",
+        "Leading Teams with Confidence",
+        "Certificate of Completion",
+      ],
+      delivery: [
+        "Live Zoom Sessions",
+        "Practical Workshops",
+        "Interactive Group Discussions",
+        "Practical Course Resources",
+        "Certificate of Completion",
+      ],
+      who: [
+        "Emerging Leaders",
+        "Team Leaders",
+        "Supervisors",
+        "Managers",
+        "Business Professionals",
+        "Anyone looking to strengthen their leadership capability",
+      ],
+      cohortSub:
+        "Secure your place today and join our next instructor-led cohort. Learn through engaging discussions, practical exercises and leadership scenarios that prepare you to lead with confidence.",
+      cta: "Take the next step in your leadership journey.",
+    },
   },
   {
     key: "Agile, Product & Delivery Management",
@@ -65,6 +139,41 @@ const FOLDERS = [
     glow: "hover:shadow-[0_20px_60px_-15px_rgba(59,130,246,0.18)]",
     tag: "Agile",
     tagCls: "bg-blue-500/15 text-blue-400 border-blue-500/25",
+    programme: {
+      type: "live" as const,
+      badge: "Live Instructor-Led Programme",
+      subtitle:
+        "Build practical capability in Agile, Scrum, Product Ownership and Delivery Management through live Zoom sessions, interactive workshops and real world case studies. This hands-on programme is designed for professionals who want to lead and deliver successful projects with confidence.",
+      learn: [
+        "Agile & Scrum Foundations",
+        "Product Ownership in Practice",
+        "Sprint Planning & Backlog Management",
+        "Stakeholder Management",
+        "Delivery Planning",
+        "Agile Ceremonies",
+        "User Stories & Backlog Refinement",
+        "Real Project Scenarios",
+        "Certificate of Completion",
+      ],
+      delivery: [
+        "Live Zoom Sessions",
+        "Practical Workshops",
+        "Interactive Group Discussions",
+        "Practical Course Resources",
+        "Certificate of Completion",
+      ],
+      who: [
+        "Aspiring Product Owners",
+        "Scrum Masters",
+        "Business Analysts",
+        "Project Managers",
+        "Delivery Managers",
+        "Professionals transitioning into Agile roles",
+      ],
+      cohortSub:
+        "Secure your place today and join our next instructor-led cohort. Learn through live teaching, practical workshops and real project discussions that prepare you for Agile delivery in the workplace.",
+      cta: "Take the next step in your Agile journey and build practical skills that you can apply with confidence.",
+    },
   },
   {
     key: "Industry & Domain Specialisation",
@@ -80,10 +189,189 @@ const FOLDERS = [
     glow: "hover:shadow-[0_20px_60px_-15px_rgba(139,92,246,0.18)]",
     tag: "Specialisation",
     tagCls: "bg-purple-500/15 text-purple-400 border-purple-500/25",
+    programme: {
+      type: "live" as const,
+      badge: "Live Instructor-Led Programme",
+      subtitle:
+        "Build practical knowledge across key industries and understand how Business Analysis, Product Management and Agile delivery are applied in different business environments. Learn from real world examples, case studies and practical discussions.",
+      learn: [
+        "Banking & Financial Services",
+        "Healthcare",
+        "Insurance",
+        "Retail & E-Commerce",
+        "Public Sector",
+        "Cyber Security & Identity Management",
+        "Digital Transformation",
+        "Industry Case Studies",
+        "Certificate of Completion",
+      ],
+      delivery: [
+        "Live Zoom Sessions",
+        "Practical Workshops",
+        "Interactive Group Discussions",
+        "Practical Course Resources",
+        "Certificate of Completion",
+      ],
+      who: [
+        "Business Analysts",
+        "Product Owners",
+        "Scrum Masters",
+        "Project Managers",
+        "Consultants",
+        "Professionals looking to specialise in industry domains",
+      ],
+      cohortSub:
+        "Secure your place today and explore how professionals deliver value across different industries through practical learning and real business scenarios.",
+      cta: "Expand your industry knowledge and become more confident across multiple sectors.",
+    },
   },
 ];
 
 type SortOption = "numeric" | "az" | "za";
+
+/* ── Programme info panel rendered inside an open folder ── */
+type FoundationProgramme = {
+  type: "foundation";
+  badge: string;
+  subtitle: string;
+  phases: { title: string; intro: string; items: string[] }[];
+};
+type LiveProgramme = {
+  type: "live";
+  badge: string;
+  subtitle: string;
+  learn: string[];
+  delivery: string[];
+  who: string[];
+  cohortSub: string;
+  cta: string;
+};
+type Programme = FoundationProgramme | LiveProgramme;
+
+const DELIVERY_ICONS: Record<string, React.ElementType> = {
+  "Live Zoom Sessions": Video,
+  "Practical Workshops": Target,
+  "Interactive Group Discussions": Users,
+  "Practical Course Resources": FileText,
+  "Certificate of Completion": Award,
+};
+
+function ProgrammePanel({ programme, accentColor }: { programme: Programme; accentColor: string }) {
+  const accentBorder = accentColor.replace("text-", "border-").replace("-400", "-500/30");
+  const accentBg = accentColor.replace("text-", "bg-").replace("-400", "-500/8");
+  const accentText = accentColor;
+
+  if (programme.type === "foundation") {
+    return (
+      <div className="mb-8 rounded-2xl border border-gray-100 bg-gray-50/60 overflow-hidden">
+        {/* Header */}
+        <div className={`px-6 pt-6 pb-5 border-b border-gray-100`}>
+          <span className={`inline-block text-[10px] font-semibold tracking-widest uppercase px-2.5 py-1 rounded-full mb-3 ${accentBg} ${accentText} border ${accentBorder}`}>
+            {programme.badge}
+          </span>
+          <p className="text-sm text-gray-600 leading-relaxed max-w-3xl">{programme.subtitle}</p>
+        </div>
+
+        {/* Phases */}
+        <div className="p-6">
+          <p className="text-xs font-semibold tracking-widest uppercase text-gray-400 mb-4">Programme Structure</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {programme.phases.map((phase, pi) => (
+              <div key={pi} className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+                <div className="flex items-center gap-2.5 mb-3">
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0`}
+                    style={{ background: pi === 0 ? "hsl(30 100% 46%)" : "hsl(163 60% 35%)" }}>
+                    {pi + 1}
+                  </div>
+                  <h4 className="text-sm font-semibold text-gray-800">{phase.title}</h4>
+                </div>
+                <p className="text-xs text-gray-500 mb-3">{phase.intro}</p>
+                <ul className="space-y-1.5">
+                  {phase.items.map((item, ii) => (
+                    <li key={ii} className="flex items-start gap-2 text-xs text-gray-600">
+                      <CheckCircle2 size={12} className={`mt-0.5 shrink-0 ${accentText}`} />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-8 rounded-2xl border border-gray-100 bg-gray-50/60 overflow-hidden">
+      {/* Header */}
+      <div className="px-6 pt-6 pb-5 border-b border-gray-100">
+        <span className={`inline-block text-[10px] font-semibold tracking-widest uppercase px-2.5 py-1 rounded-full mb-3 ${accentBg} ${accentText} border ${accentBorder}`}>
+          {programme.badge}
+        </span>
+        <p className="text-sm text-gray-600 leading-relaxed max-w-3xl">{programme.subtitle}</p>
+      </div>
+
+      {/* Three-column grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-0 divide-y md:divide-y-0 md:divide-x divide-gray-100">
+        {/* What You'll Learn */}
+        <div className="p-5">
+          <p className="text-[10px] font-semibold tracking-widest uppercase text-gray-400 mb-3">What You'll Learn</p>
+          <ul className="space-y-1.5">
+            {programme.learn.map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-xs text-gray-600">
+                <CheckCircle2 size={12} className={`mt-0.5 shrink-0 ${accentText}`} />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Delivery Format */}
+        <div className="p-5">
+          <p className="text-[10px] font-semibold tracking-widest uppercase text-gray-400 mb-3">Delivery Format</p>
+          <ul className="space-y-2">
+            {programme.delivery.map((item, i) => {
+              const Icon = DELIVERY_ICONS[item] ?? CheckCircle2;
+              return (
+                <li key={i} className="flex items-center gap-2 text-xs text-gray-600">
+                  <Icon size={13} className={`shrink-0 ${accentText}`} />
+                  {item}
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* Next Cohort */}
+          <div className={`mt-5 rounded-xl p-3.5 border ${accentBorder} ${accentBg}`}>
+            <div className="flex items-center gap-1.5 mb-1">
+              <CalendarDays size={12} className={accentText} />
+              <p className="text-[10px] font-semibold tracking-widest uppercase text-gray-500">Next Cohort</p>
+            </div>
+            <p className={`text-xs font-semibold ${accentText} mb-1`}>Live Cohort Launching Soon</p>
+            <p className="text-[11px] text-gray-500 leading-relaxed">{programme.cohortSub}</p>
+          </div>
+        </div>
+
+        {/* Who Is This For */}
+        <div className="p-5">
+          <p className="text-[10px] font-semibold tracking-widest uppercase text-gray-400 mb-3">Who Is This For?</p>
+          <ul className="space-y-1.5 mb-5">
+            {programme.who.map((item, i) => (
+              <li key={i} className="flex items-start gap-2 text-xs text-gray-600">
+                <UserCheck size={12} className={`mt-0.5 shrink-0 ${accentText}`} />
+                {item}
+              </li>
+            ))}
+          </ul>
+          <div className="border-t border-gray-100 pt-4">
+            <p className="text-[11px] text-gray-500 italic leading-relaxed">{programme.cta}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const LEVEL_COLORS: Record<string, string> = {
   Beginner: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
@@ -400,15 +688,23 @@ const Courses = () => {
 
                 {/* Folder heading (when inside a specific folder) */}
                 {activeFolderMeta && !isSearching && (
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className={`w-10 h-10 rounded-xl ${activeFolderMeta.iconBg} flex items-center justify-center`}>
-                      <activeFolderMeta.icon size={18} className={activeFolderMeta.iconColor} />
+                  <>
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className={`w-10 h-10 rounded-xl ${activeFolderMeta.iconBg} flex items-center justify-center`}>
+                        <activeFolderMeta.icon size={18} className={activeFolderMeta.iconColor} />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-semibold text-gray-900 leading-tight">{activeFolderMeta.label}</h2>
+                        <p className="text-xs text-gray-500 mt-0.5">{activeFolderMeta.description}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h2 className="text-xl font-semibold text-gray-900 leading-tight">{activeFolderMeta.label}</h2>
-                      <p className="text-xs text-gray-500 mt-0.5">{activeFolderMeta.description}</p>
-                    </div>
-                  </div>
+                    {activeFolderMeta.programme && (
+                      <ProgrammePanel
+                        programme={activeFolderMeta.programme}
+                        accentColor={activeFolderMeta.iconColor}
+                      />
+                    )}
+                  </>
                 )}
 
                 {isSearching && (
