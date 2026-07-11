@@ -297,6 +297,14 @@ function ProgrammePanel({ programme, accentColor }: { programme: Programme; acce
               </div>
             ))}
           </div>
+          <div className="mt-5 flex justify-start">
+            <Link
+              to="/auth?tab=signup"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors shadow-sm"
+            >
+              Register Now <ArrowRight size={14} />
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -364,8 +372,14 @@ function ProgrammePanel({ programme, accentColor }: { programme: Programme; acce
               </li>
             ))}
           </ul>
-          <div className="border-t border-gray-100 pt-4">
+          <div className="border-t border-gray-100 pt-4 space-y-3">
             <p className="text-[11px] text-gray-500 italic leading-relaxed">{programme.cta}</p>
+            <Link
+              to="/auth?tab=signup"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors shadow-sm"
+            >
+              Register Now <ArrowRight size={14} />
+            </Link>
           </div>
         </div>
       </div>
