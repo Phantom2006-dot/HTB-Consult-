@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   MessageSquare, Send, Bot, Trash2, User, Users, AlertCircle,
-  Pencil, Check, X, Moon, Sun, Plus, ArrowLeft, SmilePlus, Search
+  Pencil, Check, X, Moon, Sun, Plus, ArrowLeft, SmilePlus, Search, Hash,
 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ interface Conversation {
   id: string;
   title: string;
   type: "ai" | "user" | "group";
+  user_id: string;
   participant_id: string | null;
   participant_name?: string | null;
   participant_avatar?: string | null;
@@ -47,15 +48,13 @@ interface AppUser {
 
 type ChatError = { message: string } | null;
 
-// ── Constants ────────────────────────────────────────────────────────────────
 const CHAT_URL = "/api/chat";
 const COMMON_EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "🙏", "🔥", "✅"];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function timeAgo(dateStr: string) {
   const d = new Date(dateStr);
-  const now = Date.now();
-  const diff = now - d.getTime();
+  const diff = Date.now() - d.getTime();
   if (diff < 60_000) return "just now";
   if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}m ago`;
   if (diff < 86_400_000) return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -116,8 +115,11 @@ async function streamChat({
   onDone();
 }
 
-// ── Avatar component ──────────────────────────────────────────────────────────
-function Avatar({ url, name, email, size = 8, online, isBot }: { url?: string | null; name?: string | null; email?: string; size?: number; online?: boolean; isBot?: boolean }) {
+// ── Avatar ──────────────────────────────────────────────────────────────────
+function Avatar({ url, name, email, size = 8, online, isBot, isGroup }: {
+  url?: string | null; name?: string | null; email?: string;
+  size?: number; online?: boolean; isBot?: boolean; isGroup?: boolean;
+}) {
   const px = size * 4;
   const style = { width: px, height: px, minWidth: px, minHeight: px };
   const fontSize = px < 28 ? 10 : 12;
@@ -127,6 +129,10 @@ function Avatar({ url, name, email, size = 8, online, isBot }: { url?: string | 
         <div className="w-full h-full rounded-full bg-primary/10 flex items-center justify-center">
           <Bot size={px * 0.5} className="text-primary" />
         </div>
+      ) : isGroup ? (
+        <div className="w-full h-full rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+          <Hash size={px * 0.45} className="text-emerald-600 dark:text-emerald-400" />
+        </div>
       ) : url ? (
         <img src={url} alt={name || ""} className="w-full h-full rounded-full object-cover" />
       ) : (
@@ -134,7 +140,7 @@ function Avatar({ url, name, email, size = 8, online, isBot }: { url?: string | 
           {initials(name, email)}
         </div>
       )}
-      {online !== undefined && (
+      {online !== undefined && !isGroup && (
         <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-gray-900 ${online ? "bg-green-500" : "bg-gray-400"}`} />
       )}
     </div>
@@ -146,11 +152,7 @@ function EmojiPicker({ onPick, onClose }: { onPick: (e: string) => void; onClose
   return (
     <div className="absolute bottom-full mb-1 left-0 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-2 flex gap-1">
       {COMMON_EMOJIS.map(emoji => (
-        <button
-          key={emoji}
-          onClick={() => { onPick(emoji); onClose(); }}
-          className="text-lg hover:scale-125 transition-transform p-0.5"
-        >
+        <button key={emoji} onClick={() => { onPick(emoji); onClose(); }} className="text-lg hover:scale-125 transition-transform p-0.5">
           {emoji}
         </button>
       ))}
@@ -158,17 +160,12 @@ function EmojiPicker({ onPick, onClose }: { onPick: (e: string) => void; onClose
   );
 }
 
-// ── Message Bubble ────────────────────────────────────────────────────────────
+// ── Message Bubble ─────────────────────────────────────────────────────────────
 function MessageBubble({
-  msg, isOwn, isAI, currentUserId, currentUserAvatar, currentUserName,
-  onEdit, onDelete, onReact,
+  msg, isOwn, isAI, currentUserId, currentUserAvatar, currentUserName, onEdit, onDelete, onReact,
 }: {
-  msg: ChatMessage;
-  isOwn: boolean;
-  isAI: boolean;
-  currentUserId: string;
-  currentUserAvatar?: string | null;
-  currentUserName?: string | null;
+  msg: ChatMessage; isOwn: boolean; isAI: boolean;
+  currentUserId: string; currentUserAvatar?: string | null; currentUserName?: string | null;
   onEdit: (id: string, content: string) => void;
   onDelete: (id: string) => void;
   onReact: (id: string, emoji: string) => void;
@@ -181,18 +178,14 @@ function MessageBubble({
   const totalReactions = Object.values(msg.reactions || {}).reduce((s, arr) => s + arr.length, 0);
 
   const handleSaveEdit = () => {
-    if (editVal.trim() && editVal.trim() !== msg.content) {
-      onEdit(msg.id, editVal.trim());
-    }
+    if (editVal.trim() && editVal.trim() !== msg.content) onEdit(msg.id, editVal.trim());
     setEditing(false);
   };
 
   if (msg.is_deleted) {
     return (
       <div className={`flex gap-2 ${isOwn ? "justify-end" : "justify-start"} mb-1`}>
-        <span className="text-xs text-gray-400 italic px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-xl">
-          This message was deleted
-        </span>
+        <span className="text-xs text-gray-400 italic px-3 py-2 bg-gray-100 dark:bg-gray-800 rounded-xl">This message was deleted</span>
       </div>
     );
   }
@@ -220,8 +213,7 @@ function MessageBubble({
           {editing ? (
             <div className="flex gap-1 items-center">
               <input
-                autoFocus
-                value={editVal}
+                autoFocus value={editVal}
                 onChange={e => setEditVal(e.target.value)}
                 onKeyDown={e => { if (e.key === "Enter") handleSaveEdit(); if (e.key === "Escape") setEditing(false); }}
                 className="text-sm px-3 py-2 rounded-xl border border-primary focus:outline-none focus:ring-1 focus:ring-primary bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 min-w-[180px]"
@@ -249,29 +241,17 @@ function MessageBubble({
           {hovering && !editing && (
             <div className={`absolute ${isOwn ? "left-0 -translate-x-full pr-1" : "right-0 translate-x-full pl-1"} top-0 flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity`}>
               <div className="relative">
-                <button
-                  onClick={() => setShowPicker(!showPicker)}
-                  className="p-1 rounded-lg bg-white dark:bg-gray-800 shadow text-gray-500 hover:text-primary hover:shadow-md transition-all"
-                  title="React"
-                >
+                <button onClick={() => setShowPicker(!showPicker)} className="p-1 rounded-lg bg-white dark:bg-gray-800 shadow text-gray-500 hover:text-primary hover:shadow-md transition-all" title="React">
                   <SmilePlus size={14} />
                 </button>
                 {showPicker && <EmojiPicker onPick={(e) => onReact(msg.id, e)} onClose={() => setShowPicker(false)} />}
               </div>
               {isOwn && !isAI && (
                 <>
-                  <button
-                    onClick={() => { setEditing(true); setEditVal(msg.content); }}
-                    className="p-1 rounded-lg bg-white dark:bg-gray-800 shadow text-gray-500 hover:text-primary hover:shadow-md transition-all"
-                    title="Edit"
-                  >
+                  <button onClick={() => { setEditing(true); setEditVal(msg.content); }} className="p-1 rounded-lg bg-white dark:bg-gray-800 shadow text-gray-500 hover:text-primary hover:shadow-md transition-all" title="Edit">
                     <Pencil size={14} />
                   </button>
-                  <button
-                    onClick={() => onDelete(msg.id)}
-                    className="p-1 rounded-lg bg-white dark:bg-gray-800 shadow text-gray-500 hover:text-red-500 hover:shadow-md transition-all"
-                    title="Delete"
-                  >
+                  <button onClick={() => onDelete(msg.id)} className="p-1 rounded-lg bg-white dark:bg-gray-800 shadow text-gray-500 hover:text-red-500 hover:shadow-md transition-all" title="Delete">
                     <Trash2 size={14} />
                   </button>
                 </>
@@ -285,15 +265,12 @@ function MessageBubble({
           <div className="flex flex-wrap gap-0.5 mt-1 px-1">
             {Object.entries(msg.reactions || {}).map(([emoji, users]) =>
               users.length > 0 ? (
-                <button
-                  key={emoji}
-                  onClick={() => onReact(msg.id, emoji)}
+                <button key={emoji} onClick={() => onReact(msg.id, emoji)}
                   className={`flex items-center gap-0.5 text-xs px-1.5 py-0.5 rounded-full border transition-colors ${
                     users.includes(currentUserId)
                       ? "bg-primary/10 border-primary/30 text-primary"
-                      : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  }`}
-                >
+                      : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100"
+                  }`}>
                   {emoji} {users.length}
                 </button>
               ) : null
@@ -301,7 +278,6 @@ function MessageBubble({
           </div>
         )}
 
-        {/* Timestamp & edited */}
         <div className="flex items-center gap-1 mt-0.5 px-1">
           <span className="text-[10px] text-gray-400">{timeAgo(msg.created_at)}</span>
           {msg.edited_at && <span className="text-[10px] text-gray-400 italic">edited</span>}
@@ -312,43 +288,29 @@ function MessageBubble({
 }
 
 // ── User Selector Modal ───────────────────────────────────────────────────────
-function UserSelectorModal({
-  users, onSelect, onClose,
-}: {
-  users: AppUser[];
-  onSelect: (u: AppUser) => void;
-  onClose: () => void;
+function UserSelectorModal({ users, onSelect, onClose }: {
+  users: AppUser[]; onSelect: (u: AppUser) => void; onClose: () => void;
 }) {
   const [q, setQ] = useState("");
-  const filtered = users.filter(u =>
-    (u.full_name || u.email).toLowerCase().includes(q.toLowerCase())
-  );
+  const filtered = users.filter(u => (u.full_name || u.email).toLowerCase().includes(q.toLowerCase()));
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-sm" onClick={e => e.stopPropagation()}>
         <div className="p-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
-          <h3 className="font-semibold text-gray-900 dark:text-white">New Message</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white">New Direct Message</h3>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600"><X size={18} /></button>
         </div>
         <div className="p-3">
           <div className="flex items-center gap-2 bg-gray-100 dark:bg-gray-800 rounded-lg px-3 py-2">
             <Search size={14} className="text-gray-400" />
-            <input
-              autoFocus
-              value={q}
-              onChange={e => setQ(e.target.value)}
-              placeholder="Search people..."
-              className="flex-1 bg-transparent text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none"
-            />
+            <input autoFocus value={q} onChange={e => setQ(e.target.value)} placeholder="Search people..."
+              className="flex-1 bg-transparent text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none" />
           </div>
         </div>
         <div className="max-h-64 overflow-y-auto pb-2">
           {filtered.map(u => (
-            <button
-              key={u.id}
-              onClick={() => onSelect(u)}
-              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-            >
+            <button key={u.id} onClick={() => onSelect(u)}
+              className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
               <Avatar url={u.avatar_url} name={u.full_name} email={u.email} size={9} online={u.is_online} />
               <div className="text-left min-w-0">
                 <p className="text-sm font-medium text-gray-900 dark:text-white truncate">{u.full_name || u.email}</p>
@@ -360,6 +322,50 @@ function UserSelectorModal({
           {filtered.length === 0 && <p className="text-sm text-center text-gray-400 py-6">No users found</p>}
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── Sidebar conversation item ─────────────────────────────────────────────────
+function ConvItem({ conv, active, onSelect, onDelete, currentUserId, showAvatar }: {
+  conv: Conversation; active: boolean; onSelect: () => void;
+  onDelete: () => void; currentUserId: string; showAvatar?: boolean;
+}) {
+  const isCommunity = conv.type === "group" && !conv.participant_id;
+  const isOwner = conv.user_id === currentUserId;
+
+  return (
+    <div
+      onClick={onSelect} role="button" tabIndex={0}
+      onKeyDown={e => e.key === "Enter" && onSelect()}
+      className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer group transition-colors ${
+        active ? "bg-primary/10 dark:bg-primary/20" : "hover:bg-gray-50 dark:hover:bg-gray-800"
+      }`}
+    >
+      {isCommunity ? (
+        <Avatar isGroup size={8} />
+      ) : showAvatar ? (
+        <Avatar url={conv.participant_avatar} name={conv.participant_name} size={8} online={conv.participant_online ?? undefined} />
+      ) : (
+        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${active ? "bg-primary/20" : "bg-gray-100 dark:bg-gray-800"}`}>
+          {conv.type === "ai" ? <Bot size={15} className="text-primary" /> : <Users size={15} className="text-gray-500" />}
+        </div>
+      )}
+      <div className="flex-1 min-w-0">
+        <p className={`text-sm truncate ${active ? "font-semibold text-primary" : "text-gray-800 dark:text-gray-200"}`}>
+          {isCommunity ? "Community" : conv.type === "ai" ? conv.title : (conv.participant_name || conv.title)}
+        </p>
+        {conv.last_message_preview && (
+          <p className="text-xs text-gray-400 truncate">{conv.last_message_preview}</p>
+        )}
+      </div>
+      {/* Only the owner can delete */}
+      {isOwner && !isCommunity && (
+        <button onClick={e => { e.stopPropagation(); onDelete(); }}
+          className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition-all shrink-0">
+          <Trash2 size={13} />
+        </button>
+      )}
     </div>
   );
 }
@@ -387,7 +393,6 @@ const Chat = () => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Dark mode toggle
   const toggleDark = () => {
     const next = !darkMode;
     setDarkMode(next);
@@ -398,7 +403,6 @@ const Chat = () => {
     if (!loading && !user) navigate("/auth");
   }, [user, loading, navigate]);
 
-  // Ping last_seen
   useEffect(() => {
     if (!user) return;
     api.post("/api/chat/ping").catch(() => {});
@@ -406,36 +410,40 @@ const Chat = () => {
     return () => clearInterval(t);
   }, [user]);
 
-  // Load users for DMs
   useEffect(() => {
     if (!user) return;
     api.get<AppUser[]>("/api/chat/users").then(setUsers).catch(() => {});
   }, [user]);
 
-  // Load conversations
+  // Load conversations (includes ones where you are the participant)
+  const loadConversations = useCallback(async () => {
+    if (!user) return;
+    const data = await api.get<Conversation[]>("/api/chat/conversations").catch(() => null);
+    if (data) setConversations(data);
+  }, [user]);
+
+  useEffect(() => {
+    loadConversations();
+  }, [loadConversations]);
+
   useEffect(() => {
     if (!user) return;
-    api.get<Conversation[]>("/api/chat/conversations").then((data) => {
-      if (data) {
-        setConversations(data);
-        const convParam = searchParams.get("conv");
-        if (convParam) {
-          const found = data.find(c => c.id === convParam);
-          if (found) { setActiveConv(convParam); setActiveType(found.type); }
-        }
-      }
-    }).catch(() => {});
-  }, [user, searchParams]);
+    const convParam = searchParams.get("conv");
+    if (convParam && conversations.length > 0) {
+      const found = conversations.find(c => c.id === convParam);
+      if (found) { setActiveConv(convParam); setActiveType(found.type); }
+    }
+  }, [conversations, searchParams, user]);
 
   // Load messages for active conversation
   useEffect(() => {
     if (!activeConv) { setMessages([]); return; }
-    api.get<ChatMessage[]>(`/api/chat/conversations/${activeConv}/messages`).then(data => {
-      if (data) setMessages(data);
-    }).catch(() => {});
+    api.get<ChatMessage[]>(`/api/chat/conversations/${activeConv}/messages`)
+      .then(data => { if (data) setMessages(data); })
+      .catch(() => {});
   }, [activeConv]);
 
-  // Poll messages in user chats every 3s
+  // Poll messages in user/group chats every 3s
   useEffect(() => {
     if (pollRef.current) clearInterval(pollRef.current);
     if (activeConv && activeType !== "ai") {
@@ -448,13 +456,11 @@ const Chat = () => {
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, [activeConv, activeType]);
 
-  // Scroll to bottom on new messages
   useEffect(() => {
     const el = messagesContainerRef.current;
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages, typingDots]);
 
-  // Auto-resize textarea
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
     e.target.style.height = "auto";
@@ -487,6 +493,19 @@ const Chat = () => {
     return data;
   };
 
+  const joinCommunity = async () => {
+    const data = await api.get<Conversation>("/api/chat/community").catch(() => null);
+    if (!data) return;
+    setConversations(prev => {
+      const exists = prev.find(c => c.id === data.id);
+      return exists ? prev : [data, ...prev];
+    });
+    setActiveConv(data.id);
+    setActiveType("group");
+    setMessages([]);
+    if (window.innerWidth < 640) setShowSidebar(false);
+  };
+
   const startDM = async (u: AppUser) => {
     setShowUserModal(false);
     const conv = await createConversation("user", u.full_name || u.email, u.id);
@@ -514,8 +533,7 @@ const Chat = () => {
   const handleReact = useCallback(async (msgId: string, emoji: string) => {
     if (!activeConv) return;
     const data = await api.post<{ reactions: Record<string, string[]> }>(
-      `/api/chat/conversations/${activeConv}/messages/${msgId}/react`,
-      { emoji }
+      `/api/chat/conversations/${activeConv}/messages/${msgId}/react`, { emoji }
     ).catch(() => null);
     if (data) setMessages(prev => prev.map(m => m.id === msgId ? { ...m, reactions: data.reactions } : m));
   }, [activeConv]);
@@ -544,14 +562,22 @@ const Chat = () => {
     const newMsgs = [...messages, userMsg];
     setMessages(newMsgs);
     setInput("");
-    if (inputRef.current) { inputRef.current.style.height = "auto"; }
+    if (inputRef.current) inputRef.current.style.height = "auto";
 
     await api.post(`/api/chat/conversations/${convId}/messages`, { role: "user", content: userMsg.content }).catch(() => {});
 
-    if (messages.length === 0) {
+    // Only the conversation owner can rename it
+    const activeConvData = conversations.find(c => c.id === convId);
+    if (messages.length === 0 && activeConvData?.user_id === user.id) {
       await api.patch(`/api/chat/conversations/${convId}`, { title: userMsg.content.slice(0, 50) }).catch(() => {});
       setConversations(prev => prev.map(c => c.id === convId ? { ...c, title: userMsg.content.slice(0, 50) } : c));
     }
+
+    // Update preview in sidebar
+    setConversations(prev => prev.map(c => c.id === convId
+      ? { ...c, last_message_preview: userMsg.content.slice(0, 80), updated_at: new Date().toISOString() }
+      : c
+    ));
 
     if (convType === "ai") {
       setIsStreaming(true);
@@ -579,11 +605,7 @@ const Chat = () => {
             await api.post(`/api/chat/conversations/${convId}/messages`, { role: "assistant", content: assistantText }).catch(() => {});
           }
         },
-        onError: (err) => {
-          setIsStreaming(false);
-          setTypingDots(false);
-          setChatError({ message: err });
-        },
+        onError: (err) => { setIsStreaming(false); setTypingDots(false); setChatError({ message: err }); },
       });
     }
   };
@@ -601,13 +623,22 @@ const Chat = () => {
 
   const activeConvData = conversations.find(c => c.id === activeConv);
   const isAIConv = activeType === "ai";
+  const isCommunityConv = activeType === "group" && !activeConvData?.participant_id;
+
   const headerTitle = activeConvData
-    ? isAIConv ? "HTB AI Assistant" : (activeConvData.participant_name || activeConvData.title)
+    ? isAIConv
+      ? "HTB AI Assistant"
+      : isCommunityConv
+        ? "Community"
+        : (activeConvData.participant_name || activeConvData.title)
     : "Select a conversation";
+
   const participantOnline = activeConvData?.participant_online;
 
   const aiConvs = conversations.filter(c => c.type === "ai");
-  const userConvs = conversations.filter(c => c.type !== "ai");
+  const dmConvs = conversations.filter(c => c.type === "user");
+  const groupConvs = conversations.filter(c => c.type === "group");
+  const hasCommunity = groupConvs.some(c => !c.participant_id);
 
   return (
     <Layout>
@@ -626,56 +657,63 @@ const Chat = () => {
           <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
             <h2 className="font-semibold text-gray-900 dark:text-white">Chats</h2>
             <div className="flex items-center gap-1">
-              <button
-                onClick={toggleDark}
-                className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                title="Toggle dark mode"
-              >
+              <button onClick={toggleDark} className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title="Toggle dark mode">
                 {darkMode ? <Sun size={16} /> : <Moon size={16} />}
               </button>
-              <button
-                onClick={() => setShowUserModal(true)}
-                className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                title="New direct message"
-              >
+              <button onClick={() => setShowUserModal(true)} className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title="New direct message">
                 <Plus size={16} />
               </button>
-              <button
-                onClick={() => createConversation("ai")}
-                className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                title="New AI chat"
-              >
+              <button onClick={() => createConversation("ai")} className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title="New AI chat">
                 <Bot size={16} />
               </button>
             </div>
           </div>
 
           <div className="flex-1 overflow-y-auto">
+            {/* Community channel */}
+            <div>
+              <p className="px-4 pt-4 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Channels</p>
+              {hasCommunity ? (
+                groupConvs.filter(c => !c.participant_id).map(c => (
+                  <ConvItem key={c.id} conv={c} active={activeConv === c.id} onSelect={() => selectConversation(c)} onDelete={() => deleteConversation(c.id)} currentUserId={user.id} />
+                ))
+              ) : (
+                <button
+                  onClick={joinCommunity}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                >
+                  <Avatar isGroup size={8} />
+                  <span className="text-sm text-gray-600 dark:text-gray-300">Community</span>
+                  <span className="ml-auto text-[10px] text-primary font-medium">Join</span>
+                </button>
+              )}
+            </div>
+
             {/* AI Chats */}
             {aiConvs.length > 0 && (
               <div>
                 <p className="px-4 pt-4 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-widest">AI Assistant</p>
                 {aiConvs.map(c => (
-                  <ConvItem key={c.id} conv={c} active={activeConv === c.id} onSelect={() => selectConversation(c)} onDelete={() => deleteConversation(c.id)} />
+                  <ConvItem key={c.id} conv={c} active={activeConv === c.id} onSelect={() => selectConversation(c)} onDelete={() => deleteConversation(c.id)} currentUserId={user.id} />
                 ))}
               </div>
             )}
 
-            {/* User Chats */}
-            {userConvs.length > 0 && (
+            {/* Direct Messages */}
+            {dmConvs.length > 0 && (
               <div>
                 <p className="px-4 pt-4 pb-1 text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Direct Messages</p>
-                {userConvs.map(c => (
-                  <ConvItem key={c.id} conv={c} active={activeConv === c.id} onSelect={() => selectConversation(c)} onDelete={() => deleteConversation(c.id)} showAvatar />
+                {dmConvs.map(c => (
+                  <ConvItem key={c.id} conv={c} active={activeConv === c.id} onSelect={() => selectConversation(c)} onDelete={() => deleteConversation(c.id)} currentUserId={user.id} showAvatar />
                 ))}
               </div>
             )}
 
             {conversations.length === 0 && (
-              <div className="px-4 py-12 text-center">
+              <div className="px-4 py-8 text-center">
                 <MessageSquare size={32} className="mx-auto text-gray-300 dark:text-gray-600 mb-3" />
                 <p className="text-sm text-gray-400">No conversations yet.</p>
-                <p className="text-xs text-gray-400 mt-1">Start an AI chat or message a teammate.</p>
+                <p className="text-xs text-gray-400 mt-1">Join Community or start a new AI/DM chat.</p>
               </div>
             )}
           </div>
@@ -686,16 +724,10 @@ const Chat = () => {
 
           {/* Header */}
           <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 flex items-center gap-3 shrink-0">
-            <button
-              onClick={() => setShowSidebar(!showSidebar)}
-              className="text-gray-500 hover:text-gray-800 dark:hover:text-white sm:hidden"
-            >
+            <button onClick={() => setShowSidebar(!showSidebar)} className="text-gray-500 hover:text-gray-800 dark:hover:text-white sm:hidden">
               <ArrowLeft size={20} />
             </button>
-            <button
-              onClick={() => setShowSidebar(!showSidebar)}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hidden sm:block"
-            >
+            <button onClick={() => setShowSidebar(!showSidebar)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hidden sm:block">
               <MessageSquare size={18} />
             </button>
 
@@ -705,17 +737,15 @@ const Chat = () => {
                   <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                     <Bot size={16} className="text-primary" />
                   </div>
+                ) : isCommunityConv ? (
+                  <Avatar isGroup size={8} />
                 ) : (
-                  <Avatar
-                    url={activeConvData.participant_avatar}
-                    name={activeConvData.participant_name}
-                    size={8}
-                    online={participantOnline}
-                  />
+                  <Avatar url={activeConvData.participant_avatar} name={activeConvData.participant_name} size={8} online={participantOnline ?? undefined} />
                 )}
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{headerTitle}</p>
-                  {!isAIConv && (
+                  {isCommunityConv && <p className="text-[10px] text-gray-400">Everyone in HTB Academy</p>}
+                  {!isAIConv && !isCommunityConv && (
                     <p className="text-[10px] text-gray-400">{participantOnline ? "Online" : "Offline"}</p>
                   )}
                   {isAIConv && <p className="text-[10px] text-gray-400">AI-powered assistant</p>}
@@ -734,15 +764,16 @@ const Chat = () => {
           </div>
 
           {/* Messages */}
-          <div
-            ref={messagesContainerRef}
-            className="flex-1 overflow-y-auto px-4 py-4 bg-gray-50 dark:bg-gray-950"
-          >
-            {messages.length === 0 && !isStreaming && !typingDots && (
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto px-4 py-4 bg-gray-50 dark:bg-gray-950">
+            {messages.length === 0 && !isStreaming && !typingDots && activeConv && (
               <div className="flex flex-col items-center justify-center h-full text-center gap-3">
                 {isAIConv ? (
                   <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
                     <Bot size={32} className="text-primary" />
+                  </div>
+                ) : isCommunityConv ? (
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                    <Hash size={32} className="text-emerald-600" />
                   </div>
                 ) : (
                   <div className="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
@@ -751,34 +782,36 @@ const Chat = () => {
                 )}
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white">
-                    {isAIConv ? "HTB AI Assistant" : headerTitle}
+                    {isAIConv ? "HTB AI Assistant" : isCommunityConv ? "Community" : headerTitle}
                   </h3>
                   <p className="text-sm text-gray-400 mt-1 max-w-xs">
                     {isAIConv
                       ? "Ask anything about PM, Business Analysis, CV tips, or career advice."
-                      : "Send a message to start the conversation."}
+                      : isCommunityConv
+                        ? "This is the beginning of the Community channel. Say hello!"
+                        : "Send a message to start the conversation."}
                   </p>
                 </div>
               </div>
             )}
 
-            {!activeConv && messages.length === 0 && (
+            {!activeConv && (
               <div className="flex flex-col items-center justify-center h-full text-center gap-4">
                 <MessageSquare size={48} className="text-gray-200 dark:text-gray-700" />
                 <div>
                   <p className="font-medium text-gray-400">No conversation selected</p>
                   <div className="flex gap-2 mt-4 justify-center flex-wrap">
-                    <button
-                      onClick={() => createConversation("ai")}
-                      className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm rounded-xl hover:opacity-90 transition-opacity"
-                    >
+                    <button onClick={joinCommunity}
+                      className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white text-sm rounded-xl hover:opacity-90 transition-opacity">
+                      <Hash size={16} /> Community
+                    </button>
+                    <button onClick={() => createConversation("ai")}
+                      className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm rounded-xl hover:opacity-90 transition-opacity">
                       <Bot size={16} /> New AI Chat
                     </button>
-                    <button
-                      onClick={() => setShowUserModal(true)}
-                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      <Users size={16} /> New Message
+                    <button onClick={() => setShowUserModal(true)}
+                      className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                      <Users size={16} /> Direct Message
                     </button>
                   </div>
                 </div>
@@ -800,7 +833,6 @@ const Chat = () => {
               />
             ))}
 
-            {/* Typing indicator */}
             {typingDots && (
               <div className="flex gap-2 mb-1">
                 <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center">
@@ -837,14 +869,20 @@ const Chat = () => {
                 onKeyDown={e => {
                   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
                 }}
-                placeholder={isAIConv ? "Ask the AI assistant..." : "Type a message... (Shift+Enter for new line)"}
-                disabled={isStreaming}
+                placeholder={
+                  isAIConv
+                    ? "Ask the AI assistant..."
+                    : isCommunityConv
+                      ? "Message #community..."
+                      : "Type a message... (Shift+Enter for new line)"
+                }
+                disabled={isStreaming || !activeConv}
                 className="flex-1 bg-transparent text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none resize-none max-h-28 disabled:opacity-50"
                 style={{ minHeight: "24px" }}
               />
               <button
                 onClick={sendMessage}
-                disabled={!input.trim() || isStreaming}
+                disabled={!input.trim() || isStreaming || !activeConv}
                 className="w-8 h-8 bg-primary rounded-xl flex items-center justify-center shrink-0 disabled:opacity-40 hover:opacity-90 transition-opacity"
               >
                 <Send size={15} className="text-white" />
@@ -855,57 +893,11 @@ const Chat = () => {
         </main>
       </div>
 
-      {/* User selector modal */}
       {showUserModal && (
         <UserSelectorModal users={users} onSelect={startDM} onClose={() => setShowUserModal(false)} />
       )}
     </Layout>
   );
 };
-
-// ── Sidebar conversation item ─────────────────────────────────────────────────
-function ConvItem({ conv, active, onSelect, onDelete, showAvatar }: {
-  conv: Conversation;
-  active: boolean;
-  onSelect: () => void;
-  onDelete: () => void;
-  showAvatar?: boolean;
-}) {
-  return (
-    <div
-      onClick={onSelect}
-      role="button"
-      tabIndex={0}
-      onKeyDown={e => e.key === "Enter" && onSelect()}
-      className={`w-full flex items-center gap-3 px-4 py-2.5 cursor-pointer group transition-colors ${
-        active
-          ? "bg-primary/10 dark:bg-primary/20"
-          : "hover:bg-gray-50 dark:hover:bg-gray-800"
-      }`}
-    >
-      {showAvatar ? (
-        <Avatar url={conv.participant_avatar} name={conv.participant_name} size={8} online={conv.participant_online} />
-      ) : (
-        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${active ? "bg-primary/20" : "bg-gray-100 dark:bg-gray-800"}`}>
-          {conv.type === "ai" ? <Bot size={15} className="text-primary" /> : <Users size={15} className="text-gray-500" />}
-        </div>
-      )}
-      <div className="flex-1 min-w-0">
-        <p className={`text-sm truncate ${active ? "font-semibold text-primary" : "text-gray-800 dark:text-gray-200"}`}>
-          {conv.type === "ai" ? conv.title : (conv.participant_name || conv.title)}
-        </p>
-        {conv.last_message_preview && (
-          <p className="text-xs text-gray-400 truncate">{conv.last_message_preview}</p>
-        )}
-      </div>
-      <button
-        onClick={e => { e.stopPropagation(); onDelete(); }}
-        className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-500 transition-all shrink-0"
-      >
-        <Trash2 size={13} />
-      </button>
-    </div>
-  );
-}
 
 export default Chat;
