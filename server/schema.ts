@@ -246,7 +246,11 @@ export async function initSchema() {
       );
     `);
 
-    // ── Runtime migrations: add new course fields if missing ──────────────────
+    // ── Runtime migrations: add new columns if missing ────────────────────────
+    await client.query(`
+      ALTER TABLE users ADD COLUMN IF NOT EXISTS last_seen_at TIMESTAMPTZ DEFAULT now();
+    `);
+
     await client.query(`
       ALTER TABLE courses ADD COLUMN IF NOT EXISTS next_batch_date TEXT DEFAULT '';
       ALTER TABLE courses ADD COLUMN IF NOT EXISTS schedule         TEXT DEFAULT '';
