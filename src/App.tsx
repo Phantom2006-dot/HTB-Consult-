@@ -48,6 +48,7 @@ import Sessions from "./pages/Sessions";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import VerifyEmail from "./pages/VerifyEmail";
+import PaymentSuccess from "./pages/PaymentSuccess";
 
 const queryClient = new QueryClient();
 
@@ -97,6 +98,7 @@ function AppRoutes() {
             <Route path="/mentor/articles" element={<MentorArticles />} />
             <Route path="/mentor/articles/:id" element={<AdminArticleEditor />} />
             <Route path="/sessions" element={<Sessions />} />
+            <Route path="/payment/success" element={<PaymentSuccess />} />
             <Route path="*" element={<NotFound />} />
     </Routes>
   );

@@ -9,6 +9,9 @@ import { fileURLToPath } from "url";
 import { logger } from "./lib/logger.js";
 import { pool, runMigrations } from "./db.js";
 import { initSchema } from "./schema.js";
+import { WebhookHandlers } from "./webhookHandlers.js";
+import { getStripeSync } from "./stripeClient.js";
+import { runMigrations as runStripeMigrations } from "stripe-replit-sync";
 import authRoutes from "./routes/auth.js";
 import coursesRoutes from "./routes/courses.js";
 import mentorsRoutes from "./routes/mentors.js";
@@ -57,6 +60,23 @@ pool.connect()
   })
   .then(() => runMigrations())
   .then(() => logger.info("Database: schema and migrations applied"))
+  .then(async () => {
+    const databaseUrl = process.env.DATABASE_URL;
+    if (!databaseUrl) return;
+    try {
+      await runStripeMigrations({ databaseUrl });
+      const stripeSync = await getStripeSync();
+      const webhookBaseUrl = process.env.FRONTEND_URL ||
+        `https://${process.env.REPLIT_DOMAINS?.split(",")[0]}`;
+      await stripeSync.findOrCreateManagedWebhook(`${webhookBaseUrl}/api/stripe/webhook`);
+      stripeSync.syncBackfill().catch((err: Error) =>
+        logger.error("Stripe backfill error", { error: err.message })
+      );
+      logger.info("Stripe: initialized successfully");
+    } catch (err: any) {
+      logger.warn("Stripe: not configured (integration not connected)", { error: err.message });
+    }
+  })
   .catch(err => {
     logger.error("Database: startup error", { error: err.message });
   });
@@ -72,6 +92,25 @@ app.use(cors({
   origin: (_origin, callback) => callback(null, true),
   credentials: true,
 }));
+
+// ── Stripe webhook — MUST be before express.json() ───────────────────────────
+app.post(
+  "/api/stripe/webhook",
+  express.raw({ type: "application/json" }),
+  async (req: Request, res: Response) => {
+    const signature = req.headers["stripe-signature"];
+    if (!signature) return res.status(400).json({ error: "Missing stripe-signature" });
+    try {
+      const sig = Array.isArray(signature) ? signature[0] : signature;
+      await WebhookHandlers.processWebhook(req.body as Buffer, sig);
+      return res.status(200).json({ received: true });
+    } catch (err: any) {
+      logger.error("Stripe webhook error", { error: err.message });
+      return res.status(400).json({ error: "Webhook processing error" });
+    }
+  }
+);
+
 app.use(express.json({ limit: "10mb" }));
 
 // ── Rate limiters ─────────────────────────────────────────────────────────────

@@ -1,133 +1,137 @@
 import { Router } from "express";
 import { pool } from "../db.js";
 import { requireAuth, requireAdmin, type AuthRequest } from "../middleware/auth.js";
+import { getUncachableStripeClient } from "../stripeClient.js";
 
 const router = Router();
 
-// ── Initiate payment: create a pending record and return a unique reference ───
-router.post("/initiate", requireAuth, async (req: AuthRequest, res) => {
-  const { course_id, amount, currency } = req.body;
-  if (!course_id || !amount || !currency) {
-    return res.status(400).json({ error: "course_id, amount, and currency are required" });
-  }
+// ── Create Stripe Checkout Session ────────────────────────────────────────────
+router.post("/create-checkout-session", requireAuth, async (req: AuthRequest, res) => {
+  const { course_id } = req.body;
+  if (!course_id) return res.status(400).json({ error: "course_id is required" });
+
   try {
     const courseRow = await pool.query(
-      `SELECT id, title, price FROM courses WHERE id = $1`,
+      `SELECT id, title, price, thumbnail_url FROM courses WHERE id = $1 AND published = true`,
       [course_id]
     );
     if (courseRow.rows.length === 0) return res.status(404).json({ error: "Course not found" });
+    const course = courseRow.rows[0];
 
-    // Generate a unique payment reference (Paystack-compatible format)
+    // Check not already enrolled
+    const enrolled = await pool.query(
+      `SELECT id FROM enrollments WHERE user_id = $1 AND course_id = $2`,
+      [req.user!.id, course_id]
+    );
+    if (enrolled.rows.length > 0) {
+      return res.status(400).json({ error: "You are already enrolled in this course" });
+    }
+
+    const stripe = await getUncachableStripeClient();
+
+    // Amount in pence (GBP) — price is stored in pounds
+    const amountPence = Math.round(Number(course.price) * 100);
+
+    const origin = process.env.FRONTEND_URL ||
+      `https://${process.env.REPLIT_DOMAINS?.split(",")[0]}` ||
+      "http://localhost:5000";
+
     const reference = `HTB-${Date.now()}-${Math.random().toString(36).slice(2, 8).toUpperCase()}`;
 
-    const { rows } = await pool.query(
-      `INSERT INTO course_payments (user_id, course_id, amount, currency, tx_ref, status)
-       VALUES ($1, $2, $3, $4, $5, 'pending')
-       RETURNING *`,
-      [req.user!.id, course_id, amount, currency, reference]
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: "gbp",
+            unit_amount: amountPence,
+            product_data: {
+              name: course.title,
+              images: course.thumbnail_url ? [course.thumbnail_url] : [],
+              metadata: { course_id },
+            },
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        course_id,
+        user_id: req.user!.id,
+        reference,
+      },
+      success_url: `${origin}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/course/${course_id}?payment=cancelled`,
+    });
+
+    // Record pending payment
+    await pool.query(
+      `INSERT INTO course_payments (user_id, course_id, amount, currency, tx_ref, status, gateway_transaction_id)
+       VALUES ($1, $2, $3, 'GBP', $4, 'pending', $5)`,
+      [req.user!.id, course_id, course.price, reference, session.id]
     );
-    return res.status(201).json({ reference, payment_id: rows[0].id });
+
+    return res.json({ url: session.url, session_id: session.id });
   } catch (err: any) {
-    return res.status(500).json({ error: err.message || "Failed to initiate payment" });
+    return res.status(500).json({ error: err.message || "Failed to create checkout session" });
   }
 });
 
-// ── Verify payment with Paystack and auto-enroll on success ──────────────────
-router.post("/verify", requireAuth, async (req: AuthRequest, res) => {
-  const { reference } = req.body;
-  if (!reference) {
-    return res.status(400).json({ error: "reference is required" });
-  }
-
-  const secretKey = process.env.PAYSTACK_SECRET_KEY;
-  if (!secretKey) {
-    return res.status(500).json({ error: "Payment gateway not configured. Contact support." });
-  }
+// ── Verify Stripe Session after redirect ──────────────────────────────────────
+router.post("/verify-session", requireAuth, async (req: AuthRequest, res) => {
+  const { session_id } = req.body;
+  if (!session_id) return res.status(400).json({ error: "session_id is required" });
 
   try {
-    // Verify transaction with Paystack API
-    const psRes = await fetch(
-      `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
-      {
-        headers: {
-          Authorization: `Bearer ${secretKey}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const psData = (await psRes.json()) as any;
+    const stripe = await getUncachableStripeClient();
+    const session = await stripe.checkout.sessions.retrieve(session_id);
 
-    if (!psRes.ok || !psData.status) {
-      await pool.query(
-        `UPDATE course_payments SET status = 'failed', updated_at = now() WHERE tx_ref = $1`,
-        [reference]
-      );
-      return res.status(400).json({ error: "Payment verification failed", details: psData.message });
+    if (session.payment_status !== "paid") {
+      return res.status(400).json({ error: "Payment not completed" });
     }
 
-    const txData = psData.data;
+    const course_id = session.metadata?.course_id;
+    const user_id = session.metadata?.user_id;
 
-    // Confirm the transaction is actually successful
-    if (txData.status !== "success") {
-      await pool.query(
-        `UPDATE course_payments
-         SET status = 'failed', gateway_transaction_id = $1, updated_at = now()
-         WHERE tx_ref = $2`,
-        [String(txData.id), reference]
-      );
-      return res.status(400).json({ error: "Transaction was not successful", details: txData.gateway_response });
+    if (!course_id || user_id !== req.user!.id) {
+      return res.status(403).json({ error: "Session does not belong to this user" });
     }
 
-    // Fetch our pending payment record
-    const paymentRow = await pool.query(
-      `SELECT * FROM course_payments WHERE tx_ref = $1 AND user_id = $2`,
-      [reference, req.user!.id]
-    );
-    if (paymentRow.rows.length === 0) {
-      return res.status(404).json({ error: "Payment record not found" });
-    }
-    const payment = paymentRow.rows[0];
-
-    // Mark payment as successful with Paystack gateway details
-    // Paystack returns amount in kobo/cents — store the raw gateway values
+    // Mark payment successful
     await pool.query(
       `UPDATE course_payments
        SET status = 'successful',
-           gateway_transaction_id = $1,
-           gateway_amount = $2,
-           gateway_currency = $3,
+           gateway_amount = $1,
+           gateway_currency = 'GBP',
            updated_at = now()
-       WHERE tx_ref = $4`,
-      [String(txData.id), txData.amount / 100, txData.currency, reference]
+       WHERE gateway_transaction_id = $2`,
+      [session.amount_total ? session.amount_total / 100 : null, session_id]
     );
 
-    // Auto-enroll the student
+    // Auto-enroll
     await pool.query(
       `INSERT INTO enrollments (user_id, course_id)
        VALUES ($1, $2)
        ON CONFLICT (user_id, course_id) DO NOTHING`,
-      [req.user!.id, payment.course_id]
+      [req.user!.id, course_id]
     );
 
-    // Send in-app notification
-    const courseRow = await pool.query(
-      `SELECT title FROM courses WHERE id = $1`,
-      [payment.course_id]
-    );
+    // In-app notification
+    const courseRow = await pool.query(`SELECT title FROM courses WHERE id = $1`, [course_id]);
     const courseTitle = courseRow.rows[0]?.title || "the course";
-    const paidAmount = (txData.amount / 100).toLocaleString();
+    const paidAmount = session.amount_total ? (session.amount_total / 100).toLocaleString() : "";
     await pool.query(
       `INSERT INTO user_notifications (user_id, type, title, body, link)
        VALUES ($1, 'success', $2, $3, $4)`,
       [
         req.user!.id,
         "🎉 Payment Confirmed — You're Enrolled!",
-        `Your payment of ${txData.currency} ${paidAmount} was successful. You are now enrolled in "${courseTitle}". Start learning today!`,
-        `/course/${payment.course_id}`,
+        `Your payment of £${paidAmount} GBP was successful. You are now enrolled in "${courseTitle}". Start learning today!`,
+        `/course/${course_id}`,
       ]
     );
 
-    return res.json({ success: true, course_id: payment.course_id });
+    return res.json({ success: true, course_id });
   } catch (err: any) {
     return res.status(500).json({ error: err.message || "Verification error" });
   }
@@ -154,7 +158,7 @@ router.get("/admin", requireAdmin, async (_req, res) => {
   }
 });
 
-// ── Admin: manually confirm enrollment for offline/bank-transfer payments ─────
+// ── Admin: manually confirm enrollment ────────────────────────────────────────
 router.post("/admin/manual-enroll", requireAdmin, async (req: AuthRequest, res) => {
   const { payment_id } = req.body;
   if (!payment_id) return res.status(400).json({ error: "payment_id required" });
@@ -174,7 +178,6 @@ router.post("/admin/manual-enroll", requireAdmin, async (req: AuthRequest, res) 
       [p.user_id, p.course_id]
     );
 
-    // Notify student
     const courseRow = await pool.query(`SELECT title FROM courses WHERE id = $1`, [p.course_id]);
     const courseTitle = courseRow.rows[0]?.title || "the course";
     await pool.query(
