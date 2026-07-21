@@ -6,13 +6,31 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is required");
 }
 
-export const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 5000,
-});
+function buildPoolConfig() {
+  const dbUrl = process.env.DATABASE_URL!;
+  if (process.env.NODE_ENV === "production") {
+    // Strip sslmode from the URL so pg-connection-string doesn't trigger its
+    // deprecation warning, then supply the SSL config directly on the Pool.
+    const url = new URL(dbUrl);
+    url.searchParams.delete("sslmode");
+    return {
+      connectionString: url.toString(),
+      ssl: { rejectUnauthorized: false },
+      max: 20,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 5000,
+    };
+  }
+  return {
+    connectionString: dbUrl,
+    ssl: false as false,
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+  };
+}
+
+export const pool = new Pool(buildPoolConfig());
 
 // Auto-apply any missing column migrations on startup
 export async function runMigrations() {

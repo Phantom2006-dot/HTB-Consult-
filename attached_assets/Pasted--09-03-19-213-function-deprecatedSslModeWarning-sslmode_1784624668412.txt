@@ -1,0 +1,73 @@
+|
+09:03:19
+213 | function deprecatedSslModeWarning(sslmode) {
+09:03:19
+214 |   if (!deprecatedSslModeWarning.warned && typeof process !== 'undefined' && process.emitWarning) {
+09:03:19
+215 |     deprecatedSslModeWarning.warned = true
+09:03:19
+216 |     process.emitWarning(`SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+09:03:19
+                  ^
+09:03:19
+warn: SECURITY WARNING: The SSL modes 'prefer', 'require', and 'verify-ca' are treated as aliases for 'verify-full'.
+09:03:19
+In the next major version (pg-connection-string v3.0.0 and pg v9.0.0), these modes will adopt standard libpq semantics, which have weaker security guarantees.
+09:03:19
+To prepare for this change:
+09:03:19
+- If you want the current behavior, explicitly use 'sslmode=verify-full'
+09:03:19
+- If you want libpq compatibility now, use 'uselibpqcompat=true&sslmode=require'
+09:03:19
+See https://www.postgresql.org/docs/current/libpq-ssl.html for libpq SSL mode definitions.
+09:03:19
+      at deprecatedSslModeWarning (/app/node_modules/pg-connection-string/index.js:216:13)
+09:03:19
+      at parse (/app/node_modules/pg-connection-string/index.js:143:11)
+09:03:19
+      at new ConnectionParameters (/app/node_modules/pg/lib/connection-parameters.js:60:42)
+09:03:19
+      at new Client (/app/node_modules/pg/lib/client.js:43:33)
+09:03:19
+      at newClient (/app/node_modules/pg-pool/index.js:241:20)
+09:03:19
+      at connect (/app/node_modules/pg-pool/index.js:235:10)
+09:03:19
+      at /app/dist/server/index.js:47:6
+09:03:20
+[2026-07-21T09:03:20.073Z] INFO Server listening on http://0.0.0.0:8080
+09:03:20
+machine became reachable in 4.246442035s
+09:03:20
+machine became reachable in 4.280939825s
+09:03:20
+[2026-07-21T09:03:20.801Z] INFO Database: connected successfully
+09:03:20
+machine became reachable in 4.37170746s
+09:03:20
+machine became reachable in 4.378418282s
+09:03:20
+machine became reachable in 4.486848432s
+09:03:20
+machine became reachable in 4.516340698s
+09:03:21
+machine became reachable in 4.576371486s
+09:03:21
+[2026-07-21T09:03:21.290Z] INFO GET /course/738f65fd-ad92-46b4-80c7-e882483e0835 {"status":200,"ms":573,"ip":"102.91.105.59, 15.240.138.16, 66.241.124.21"}
+09:03:21
+[2026-07-21T09:03:21.291Z] INFO GET / {"status":200,"ms":604,"ip":"102.91.105.59, 15.240.138.16, 66.241.124.21"}
+09:03:21
+[2026-07-21T09:03:21.465Z] INFO POST /initiate {"status":201,"ms":634,"ip":"102.91.105.59, 15.240.138.16, 66.241.124.21"}
+09:03:21
+[2026-07-21T09:03:21.477Z] INFO Schema: all tables and indexes ready
+09:03:21
+[2026-07-21T09:03:21.513Z] INFO GET / {"status":200,"ms":591,"ip":"102.91.105.59, 16.28.99.239, 66.241.124.21"}
+09:03:21
+[2026-07-21T09:03:21.584Z] INFO GET /me {"status":200,"ms":633,"ip":"102.91.105.59, 16.28.99.239, 66.241.124.21"}
+09:03:21
+[2026-07-21T09:03:21.795Z] INFO GET /738f65fd-ad92-46b4-80c7-e882483e0835 {"status":200,"ms":780,"ip":"102.91.105.59, 13.247.111.139, 66.241.124.21"}
+09:03:22
+[2026-07-21T09:03:22.056Z] INFO GET /unread-count {"status":200,"ms":1220,"ip":"102.91.105.59, 13.247.111.139, 66.241.124.21"}
+09:03:22
+[2026-07-21T09:03:22.144Z] INFO Database: schema and migrations applied
