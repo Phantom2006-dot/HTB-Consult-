@@ -1,14 +1,9 @@
 {
-  "nodeVersion": "22.x",
   "buildCommand": "npm run build",
   "installCommand": "npm install --legacy-peer-deps",
   "outputDirectory": "dist/public",
   "framework": "vite",
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "https://htbconsult.fly.dev/api/$1"
-    },
     {
       "source": "/(.*)",
       "destination": "/index.html"

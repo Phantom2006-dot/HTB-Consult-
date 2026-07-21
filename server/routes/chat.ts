@@ -201,7 +201,8 @@ router.delete("/conversations/:id", requireAuth, async (req: AuthRequest, res) =
 // ── Messages CRUD ──────────────────────────────────────────────────────────────
 router.get("/conversations/:id/messages", requireAuth, async (req: AuthRequest, res) => {
   try {
-    const conv = await getAccessibleConv(req.params.id, req.user!.id);
+    const convId = String(req.params.id);
+    const conv = await getAccessibleConv(convId, req.user!.id);
     if (!conv) return res.status(404).json({ error: "Conversation not found" });
 
     const { rows } = await pool.query(
@@ -212,7 +213,7 @@ router.get("/conversations/:id/messages", requireAuth, async (req: AuthRequest, 
        LEFT JOIN users u ON u.id = cm.sender_id
        WHERE cm.conversation_id = $1
        ORDER BY cm.created_at ASC`,
-      [req.params.id]
+      [convId]
     );
     return res.json(rows);
   } catch { return res.status(500).json({ error: "Failed to fetch messages" }); }
@@ -222,17 +223,18 @@ router.post("/conversations/:id/messages", requireAuth, async (req: AuthRequest,
   const { role, content } = req.body;
   if (!role || !content) return res.status(400).json({ error: "role and content required" });
   try {
-    const conv = await getAccessibleConv(req.params.id, req.user!.id);
+    const convId = String(req.params.id);
+    const conv = await getAccessibleConv(convId, req.user!.id);
     if (!conv) return res.status(404).json({ error: "Conversation not found" });
 
     const { rows } = await pool.query(
       `INSERT INTO chat_messages (conversation_id, role, content, sender_id)
        VALUES ($1,$2,$3,$4) RETURNING *`,
-      [req.params.id, role, content, role === "user" ? req.user!.id : null]
+      [convId, role, content, role === "user" ? req.user!.id : null]
     );
     await pool.query(
       "UPDATE chat_conversations SET updated_at = now(), last_message_preview = $1 WHERE id = $2",
-      [content.slice(0, 80), req.params.id]
+      [content.slice(0, 80), convId]
     );
     return res.json(rows[0]);
   } catch (err: any) {
@@ -274,7 +276,8 @@ router.post("/conversations/:convId/messages/:msgId/react", requireAuth, async (
   if (!emoji) return res.status(400).json({ error: "emoji required" });
   const userId = req.user!.id;
   try {
-    const conv = await getAccessibleConv(req.params.convId, userId);
+    const convId = String(req.params.convId);
+    const conv = await getAccessibleConv(convId, userId);
     if (!conv) return res.status(404).json({ error: "Not found" });
 
     const { rows } = await pool.query("SELECT reactions FROM chat_messages WHERE id = $1", [req.params.msgId]);

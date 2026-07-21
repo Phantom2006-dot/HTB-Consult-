@@ -14,7 +14,7 @@ async function cloudinaryUpload(buffer: Buffer, originalname: string, folder: st
   }
 
   const formData = new FormData();
-  const blob = new Blob([buffer]);
+  const blob = new Blob([new Uint8Array(buffer)]);
   formData.append("file", blob, originalname);
   formData.append("upload_preset", uploadPreset);
   formData.append("folder", folder);
