@@ -4,11 +4,12 @@ import {
   ArrowRight, BookOpen, Target, CheckCircle, Star, Lightbulb,
   UserCheck, Briefcase, Brain, BarChart3, Quote, LogIn,
   LayoutDashboard, Sparkles, TrendingUp, Award, ChevronRight,
-  Users, Clock, Shield, Rocket, GraduationCap, Building2
+  Users, Clock, Shield, Rocket, GraduationCap, Building2, Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/Layout";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCourses } from "@/hooks/use-courses";
 
 /* ── Animation helpers ── */
 const fadeUp = {
@@ -167,8 +168,69 @@ const trustBadges = [
 
 /* ═══════════════════════════════════════════════════════════ */
 
+/* ── Home page pathway folders (mirrors /courses FOLDERS) ── */
+const HOME_FOLDERS = [
+  {
+    key: "Business Analysis",
+    label: "Business Analysis & Digital Transformation",
+    description: "Learn to analyse, improve and transform business with practical frameworks, elicitation techniques and digital tools.",
+    icon: BarChart3,
+    iconBg: "bg-orange-500/15",
+    iconColor: "text-orange-400",
+    accent: "border-orange-500/25 hover:border-orange-500/50",
+    glow: "hover:shadow-[0_12px_40px_-10px_rgba(234,119,0,0.18)]",
+    tag: "Analysis",
+    tagCls: "bg-orange-500/15 text-orange-400 border-orange-500/25",
+  },
+  {
+    key: "Leadership & Professional Development",
+    label: "Leadership & Professional Development",
+    description: "Strengthen mindset, communication, influence and leadership for career growth and professional impact.",
+    icon: UserCheck,
+    iconBg: "bg-emerald-500/15",
+    iconColor: "text-emerald-400",
+    accent: "border-emerald-500/25 hover:border-emerald-500/50",
+    glow: "hover:shadow-[0_12px_40px_-10px_rgba(16,185,129,0.15)]",
+    tag: "Leadership",
+    tagCls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
+  },
+  {
+    key: "Agile, Product & Delivery Management",
+    label: "Agile, Product & Delivery Management",
+    description: "Build capability in Agile, Scrum, Product Ownership and delivery excellence for high-velocity teams.",
+    icon: Layers,
+    iconBg: "bg-blue-500/15",
+    iconColor: "text-blue-400",
+    accent: "border-blue-500/25 hover:border-blue-500/50",
+    glow: "hover:shadow-[0_12px_40px_-10px_rgba(59,130,246,0.15)]",
+    tag: "Agile",
+    tagCls: "bg-blue-500/15 text-blue-400 border-blue-500/25",
+  },
+  {
+    key: "Industry & Domain Specialisation",
+    label: "Industry & Domain Specialisation",
+    description: "Apply your skills across real world industries — finance, healthcare, technology and more.",
+    icon: Building2,
+    iconBg: "bg-purple-500/15",
+    iconColor: "text-purple-400",
+    accent: "border-purple-500/25 hover:border-purple-500/50",
+    glow: "hover:shadow-[0_12px_40px_-10px_rgba(139,92,246,0.15)]",
+    tag: "Specialisation",
+    tagCls: "bg-purple-500/15 text-purple-400 border-purple-500/25",
+  },
+];
+
 const Index = () => {
   const { user } = useAuth();
+  const { data: courses } = useCourses();
+
+  // Count courses per pathway
+  const folderCounts = courses
+    ? HOME_FOLDERS.reduce<Record<string, number>>((acc, f) => {
+        acc[f.key] = courses.filter((c) => c.category === f.key).length;
+        return acc;
+      }, {})
+    : {};
 
   return (
     <Layout>
@@ -563,6 +625,108 @@ const Index = () => {
               className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold px-8 h-11 text-sm shadow-none"
             >
               <Link to="/courses">View All Courses</Link>
+            </Button>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ─────────────────── BROWSE COURSES (white) ─────────────────── */}
+      <section className="py-16 lg:py-24 relative overflow-hidden bg-white">
+        <div className="absolute top-0 left-6 right-6 lg:left-12 lg:right-12 h-px bg-slate-100" />
+        <div className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: "linear-gradient(rgba(0,0,0,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,0.025) 1px,transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+
+        <div className="container mx-auto px-6 lg:px-12 relative z-10">
+          {/* Header */}
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <motion.p variants={fadeUp} custom={0}
+              className="text-xs font-bold uppercase tracking-[0.25em] mb-4"
+              style={{ color: "hsl(var(--primary))" }}
+            >
+              Choose Your Learning Pathway
+            </motion.p>
+            <motion.h2 variants={fadeUp} custom={1}
+              className="text-3xl md:text-4xl lg:text-5xl font-serif text-slate-900 leading-tight"
+            >
+              Find the right{" "}
+              <em className="not-italic text-gradient-gold">course for you</em>
+            </motion.h2>
+            <motion.p variants={fadeUp} custom={2}
+              className="mt-4 text-slate-500 text-sm max-w-xl mx-auto leading-relaxed"
+            >
+              Browse across four structured pathways — from BA foundations to domain specialisation.
+            </motion.p>
+          </motion.div>
+
+          {/* Folder cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+            {HOME_FOLDERS.map((folder, i) => {
+              const Icon = folder.icon;
+              const count = folderCounts[folder.key] ?? 0;
+              return (
+                <motion.div
+                  key={folder.key}
+                  initial="hidden" whileInView="visible" viewport={{ once: true }}
+                  custom={i} variants={scaleIn}
+                >
+                  <Link
+                    to={`/courses?category=${encodeURIComponent(folder.key)}`}
+                    className={`flex flex-col h-full bg-white border rounded-2xl p-6 transition-all duration-300 group ${folder.accent} ${folder.glow} hover:-translate-y-1`}
+                  >
+                    {/* Icon */}
+                    <div className={`w-12 h-12 rounded-xl ${folder.iconBg} flex items-center justify-center mb-4`}>
+                      <Icon size={22} className={folder.iconColor} />
+                    </div>
+
+                    {/* Tag + count */}
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${folder.tagCls}`}>
+                        {folder.tag}
+                      </span>
+                      {count > 0 && (
+                        <span className="text-[10px] text-slate-400 font-medium">
+                          {count} {count === 1 ? "course" : "courses"}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="font-serif text-base font-normal text-slate-900 mb-2 leading-snug">
+                      {folder.label}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-sm text-slate-500 leading-relaxed flex-1 mb-5">
+                      {folder.description}
+                    </p>
+
+                    {/* CTA */}
+                    <span
+                      className={`inline-flex items-center gap-1.5 text-sm font-semibold group-hover:gap-2.5 transition-all duration-200 ${folder.iconColor}`}
+                    >
+                      Browse Courses <ArrowRight size={14} />
+                    </span>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Bottom CTA */}
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true }}
+            variants={fadeUp} custom={4}
+            className="text-center"
+          >
+            <Button asChild className="bg-gradient-gold hover:opacity-90 font-semibold px-8 h-11 text-sm btn-shimmer shadow-orange">
+              <Link to="/courses">View All Courses <ArrowRight className="ml-2" size={15} /></Link>
             </Button>
           </motion.div>
         </div>
