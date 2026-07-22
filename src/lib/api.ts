@@ -21,7 +21,16 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const res = await fetch(`${BASE}${path}`, { ...options, headers });
+  const url = `${BASE}${path}`;
+
+  let res: Response;
+  try {
+    res = await fetch(url, { ...options, headers });
+  } catch (networkErr: any) {
+    const e = new Error(`Network error: Unable to reach the server at ${url}. ${networkErr.message}`) as Error & { status: number };
+    e.status = 0;
+    throw e;
+  }
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
@@ -29,7 +38,11 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     e.status = res.status;
     throw e;
   }
-  return res.json() as Promise<T>;
+
+  // Handle empty responses (e.g. 204)
+  const text = await res.text();
+  if (!text) return undefined as unknown as T;
+  return JSON.parse(text) as T;
 }
 
 export const api = {

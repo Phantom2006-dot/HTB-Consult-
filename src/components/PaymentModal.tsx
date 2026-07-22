@@ -39,9 +39,15 @@ const PaymentModal = ({ open, onClose, course }: PaymentModalProps) => {
         "/api/payments/create-checkout-session",
         { course_id: course.id }
       );
-      window.location.href = url;
+      if (url) {
+        window.location.href = url;
+      } else {
+        setErrorMsg("No checkout URL returned from the server. Please try again.");
+        setStep("error");
+      }
     } catch (err: any) {
-      setErrorMsg(err.message || "Failed to start checkout. Please try again.");
+      const msg = err?.response?.data?.error || err.message || "Failed to start checkout. Please try again.";
+      setErrorMsg(msg);
       setStep("error");
     }
   };
