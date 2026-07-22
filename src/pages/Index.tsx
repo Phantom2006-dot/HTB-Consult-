@@ -171,7 +171,7 @@ const trustBadges = [
 /* ── Home page pathway folders (mirrors /courses FOLDERS) ── */
 const HOME_FOLDERS = [
   {
-    key: "Business Analysis",
+    key: "Business Analysis & Digital Transformation",
     label: "Business Analysis & Digital Transformation",
     description: "Learn to analyse, improve and transform business with practical frameworks, elicitation techniques and digital tools.",
     icon: BarChart3,

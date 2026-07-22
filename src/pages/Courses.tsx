@@ -23,7 +23,7 @@ import { useAuth } from "@/contexts/AuthContext";
 /* ── Category folder metadata (4 official pathways) ── */
 const FOLDERS = [
   {
-    key: "Business Analysis",
+    key: "Business Analysis & Digital Transformation",
     label: "Business Analysis & Digital Transformation",
     description:
       "Learn to analyse, improve and transform business with practical frameworks, elicitation techniques and digital tools.",
