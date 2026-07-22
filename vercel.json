@@ -5,8 +5,8 @@
   "framework": "vite",
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "https://htbconsult.fly.dev/api/$1"
+      "source": "/api/:path*",
+      "destination": "https://htbconsult.fly.dev/api/:path*"
     },
     {
       "source": "/(.*)",
