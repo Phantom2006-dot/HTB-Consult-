@@ -149,7 +149,7 @@ fly secrets set SMTP_PASS="your-app-password"
 fly secrets set SMTP_FROM="noreply@htbconsults.com"
 
 # Your deployed frontend URL (used in password reset emails)
-fly secrets set FRONTEND_URL="https://htb-consult-academy.fly.dev"
+fly secrets set FRONTEND_URL="https://academy.htbconsults.com"
 ```
 
 Verify secrets were set:
