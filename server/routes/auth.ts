@@ -303,7 +303,10 @@ router.post("/forgot-password", async (req, res) => {
       [user.id, rawToken, expiresAt]
     );
 
-    const frontendUrl = (process.env.FRONTEND_URL || "").replace(/\/$/, "");
+    const frontendUrl = (
+      process.env.FRONTEND_URL ||
+      (process.env.REPLIT_DEV_DOMAIN ? `https://${process.env.REPLIT_DEV_DOMAIN}` : "")
+    ).replace(/\/$/, "");
     const resetUrl = `${frontendUrl}/reset-password?token=${rawToken}`;
 
     await sendEmail({
