@@ -71,7 +71,7 @@ const VerifyEmail = () => {
       >
         <motion.div variants={fadeUp} custom={0} className="text-center mb-8">
           <Link to="/">
-            <img src={htbLogo} alt="HTB Consult Academy" className="h-10 w-auto mx-auto mb-6" />
+            <img src={htbLogo} alt="HTB Consult Academy" className="h-14 w-auto mx-auto mb-6" />
           </Link>
         </motion.div>
 

@@ -139,7 +139,7 @@ const Auth = () => {
         <div className="relative z-10 flex flex-col h-full p-10 xl:p-14">
           {/* Logo */}
           <Link to="/" className="inline-flex items-center gap-2 mb-12 shrink-0">
-            <img src={htbLogo} alt="HTB Consult Academy" className="h-10 w-auto" />
+            <img src={htbLogo} alt="HTB Consult Academy" className="h-14 w-auto" />
           </Link>
 
           {/* Headline */}

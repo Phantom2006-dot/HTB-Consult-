@@ -125,7 +125,7 @@ const SidebarLayout = ({ children }: { children: ReactNode }) => {
         <div className="px-5 pt-5 pb-4 border-b border-white/8">
           <div className="flex items-center justify-between">
             <Link to="/" onClick={() => setSidebarOpen(false)} className="flex items-center gap-2.5">
-              <img src={htbLogo} alt="HTB Academy" className="h-7 w-auto" />
+              <img src={htbLogo} alt="HTB Academy" className="h-10 w-auto" />
             </Link>
             <button
               onClick={() => setSidebarOpen(false)}

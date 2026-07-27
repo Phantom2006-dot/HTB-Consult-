@@ -66,7 +66,7 @@ const ResetPassword = () => {
       <motion.div initial="hidden" animate="visible" className="relative z-10 w-full max-w-md">
         <motion.div variants={fadeUp} custom={0} className="mb-8 text-center">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <img src={htbLogo} alt="HTB HighTicketBoss" className="h-12 w-auto" />
+            <img src={htbLogo} alt="HTB HighTicketBoss" className="h-16 w-auto" />
           </Link>
         </motion.div>
 

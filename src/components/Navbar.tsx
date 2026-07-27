@@ -73,7 +73,7 @@ const Navbar = () => {
 
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 shrink-0">
-            <img src={htbLogo} alt="HTB Consult Academy" className="h-12 w-auto" />
+            <img src={htbLogo} alt="HTB Consult Academy" className="h-16 w-auto" />
           </Link>
 
           {/* Desktop links */}

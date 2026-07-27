@@ -80,7 +80,7 @@ const Footer = () => {
           {/* Brand column */}
           <div>
             <Link to="/" className="inline-block mb-5">
-              <img src={htbLogo} alt="HTB Consult Academy" className="h-12 w-auto opacity-90 hover:opacity-100 transition-opacity" />
+              <img src={htbLogo} alt="HTB Consult Academy" className="h-16 w-auto opacity-90 hover:opacity-100 transition-opacity" />
             </Link>
             <p className="text-white/40 text-sm leading-relaxed mb-6">
               Practical learning. Real projects.<br />
