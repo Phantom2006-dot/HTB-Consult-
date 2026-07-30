@@ -92,18 +92,14 @@ const Contact = () => {
   return (
     <Layout>
       {/* ── Main two-column section ──────────────────────────────────────────── */}
-      <section
-        className="relative bg-[hsl(163,40%,6%)]"
-        style={{
-          backgroundImage: [
-            "radial-gradient(ellipse 600px 350px at 70% 0%, hsla(30,100%,50%,0.07) 0%, transparent 70%)",
-            "radial-gradient(ellipse 350px 350px at 0% 60%, hsla(200,80%,40%,0.06) 0%, transparent 70%)",
-            "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px)",
-            "linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",
-          ].join(", "),
-          backgroundSize: "auto, auto, 40px 40px, 40px 40px",
-        }}
-      >
+      <section className="relative min-h-screen bg-[hsl(163,40%,6%)] overflow-hidden">
+        {/* Subtle grid */}
+        <div className="absolute inset-0 grid-pattern opacity-10 pointer-events-none" />
+        {/* Glow orbs */}
+        <div className="absolute top-0 right-1/3 w-[500px] h-[300px] rounded-full opacity-10 blur-[120px] pointer-events-none"
+          style={{ background: "hsl(var(--primary))" }} />
+        <div className="absolute bottom-1/3 left-0 w-[300px] h-[300px] rounded-full opacity-8 blur-[100px] pointer-events-none"
+          style={{ background: "hsl(200,80%,40%)" }} />
 
         <div className="container mx-auto px-4 lg:px-8 py-16 lg:py-24 relative z-10">
           <div className="grid lg:grid-cols-[1fr_420px] gap-10 xl:gap-16 items-start">
@@ -136,7 +132,7 @@ const Contact = () => {
                   { icon: Shield, label: "We Care",      sub: "Your success is our priority" },
                 ].map((item) => (
                   <div key={item.label}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 bg-white/5">
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
                     <div className="w-9 h-9 rounded-lg bg-primary/15 flex items-center justify-center shrink-0">
                       <item.icon size={16} className="text-primary" />
                     </div>
@@ -189,7 +185,7 @@ const Contact = () => {
               {/* Other Ways to Reach Us */}
               <motion.div variants={fadeUp} custom={5}>
                 <h3 className="text-sm font-semibold text-white/80 mb-4">Other Ways to Reach Us</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {contactMethods.map((item) => (
                     <div key={item.label}
                       className="flex flex-col gap-2 p-3 rounded-xl border border-white/10 bg-white/5">
