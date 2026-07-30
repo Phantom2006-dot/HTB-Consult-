@@ -92,7 +92,7 @@ const Contact = () => {
   return (
     <Layout>
       {/* ── Main two-column section ──────────────────────────────────────────── */}
-      <section className="relative min-h-screen bg-[hsl(163,40%,6%)] overflow-hidden">
+      <section className="relative bg-[hsl(163,40%,6%)]">
         {/* Subtle grid */}
         <div className="absolute inset-0 grid-pattern opacity-10 pointer-events-none" />
         {/* Glow orbs */}
@@ -132,7 +132,7 @@ const Contact = () => {
                   { icon: Shield, label: "We Care",      sub: "Your success is our priority" },
                 ].map((item) => (
                   <div key={item.label}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm">
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/10 bg-white/5">
                     <div className="w-9 h-9 rounded-lg bg-primary/15 flex items-center justify-center shrink-0">
                       <item.icon size={16} className="text-primary" />
                     </div>
@@ -185,7 +185,7 @@ const Contact = () => {
               {/* Other Ways to Reach Us */}
               <motion.div variants={fadeUp} custom={5}>
                 <h3 className="text-sm font-semibold text-white/80 mb-4">Other Ways to Reach Us</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                   {contactMethods.map((item) => (
                     <div key={item.label}
                       className="flex flex-col gap-2 p-3 rounded-xl border border-white/10 bg-white/5">
