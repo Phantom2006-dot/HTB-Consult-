@@ -92,14 +92,18 @@ const Contact = () => {
   return (
     <Layout>
       {/* ── Main two-column section ──────────────────────────────────────────── */}
-      <section className="relative bg-[hsl(163,40%,6%)]">
-        {/* Subtle grid */}
-        <div className="absolute inset-0 grid-pattern opacity-10 pointer-events-none" />
-        {/* Glow orbs */}
-        <div className="absolute top-0 right-1/3 w-[500px] h-[300px] rounded-full opacity-10 blur-[120px] pointer-events-none"
-          style={{ background: "hsl(var(--primary))" }} />
-        <div className="absolute bottom-1/3 left-0 w-[300px] h-[300px] rounded-full opacity-8 blur-[100px] pointer-events-none"
-          style={{ background: "hsl(200,80%,40%)" }} />
+      <section
+        className="relative bg-[hsl(163,40%,6%)]"
+        style={{
+          backgroundImage: [
+            "radial-gradient(ellipse 600px 350px at 70% 0%, hsla(30,100%,50%,0.07) 0%, transparent 70%)",
+            "radial-gradient(ellipse 350px 350px at 0% 60%, hsla(200,80%,40%,0.06) 0%, transparent 70%)",
+            "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px)",
+            "linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",
+          ].join(", "),
+          backgroundSize: "auto, auto, 40px 40px, 40px 40px",
+        }}
+      >
 
         <div className="container mx-auto px-4 lg:px-8 py-16 lg:py-24 relative z-10">
           <div className="grid lg:grid-cols-[1fr_420px] gap-10 xl:gap-16 items-start">
