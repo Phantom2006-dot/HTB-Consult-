@@ -240,8 +240,11 @@ const Index = () => {
         {/* Background image */}
         <div className="absolute inset-0">
           <img
-            src="/hero-bg.png"
+            src="/hero-bg.webp"
             alt=""
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
             className="w-full h-full object-cover object-center brightness-110 contrast-105"
           />
         </div>

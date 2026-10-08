@@ -51,8 +51,13 @@ const Blog = () => {
       <div className="relative overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=1600&q=80&auto=format&fit=crop"
+            src="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=1280&q=72&auto=format&fit=crop"
+            srcSet="https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=768&q=72&auto=format&fit=crop 768w, https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d?w=1280&q=72&auto=format&fit=crop 1280w"
+            sizes="100vw"
             alt=""
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-[hsl(163,36%,8%)]/92 backdrop-blur-[2px]" />
@@ -129,6 +134,9 @@ const Blog = () => {
                             <img
                               src={featured[0].cover_image_url}
                               alt={featured[0].title}
+                              loading="eager"
+                              fetchPriority="high"
+                              decoding="async"
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                             />
                           </div>
@@ -153,7 +161,7 @@ const Blog = () => {
                           <div className="glow-line" />
                           <div className="flex items-center gap-2">
                             {featured[0].author_avatar ? (
-                              <img src={featured[0].author_avatar} alt="" className="w-7 h-7 rounded-full object-cover" />
+                              <img src={featured[0].author_avatar} alt="" loading="lazy" decoding="async" className="w-7 h-7 rounded-full object-cover" />
                             ) : (
                               <div className="w-7 h-7 rounded-full glass border border-white/10 flex items-center justify-center">
                                 <User size={13} className="text-white/40" />
@@ -212,6 +220,8 @@ function ArticleCard({ article, index }: { article: Article; index: number }) {
               <img
                 src={article.cover_image_url}
                 alt={article.title}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
               />
             </div>
@@ -241,7 +251,7 @@ function ArticleCard({ article, index }: { article: Article; index: number }) {
             <div className="glow-line opacity-30" />
             <div className="flex items-center gap-2 pt-1 mt-auto">
               {article.author_avatar ? (
-                <img src={article.author_avatar} alt={article.author_name || ""} className="w-6 h-6 rounded-full object-cover" />
+                <img src={article.author_avatar} alt={article.author_name || ""} loading="lazy" decoding="async" className="w-6 h-6 rounded-full object-cover" />
               ) : (
                 <div className="w-6 h-6 rounded-full glass border border-white/10 flex items-center justify-center">
                   <User size={12} className="text-white/30" />

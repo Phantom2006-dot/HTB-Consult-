@@ -34,5 +34,15 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: "dist/public",
     sourcemap: false,
+    cssCodeSplit: false,
+    rollupOptions: {
+      output: {
+        entryFileNames: "assets/app.js",
+        chunkFileNames: "assets/chunks/[name]-[hash].js",
+        assetFileNames: (assetInfo) => assetInfo.name?.endsWith(".css")
+          ? "assets/app.css"
+          : "assets/[name]-[hash][extname]",
+      },
+    },
   },
 }));

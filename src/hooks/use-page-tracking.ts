@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackPageView } from "@/lib/analytics";
 
 function getSessionId(): string {
   const key = "htb_sid";
@@ -21,6 +22,8 @@ export function usePageTracking() {
     const page = location.pathname;
     if (page === lastTracked.current) return;
     lastTracked.current = page;
+
+    trackPageView(page);
 
     const payload = {
       session_id: getSessionId(),

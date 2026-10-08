@@ -495,8 +495,13 @@ const Courses = () => {
       <section className="relative py-20 lg:py-28 overflow-hidden -mt-[72px] pt-[140px] lg:pt-[160px]">
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1920&q=80&auto=format&fit=crop"
+            src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1280&q=72&auto=format&fit=crop"
+            srcSet="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=768&q=72&auto=format&fit=crop 768w, https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=1280&q=72&auto=format&fit=crop 1280w"
+            sizes="100vw"
             alt=""
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-[hsl(163,36%,8%)]/93 backdrop-blur-[3px]" />
@@ -776,6 +781,8 @@ const Courses = () => {
                                   <img
                                     src={(course as any).thumbnail_url}
                                     alt={course.title}
+                                    loading="lazy"
+                                    decoding="async"
                                     className={`w-full h-full object-cover transition-transform duration-700 ${isLocked ? "grayscale" : "hover:scale-105"}`}
                                   />
                                 ) : (

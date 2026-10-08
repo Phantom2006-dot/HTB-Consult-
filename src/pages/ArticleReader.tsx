@@ -11,6 +11,7 @@ import { fadeUp } from "@/lib/animations";
 import SidebarLayout from "@/components/SidebarLayout";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
+import { breadcrumbSchema, makePageTitle, SITE_ORIGIN, setSeoMetadata } from "@/lib/seo";
 
 function isMarkdown(content: string) {
   return /^#{1,6}\s|^\*\*|^\*[^*]|\[.+\]\(.+\)|^>\s|^- /.test(content.trim());
@@ -106,6 +107,51 @@ const ArticleReader = () => {
     enabled: !!slug,
   });
 
+  useEffect(() => {
+    if (article) {
+      const pathname = `/blog/${encodeURIComponent(article.slug || slug || "")}`;
+      const canonical = `${SITE_ORIGIN}${pathname}`;
+      const description = String(article.excerpt || article.content || `Read ${article.title} from HTB Consult Academy.`)
+        .replace(/<[^>]*>/g, " ").replace(/[#*_>`~|]/g, " ").replace(/\s+/g, " ").trim().slice(0, 155);
+      const image = article.cover_image_url && /^https?:\/\//i.test(article.cover_image_url) ? article.cover_image_url : undefined;
+      const datePublished = article.created_at && !Number.isNaN(Date.parse(article.created_at))
+        ? new Date(article.created_at).toISOString()
+        : undefined;
+      setSeoMetadata({
+        title: makePageTitle(article.title),
+        description,
+        pathname,
+        image,
+        type: "article",
+        schemas: [
+          breadcrumbSchema([
+            { name: "Home", url: SITE_ORIGIN },
+            { name: "Blog", url: `${SITE_ORIGIN}/blog` },
+            { name: article.title, url: canonical },
+          ]),
+          {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: article.title,
+            description,
+            mainEntityOfPage: canonical,
+            datePublished,
+            author: { "@type": "Organization", name: article.author_name || "HTB Consult Academy" },
+            publisher: { "@type": "Organization", name: "HTB Consult Academy", url: SITE_ORIGIN },
+            ...(image ? { image } : {}),
+          },
+        ],
+      });
+    } else if (isError) {
+      setSeoMetadata({
+        title: "Article not found | HTB Consult Academy",
+        description: "Browse practical insights and learning resources from HTB Consult Academy.",
+        pathname: `/blog/${encodeURIComponent(slug || "")}`,
+        noindex: true,
+      });
+    }
+  }, [article, isError, slug]);
+
   const { data: readStatus } = useQuery({
     queryKey: ["article-read", article?.id],
     queryFn: () => api.get<{ read: boolean }>(`/api/articles/${article!.id}/read-status`),
@@ -190,7 +236,7 @@ const ArticleReader = () => {
         <motion.article initial="hidden" animate="visible" variants={fadeUp} custom={1}>
           {article.cover_image_url && (
             <div className="rounded-xl overflow-hidden mb-6 h-56 sm:h-72">
-              <img src={article.cover_image_url} alt={article.title} className="w-full h-full object-cover" />
+              <img src={article.cover_image_url} alt={article.title} loading="eager" fetchPriority="high" decoding="async" className="w-full h-full object-cover" />
             </div>
           )}
 
@@ -214,7 +260,7 @@ const ArticleReader = () => {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 pb-6 border-b border-border">
             <div className="flex items-center gap-3">
               {article.author_avatar ? (
-                <img src={article.author_avatar} alt={article.author_name || ""} className="w-10 h-10 rounded-full object-cover" />
+                <img src={article.author_avatar} alt={article.author_name || ""} loading="lazy" decoding="async" className="w-10 h-10 rounded-full object-cover" />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
                   <User size={16} className="text-muted-foreground" />
@@ -268,7 +314,7 @@ const ArticleReader = () => {
             <div className="mt-8 pt-6 border-t border-border">
               <div className="flex items-center gap-3 mb-3">
                 {article.author_avatar ? (
-                  <img src={article.author_avatar} alt={article.author_name || ""} className="w-10 h-10 rounded-full object-cover" />
+                  <img src={article.author_avatar} alt={article.author_name || ""} loading="lazy" decoding="async" className="w-10 h-10 rounded-full object-cover" />
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
                     <User size={16} className="text-muted-foreground" />

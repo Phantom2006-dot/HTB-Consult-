@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { fadeUp } from "@/lib/animations";
-import htbLogo from "@/assets/htb-logo.png";
+import htbLogo from "@/assets/htb-logo.webp";
 import { useAuth, setToken } from "@/contexts/AuthContext";
 import { api } from "@/lib/api";
 

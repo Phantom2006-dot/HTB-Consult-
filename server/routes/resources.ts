@@ -7,9 +7,16 @@ const router = Router();
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const isUUID = (v: string | string[]) => typeof v === "string" && UUID_RE.test(v);
 
-router.get("/course/:courseId", async (req, res) => {
+router.get("/course/:courseId", requireAuth, async (req: AuthRequest, res) => {
   if (!isUUID(req.params.courseId)) return res.json([]);
   try {
+    if (req.user?.role !== "admin") {
+      const { rows: enrollmentRows } = await pool.query(
+        "SELECT 1 FROM enrollments WHERE user_id = $1 AND course_id = $2 LIMIT 1",
+        [req.user!.id, req.params.courseId]
+      );
+      if (enrollmentRows.length === 0) return res.status(404).json({ error: "Course resources not found" });
+    }
     const { rows } = await pool.query(
       `SELECT r.id, r.title, r.file_url, r.file_type, r.file_size, r.created_at,
               u.full_name AS uploaded_by_name

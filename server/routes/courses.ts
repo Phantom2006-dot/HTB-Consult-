@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { pool } from "../db.js";
-import { requireAuth, requireAdmin, type AuthRequest } from "../middleware/auth.js";
+import { optionalAuth, requireAuth, requireAdmin, type AuthRequest } from "../middleware/auth.js";
 
 const router = Router();
 
@@ -12,7 +12,7 @@ router.get("/", async (_req, res) => {
     const { rows } = await pool.query(
       "SELECT * FROM courses WHERE published = true ORDER BY created_at DESC"
     );
-    return res.json(rows);
+    return res.json(rows.map(({ live_class_url, ...course }) => course));
   } catch (err) {
     return res.status(500).json({ error: "Failed to fetch courses" });
   }
@@ -27,11 +27,24 @@ router.get("/admin/all", requireAdmin, async (_req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", optionalAuth, async (req: AuthRequest, res) => {
   if (!isUUID(req.params.id)) return res.status(404).json({ error: "Course not found" });
   try {
-    const { rows: courseRows } = await pool.query("SELECT * FROM courses WHERE id = $1", [req.params.id]);
+    const isAdmin = req.user?.role === "admin";
+    const { rows: courseRows } = await pool.query(
+      "SELECT * FROM courses WHERE id = $1 AND (published = true OR $2::boolean)",
+      [req.params.id, isAdmin]
+    );
     if (courseRows.length === 0) return res.status(404).json({ error: "Course not found" });
+
+    let canAccessProtectedContent = isAdmin;
+    if (req.user && !isAdmin) {
+      const { rows: enrollmentRows } = await pool.query(
+        "SELECT 1 FROM enrollments WHERE user_id = $1 AND course_id = $2 LIMIT 1",
+        [req.user.id, req.params.id]
+      );
+      canAccessProtectedContent = enrollmentRows.length > 0;
+    }
 
     // ── Try sort_order first (new schema), fallback to position (old schema) ──
     let modules: any[] = [];
@@ -79,9 +92,15 @@ router.get("/:id", async (req, res) => {
 
     const modulesWithLessons = modules.map((m) => ({
       ...m,
-      lessons: lessons.filter((l) => l.module_id === m.id),
+      lessons: lessons.filter((l) => l.module_id === m.id).map((lesson) => {
+        if (canAccessProtectedContent || lesson.is_free) return lesson;
+        const { content, video_url, ...publicLesson } = lesson;
+        return publicLesson;
+      }),
     }));
-    return res.json({ course: courseRows[0], modules: modulesWithLessons });
+    const course = { ...courseRows[0] };
+    if (!canAccessProtectedContent) delete course.live_class_url;
+    return res.json({ course, modules: modulesWithLessons });
   } catch (err) {
     return res.status(500).json({ error: "Failed to fetch course" });
   }

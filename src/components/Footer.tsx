@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { motion } from "framer-motion";
-import htbLogo from "@/assets/htb-logo.png";
+import htbLogo from "@/assets/htb-logo.webp";
 
 const socialLinks = [
   {
