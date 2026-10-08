@@ -3,7 +3,7 @@
 ## Public crawl endpoints
 
 - `https://academy.htbconsults.com/robots.txt` is a static public file in `public/` and points crawlers to the XML sitemap.
-- `https://academy.htbconsults.com/sitemap.xml` is served by a Vercel function. It includes the fixed public Academy pages plus current published courses, articles and mentors from the public API; private and unpublished records are excluded.
+- `https://academy.htbconsults.com/sitemap.xml` is served by a Vercel function. It includes the fixed public Academy pages plus current published courses, articles and mentors from the public API; private and unpublished records are excluded. The edge cache revalidates every 60 seconds without a stale-while-revalidate window.
 - Public HTML routes are rewritten to SEO-aware Vercel functions. Course, article and mentor pages receive metadata and visible summary content before JavaScript runs. Missing records return HTTP 404; a temporarily unavailable content API returns HTTP 503 rather than a false 404.
 - The functions use `VITE_API_URL` when available and otherwise use the API origin currently configured for the frontend (`https://htbconsult.fly.dev`). Keep this value aligned with the live API deployment.
 

@@ -48,6 +48,8 @@ describe("Academy SEO server handlers", () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.headers["content-type"]).toContain("application/xml");
+    expect(res.headers["cache-control"]).toContain("s-maxage=60");
+    expect(res.headers["cache-control"]).toContain("must-revalidate");
     expect(res.body).toContain('<?xml version="1.0" encoding="UTF-8"?>');
     const parsedXml = new DOMParser().parseFromString(res.body, "application/xml");
     expect(parsedXml.getElementsByTagName("parsererror")).toHaveLength(0);
