@@ -3,9 +3,11 @@ import {
   SEO_PAGES,
   SITE_ORIGIN,
   breadcrumbSchema,
+  courseListSchema,
   escapeHtml,
   fetchPublicJson,
   makePageTitle,
+  publishedCoursesInDisplayOrder,
   sendSeoDocument,
   siteBreadcrumb,
   stripMarkup,
@@ -26,9 +28,7 @@ function requestPath(req) {
 }
 
 function courseCards(courses = []) {
-  const publicCourses = (Array.isArray(courses) ? courses : []).filter((course) =>
-    course && course.id && course.title && course.published !== false
-  );
+  const publicCourses = publishedCoursesInDisplayOrder(courses);
   if (!publicCourses.length) return "";
   return `<section aria-labelledby="available-courses"><h2 id="available-courses">Available courses</h2><ul>${publicCourses.map((course) =>
     `<li><a href="${SITE_ORIGIN}/course/${encodeURIComponent(String(course.id))}">${escapeHtml(course.title)}</a><p>${escapeHtml(course.description || "Explore practical professional training from HTB Consult Academy.")}</p></li>`
@@ -63,15 +63,22 @@ async function sendStaticPublicPage(res, pathname) {
   const page = SEO_PAGES[pathname];
   if (!page) return false;
   let body = "";
+  const dynamicSchemas = [];
   if (pathname === "/courses") {
-    try { body = courseCards(await fetchPublicJson("/api/courses")); } catch { /* Keep the public page available if the API is temporarily offline. */ }
+    try {
+      const courses = await fetchPublicJson("/api/courses");
+      body = courseCards(courses);
+      const listSchema = courseListSchema(courses);
+      if (listSchema) dynamicSchemas.push(listSchema);
+    } catch { /* Keep the public page available if the API is temporarily offline. */ }
   } else if (pathname === "/blog") {
     try { body = articleCards(await fetchPublicJson("/api/articles")); } catch { /* Keep the public page available if the API is temporarily offline. */ }
   } else if (pathname === "/mentors") {
     try { body = mentorCards(await fetchPublicJson("/api/mentors")); } catch { /* Keep the public page available if the API is temporarily offline. */ }
   }
   if (page.intro) body = `<p>${escapeHtml(page.intro)}</p>${body}`;
-  const schemas = siteBreadcrumb(pathname, page.h1) ? [siteBreadcrumb(pathname, page.h1)] : [];
+  const crumb = siteBreadcrumb(pathname, page.h1);
+  const schemas = [...(crumb ? [crumb] : []), ...dynamicSchemas];
   sendSeoDocument(res, { pathname, ...page, body, schemas });
   return true;
 }
@@ -175,15 +182,20 @@ async function sendMentorPage(res, pathname, id) {
   const description = String(biography || `${mentor.name}${mentor.title ? ` — ${mentor.title}` : ""} is an HTB Consult Academy industry mentor.`).slice(0, 155);
   const canonical = `${SITE_ORIGIN}${pathname}`;
   const image = /^https?:\/\//i.test(mentor.avatar_url || "") ? mentor.avatar_url : undefined;
-  const schema = {
-    "@context": "https://schema.org",
+  const person = {
     "@type": "Person",
     name: mentor.name,
+    identifier: String(mentor.id),
     ...(mentor.title ? { jobTitle: mentor.title } : {}),
     description,
     url: canonical,
     ...(image ? { image } : {}),
     worksFor: { "@type": "Organization", name: "HTB Consult Academy", url: SITE_ORIGIN },
+  };
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    mainEntity: person,
   };
   const crumbs = breadcrumbSchema([
     { name: "Home", url: SITE_ORIGIN },
