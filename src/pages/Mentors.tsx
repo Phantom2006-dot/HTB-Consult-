@@ -47,8 +47,13 @@ const Mentors = () => {
       <div className="relative overflow-hidden">
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1600&q=80&auto=format&fit=crop"
+            src="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1280&q=72&auto=format&fit=crop"
+            srcSet="https://images.unsplash.com/photo-1521791136064-7986c2920216?w=768&q=72&auto=format&fit=crop 768w, https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1280&q=72&auto=format&fit=crop 1280w"
+            sizes="100vw"
             alt=""
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
             className="w-full h-full object-cover"
           />
           <div className={`absolute inset-0 ${isDark ? "bg-[hsl(163,36%,8%)]/92 backdrop-blur-[2px]" : "bg-slate-900/60 backdrop-blur-[1px]"}`} />

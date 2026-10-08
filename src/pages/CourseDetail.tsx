@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import PaymentModal from "@/components/PaymentModal";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,6 +23,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { breadcrumbSchema, makePageTitle, SITE_ORIGIN, setSeoMetadata } from "@/lib/seo";
 
 const FILE_ICONS: Record<string, React.ElementType> = {
   pptx: Presentation, ppt: Presentation,
@@ -48,13 +49,60 @@ const CourseDetail = () => {
   const [openModules, setOpenModules] = useState<Set<string>>(new Set());
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
 
+  useEffect(() => {
+    if (data?.course) {
+      const course = data.course;
+      const pathname = `/course/${encodeURIComponent(String(course.id || id || ""))}`;
+      const description = String(course.description || `Explore ${course.title}, a professional course from HTB Consult Academy.`)
+        .replace(/\s+/g, " ").trim().slice(0, 155);
+      const canonical = `${SITE_ORIGIN}${pathname}`;
+      const image = course.thumbnail_url && /^https?:\/\//i.test(course.thumbnail_url) ? course.thumbnail_url : undefined;
+      const price = Number(course.price);
+      const isAdminPreview = new URLSearchParams(window.location.search).get("preview") === "1";
+      const schemas: Record<string, unknown>[] = [
+        breadcrumbSchema([
+          { name: "Home", url: SITE_ORIGIN },
+          { name: "Courses", url: `${SITE_ORIGIN}/courses` },
+          { name: course.title, url: canonical },
+        ]),
+        {
+          "@context": "https://schema.org",
+          "@type": "Course",
+          name: course.title,
+          description: course.description || description,
+          url: canonical,
+          inLanguage: "en-GB",
+          provider: { "@type": "Organization", name: "HTB Consult Academy", url: SITE_ORIGIN },
+          ...(image ? { image } : {}),
+          ...(Number.isFinite(price) && !course.is_locked ? {
+            offers: {
+              "@type": "Offer",
+              price: Math.max(0, price).toFixed(2),
+              priceCurrency: "GBP",
+              availability: "https://schema.org/InStock",
+              url: canonical,
+            },
+          } : {}),
+        },
+      ];
+      setSeoMetadata({ title: makePageTitle(course.title), description, pathname, image, schemas, noindex: isAdminPreview });
+    } else if (isError) {
+      setSeoMetadata({
+        title: "Course not found | HTB Consult Academy",
+        description: "Browse professional learning and published courses at HTB Consult Academy.",
+        pathname: `/course/${encodeURIComponent(String(id || ""))}`,
+        noindex: true,
+      });
+    }
+  }, [data, isError, id]);
+
   const isBookmarked = (bookmarksData || []).some((b: any) => b.course_id === id);
   const isEnrolled = (enrollmentsData || []).some((e: any) => e.course_id === id);
 
   const { data: resources } = useQuery({
     queryKey: ["course-resources", id],
     queryFn: () => api.get<any[]>(`/api/resources/course/${id}`),
-    enabled: !!id,
+    enabled: !!id && isEnrolled,
   });
 
   const handleEnroll = useCallback(async () => {
@@ -396,7 +444,7 @@ const CourseDetail = () => {
             >
               <div className="relative rounded-xl overflow-hidden bg-muted aspect-video shadow-lg border border-border group cursor-pointer">
                 {course.thumbnail_url ? (
-                  <img src={course.thumbnail_url} alt={course.title} className="w-full h-full object-cover" />
+                  <img src={course.thumbnail_url} alt={course.title} loading="eager" fetchPriority="high" decoding="async" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
                     <div className="text-muted-foreground/30">

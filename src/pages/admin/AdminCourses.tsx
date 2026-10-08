@@ -435,7 +435,7 @@ const AdminCourses = () => {
                     >
                       {course.is_locked ? <Lock size={14} /> : <LockOpen size={14} />}
                     </Button>
-                    <Link to={`/course/${course.id}`} target="_blank" rel="noopener noreferrer">
+                    <Link to={`/course/${course.id}${course.published ? "" : "?preview=1"}`} target="_blank" rel="noopener noreferrer">
                       <Button size="icon" variant="ghost" className="h-8 w-8 hover:text-blue-400" title="Preview course page">
                         <ExternalLink size={14} />
                       </Button>

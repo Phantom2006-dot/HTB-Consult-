@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { fadeUp } from "@/lib/animations";
 import { api } from "@/lib/api";
 import { useAuth, setToken } from "@/contexts/AuthContext";
-import htbLogo from "@/assets/htb-logo.png";
+import htbLogo from "@/assets/htb-logo.webp";
 
 type Status = "verifying" | "success" | "error" | "expired" | "resend";
 

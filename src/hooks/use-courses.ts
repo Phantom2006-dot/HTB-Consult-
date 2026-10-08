@@ -13,7 +13,7 @@ export interface Course {
   rating: number;
   total_duration: string;
   instructor_id: string | null;
-  live_class_url: string | null;
+  live_class_url?: string | null;
   course_type: string;
   published: boolean;
   is_locked: boolean;
@@ -33,8 +33,8 @@ export interface Lesson {
   module_id: string;
   title: string;
   content_type: string;
-  content: string | null;
-  video_url: string | null;
+  content?: string | null;
+  video_url?: string | null;
   duration: string;
   sort_order: number;
   is_free: boolean;

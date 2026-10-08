@@ -1,14 +1,27 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+
+# Keep non-public account and management URLs out of crawler requests.
+# These rules are not an access-control mechanism; sensitive routes and APIs must enforce authentication.
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /notifications
+Disallow: /emails
+Disallow: /messages
+Disallow: /chat
+Disallow: /saved
+Disallow: /settings
+Disallow: /mentor-dashboard
+Disallow: /my-learning
+Disallow: /onboarding
+Disallow: /mentor/articles
+Disallow: /explore
+Disallow: /sessions
+Disallow: /auth
+Disallow: /reset-password
+Disallow: /verify-email
+Disallow: /payment
+Disallow: /api/
+
+Sitemap: https://academy.htbconsults.com/sitemap.xml

@@ -22,6 +22,21 @@ export function requireAuth(req: AuthRequest, res: Response, next: NextFunction)
   }
 }
 
+export function optionalAuth(req: AuthRequest, _res: Response, next: NextFunction) {
+  const header = req.headers.authorization;
+  if (header?.startsWith("Bearer ")) {
+    try {
+      const decoded = jwt.verify(header.slice(7), JWT_SECRET) as { id?: unknown; email?: unknown; role?: unknown };
+      if (typeof decoded.id === "string" && typeof decoded.email === "string" && typeof decoded.role === "string") {
+        req.user = { id: decoded.id, email: decoded.email, role: decoded.role };
+      }
+    } catch {
+      // Invalid or expired credentials receive only the public response.
+    }
+  }
+  next();
+}
+
 export function requireAdmin(req: AuthRequest, res: Response, next: NextFunction) {
   requireAuth(req, res, () => {
     if (req.user?.role !== "admin") {

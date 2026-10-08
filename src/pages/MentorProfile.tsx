@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -18,6 +18,7 @@ import { useCreateBooking } from "@/hooks/use-bookings";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
+import { breadcrumbSchema, makePageTitle, SITE_ORIGIN, setSeoMetadata } from "@/lib/seo";
 
 const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -28,6 +29,39 @@ const MentorProfile = () => {
   const { toast } = useToast();
   const { data, isLoading } = useMentorDetail(id);
   const createBooking = useCreateBooking();
+
+  useEffect(() => {
+    if (!data?.mentor) return;
+    const mentor = data.mentor;
+    const pathname = `/mentor/${encodeURIComponent(String(mentor.id || id || ""))}`;
+    const canonical = `${SITE_ORIGIN}${pathname}`;
+    const description = String(mentor.bio || `${mentor.name}${mentor.title ? ` — ${mentor.title}` : ""} is an HTB Consult Academy industry mentor.`)
+      .replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 155);
+    const image = mentor.avatar_url && /^https?:\/\//i.test(mentor.avatar_url) ? mentor.avatar_url : undefined;
+    setSeoMetadata({
+      title: makePageTitle(`${mentor.name} | Academy Mentor`),
+      description,
+      pathname,
+      image,
+      schemas: [
+        breadcrumbSchema([
+          { name: "Home", url: SITE_ORIGIN },
+          { name: "Mentors", url: `${SITE_ORIGIN}/mentors` },
+          { name: mentor.name, url: canonical },
+        ]),
+        {
+          "@context": "https://schema.org",
+          "@type": "Person",
+          name: mentor.name,
+          ...(mentor.title ? { jobTitle: mentor.title } : {}),
+          description,
+          url: canonical,
+          ...(image ? { image } : {}),
+          worksFor: { "@type": "Organization", name: "HTB Consult Academy", url: SITE_ORIGIN },
+        },
+      ],
+    });
+  }, [data, id]);
 
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedSlot, setSelectedSlot] = useState<{ start: string; end: string } | null>(null);
@@ -131,6 +165,9 @@ const MentorProfile = () => {
                 <img
                   src={mentor.avatar_url}
                   alt={mentor.name}
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
                   className="w-20 h-20 rounded-full object-cover shrink-0 ring-2 ring-border"
                 />
               ) : (
