@@ -61,7 +61,7 @@ export default async function seoSitemap(req, res) {
 
   res.statusCode = 200;
   res.setHeader("content-type", "application/xml; charset=utf-8");
-  res.setHeader("cache-control", "public, max-age=0, s-maxage=300, stale-while-revalidate=600");
+  res.setHeader("cache-control", "public, max-age=0, s-maxage=60, must-revalidate");
   res.setHeader("x-content-type-options", "nosniff");
   res.end(req.method === "HEAD" ? "" : xml);
 }

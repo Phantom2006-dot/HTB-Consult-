@@ -1,6 +1,6 @@
-import { PRIVATE_ROUTE_PREFIXES, SEO_PAGES, SITE_ORIGIN, SOCIAL_IMAGE_URL, makePageTitle } from "./seo-content.js";
+import { PRIVATE_ROUTE_PREFIXES, SEO_PAGES, SITE_ORIGIN, SOCIAL_IMAGE_URL, courseListSchema, makePageTitle, publishedCoursesInDisplayOrder } from "./seo-content.js";
 
-export { PRIVATE_ROUTE_PREFIXES, SEO_PAGES, SITE_ORIGIN, SOCIAL_IMAGE_URL, makePageTitle };
+export { PRIVATE_ROUTE_PREFIXES, SEO_PAGES, SITE_ORIGIN, SOCIAL_IMAGE_URL, courseListSchema, makePageTitle, publishedCoursesInDisplayOrder };
 
 const PUBLIC_API_ORIGIN = (process.env.VITE_API_URL || "https://htbconsult.fly.dev")
   .replace(/\/$/, "")

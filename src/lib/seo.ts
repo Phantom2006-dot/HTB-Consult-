@@ -1,6 +1,6 @@
-import { PRIVATE_ROUTE_PREFIXES, SEO_PAGES, SITE_ORIGIN, SOCIAL_IMAGE_URL, makePageTitle } from "../../shared/seo-content.js";
+import { PRIVATE_ROUTE_PREFIXES, SEO_PAGES, SITE_ORIGIN, SOCIAL_IMAGE_URL, courseListSchema, makePageTitle } from "../../shared/seo-content.js";
 
-export { PRIVATE_ROUTE_PREFIXES, SEO_PAGES, SITE_ORIGIN, SOCIAL_IMAGE_URL, makePageTitle };
+export { PRIVATE_ROUTE_PREFIXES, SEO_PAGES, SITE_ORIGIN, SOCIAL_IMAGE_URL, courseListSchema, makePageTitle };
 
 export interface SeoMetadata {
   title: string;

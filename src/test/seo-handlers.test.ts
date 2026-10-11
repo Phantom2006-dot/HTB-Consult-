@@ -48,6 +48,8 @@ describe("Academy SEO server handlers", () => {
 
     expect(res.statusCode).toBe(200);
     expect(res.headers["content-type"]).toContain("application/xml");
+    expect(res.headers["cache-control"]).toContain("s-maxage=60");
+    expect(res.headers["cache-control"]).toContain("must-revalidate");
     expect(res.body).toContain('<?xml version="1.0" encoding="UTF-8"?>');
     const parsedXml = new DOMParser().parseFromString(res.body, "application/xml");
     expect(parsedXml.getElementsByTagName("parsererror")).toHaveLength(0);
@@ -64,6 +66,8 @@ describe("Academy SEO server handlers", () => {
   it("returns raw HTML with route-specific metadata and published course content", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => jsonResponse([
       { id: "course-1", title: "Business Analysis <Basics>", description: "Learn practical analysis methods.", category: "Business Analysis", skill_level: "Beginner", price: "19.99", published: true },
+      { id: "course-2", title: "Leadership Foundations", description: "Build confident leadership skills.", published: true },
+      { id: "course-3", title: "Agile Delivery", description: "Learn practical Agile delivery.", published: true },
       { id: "draft-course", title: "Secret Draft", description: "Not public", published: false },
     ])));
 
@@ -78,6 +82,10 @@ describe("Academy SEO server handlers", () => {
     expect(res.body).not.toContain("Secret Draft");
     expect(res.body).toContain('property="og:title"');
     expect(res.body).toContain('name="twitter:card"');
+    const schemas = schemasFromHtml(res.body);
+    expect(schemas.map((schema) => schema["@type"])).toEqual(["Organization", "BreadcrumbList", "ItemList"]);
+    expect(schemas[2].itemListElement).toHaveLength(3);
+    expect(schemas[2].itemListElement[0].url).toContain("/course/course-1");
   });
 
   it("returns Course, BreadcrumbList and Organization JSON-LD for published courses", async () => {
@@ -128,7 +136,9 @@ describe("Academy SEO server handlers", () => {
     await seoPage({ method: "GET", url: "/api/seo-page?path=%2Fmentor%2Fmentor-1" }, mentorRes);
     expect(mentorRes.statusCode).toBe(200);
     expect(mentorRes.body).toContain("Published Mentor");
-    expect(schemasFromHtml(mentorRes.body).map((schema) => schema["@type"])).toEqual(["Organization", "BreadcrumbList", "Person"]);
+    const mentorSchemas = schemasFromHtml(mentorRes.body);
+    expect(mentorSchemas.map((schema) => schema["@type"])).toEqual(["Organization", "BreadcrumbList", "ProfilePage"]);
+    expect(mentorSchemas[2].mainEntity["@type"]).toBe("Person");
     expect(mentorRes.body).not.toContain("hourly_rate");
 
     const draftRes = responseRecorder();

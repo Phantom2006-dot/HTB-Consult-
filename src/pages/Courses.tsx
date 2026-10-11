@@ -19,6 +19,7 @@ import { fadeUp } from "@/lib/animations";
 import { useCourses } from "@/hooks/use-courses";
 import { useEnrollments } from "@/hooks/use-enrollments";
 import { useAuth } from "@/contexts/AuthContext";
+import { breadcrumbSchema, courseListSchema, SEO_PAGES, SITE_ORIGIN, setSeoMetadata } from "@/lib/seo";
 
 /* ── Category folder metadata (4 official pathways) ── */
 const FOLDERS = [
@@ -468,6 +469,23 @@ const Courses = () => {
       return 0;
     });
   }, [courses, selectedFolder, searchQuery, sortBy]);
+
+  useEffect(() => {
+    if (!courses) return;
+    const listSchema = courseListSchema(filteredCourses);
+    const page = SEO_PAGES["/courses"];
+    setSeoMetadata({
+      ...page,
+      pathname: "/courses",
+      schemas: [
+        breadcrumbSchema([
+          { name: "Home", url: SITE_ORIGIN },
+          { name: page.h1, url: `${SITE_ORIGIN}/courses` },
+        ]),
+        ...(listSchema ? [listSchema] : []),
+      ],
+    });
+  }, [courses, filteredCourses]);
 
   const activeFolderMeta = selectedFolder
     ? FOLDERS.find((f) => f.key === selectedFolder)

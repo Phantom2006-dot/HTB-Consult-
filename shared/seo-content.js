@@ -9,6 +9,33 @@ export function makePageTitle(title) {
   return `${concise}${suffix}`;
 }
 
+export function publishedCoursesInDisplayOrder(courses = []) {
+  if (!Array.isArray(courses)) return [];
+  return courses
+    .filter((course) => course?.id && typeof course.title === "string" && course.title.trim() && course.published !== false)
+    .sort((a, b) => {
+      const numberFromTitle = (title) => {
+        const match = String(title).match(/\d+/);
+        return match ? Number(match[0]) : Infinity;
+      };
+      return numberFromTitle(a.title) - numberFromTitle(b.title);
+    });
+}
+
+export function courseListSchema(courses = []) {
+  const publicCourses = publishedCoursesInDisplayOrder(courses);
+  if (publicCourses.length < 3) return null;
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    itemListElement: publicCourses.map((course, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `${SITE_ORIGIN}/course/${encodeURIComponent(String(course.id))}`,
+    })),
+  };
+}
+
 export const SEO_PAGES = {
   "/": {
     title: "HTB Consult Academy | Practical Career Training",
