@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { fadeUp } from "@/lib/animations";
-import htbLogo from "@/assets/htb-logo.webp";
+import htbLogo from "@/assets/htb-logo-gold.webp";
 import { api } from "@/lib/api";
 
 const ResetPassword = () => {
