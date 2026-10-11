@@ -16,7 +16,7 @@ import {
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useUnreadCounts } from "@/hooks/use-unread-counts";
-import htbLogo from "@/assets/htb-logo.webp";
+import htbLogo from "@/assets/htb-logo-gold.webp";
 
 /* ── Nav config ──────────────────────────────────────────────────────────── */
 const PRIMARY_NAV = [

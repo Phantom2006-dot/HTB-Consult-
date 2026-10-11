@@ -4,7 +4,7 @@ import { Menu, X, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
-import htbLogo from "@/assets/htb-logo.webp";
+import htbLogo from "@/assets/htb-logo-gold.webp";
 
 const navLinks = [
   { label: "Home", path: "/" },
