@@ -303,12 +303,12 @@ const Index = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.55 }}
-                className="mb-8"
+                className="mb-8 max-w-2xl rounded-2xl border border-white/15 bg-slate-950/70 px-5 py-4 shadow-2xl shadow-black/30 backdrop-blur-md sm:px-6 sm:py-5"
               >
-                <p className="text-base lg:text-lg text-white font-semibold mb-2 leading-snug">
+                <p className="text-lg lg:text-xl text-white font-bold mb-3 leading-snug [text-shadow:0_2px_10px_rgba(0,0,0,0.55)]">
                   Business Analysis<span className="text-primary">.</span> Process Improvement<span className="text-primary">.</span> Change Management<span className="text-primary">.</span> Agile Delivery<span className="text-primary">.</span>
                 </p>
-                <p className="text-sm lg:text-base text-white/55 leading-[1.8] font-light">
+                <p className="text-base lg:text-lg text-white/90 leading-relaxed font-medium">
                   Practical learning. Real project simulation. Business-ready delivery skills.<br />
                   Develop the skills, mindset and confidence to excel in today's workplace.
                 </p>
