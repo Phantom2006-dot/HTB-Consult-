@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import {
   ArrowRight, BookOpen, Target, CheckCircle, Star, Lightbulb,
   UserCheck, Briefcase, Brain, BarChart3, Quote, LogIn,
-  LayoutDashboard, Sparkles, TrendingUp, Award, ChevronRight,
+  LayoutDashboard, Sparkles, ChevronRight,
   Users, Clock, Shield, Rocket, GraduationCap, Building2, Layers,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -158,13 +158,6 @@ const testimonials = [
     initial: "S",
     color: "bg-purple-500/20 text-purple-400",
   },
-];
-
-const stats = [
-  { value: "500+", label: "Professionals Trained", icon: TrendingUp },
-  { value: "95%", label: "Satisfaction Rate", icon: Star },
-  { value: "12+", label: "Expert Programmes", icon: BookOpen },
-  { value: "10+", label: "Years Consulting", icon: Award },
 ];
 
 const trustBadges = [
@@ -810,26 +803,6 @@ const Index = () => {
                 </div>
                 <h3 className="text-lg md:text-xl font-semibold text-slate-900 mb-2">{reason.title}</h3>
                 <p className="text-sm md:text-base text-slate-600 leading-relaxed max-w-md mx-auto">{reason.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─────────────────── STATS (white) ─────────────────── */}
-      <section className="relative overflow-hidden bg-slate-50 border-y border-slate-200">
-        <div className="container mx-auto px-6 lg:px-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-slate-200">
-            {stats.map((s, i) => (
-              <motion.div
-                key={s.label}
-                initial="hidden" whileInView="visible" viewport={{ once: true }}
-                custom={i} variants={fadeIn}
-                className="py-10 px-6 text-center"
-              >
-                <s.icon size={18} className="mx-auto mb-3 text-primary opacity-70" />
-                <p className="text-4xl lg:text-5xl font-serif stat-number mb-1">{s.value}</p>
-                <p className="text-xs text-slate-400 uppercase tracking-widest font-medium">{s.label}</p>
               </motion.div>
             ))}
           </div>
