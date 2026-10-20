@@ -76,55 +76,63 @@ const learningSteps = [
 
 const programmes = [
   {
-    icon: GraduationCap,
-    iconBg: "bg-primary/15 text-primary",
-    title: "BA Foundation Bootcamp",
-    badge: "Beginner Friendly",
-    badgeColor: "bg-emerald-500/15 text-emerald-400",
-    desc: "Perfect for beginners and career changers. Start your BA journey with confidence.",
-  },
-  {
     icon: BarChart3,
-    iconBg: "bg-purple-500/15 text-purple-400",
-    title: "Practical BA Simulation",
-    badge: "Hands-on Learning",
-    badgeColor: "bg-purple-500/15 text-purple-400",
-    desc: "Build practical skills through real scenarios, case studies and deliverable simulations.",
+    iconBg: "bg-orange-500/15 text-orange-500",
+    title: "Business Analysis & Digital Transformation",
+    badge: "Flagship",
+    badgeColor: "bg-orange-500/10 text-orange-700",
+    desc: "Build capability in requirements engineering, stakeholder management, BPMN, Agile, business systems and practical digital transformation delivery.",
   },
   {
-    icon: Building2,
-    iconBg: "bg-amber-500/15 text-amber-400",
-    title: "Domain Specialisation",
-    badge: "Industry Focused",
-    badgeColor: "bg-amber-500/15 text-amber-400",
-    desc: "Choose your domain and become an expert BA in high-demand industries.",
+    icon: Target,
+    iconBg: "bg-emerald-500/15 text-emerald-600",
+    title: "Business Process Improvement & Operational Excellence",
+    badge: "Process Excellence",
+    badgeColor: "bg-emerald-500/10 text-emerald-700",
+    desc: "Learn process discovery, AS-IS/TO-BE mapping, BPMN, root cause analysis, customer journeys, KPI design and continuous improvement.",
+  },
+  {
+    icon: Users,
+    iconBg: "bg-purple-500/15 text-purple-600",
+    title: "Change Management & Business Transformation",
+    badge: "Transformation",
+    badgeColor: "bg-purple-500/10 text-purple-700",
+    desc: "Develop practical skills in change impact assessment, stakeholder engagement, communication, adoption and benefits realisation.",
+  },
+  {
+    icon: Layers,
+    iconBg: "bg-blue-500/15 text-blue-600",
+    title: "Agile, Product & Project Delivery Management",
+    badge: "Agile Delivery",
+    badgeColor: "bg-blue-500/10 text-blue-700",
+    desc: "Build capability in Scrum, Kanban, Product Ownership, backlog management, user stories, Jira and project execution.",
   },
 ];
 
 const whyReasons = [
   {
+    icon: Briefcase,
+    title: "Industry-Led Training",
+    desc: "Learning informed by real business and consulting experience.",
+    color: "bg-orange-500/10 text-orange-600",
+  },
+  {
+    icon: BookOpen,
+    title: "Practical Project Experience",
+    desc: "Apply your knowledge through case studies, exercises and simulations.",
+    color: "bg-blue-500/10 text-blue-600",
+  },
+  {
     icon: Target,
-    title: "Practical & Relevant Learning",
-    desc: "Real-world scenarios and industry aligned curriculum.",
-    color: "bg-primary/15 text-primary",
+    title: "Structured Learning Pathways",
+    desc: "Progress from essential concepts to practical application.",
+    color: "bg-amber-500/10 text-amber-600",
   },
   {
     icon: UserCheck,
-    title: "Expert Mentorship",
-    desc: "Learn from senior BAs with years of industry experience.",
-    color: "bg-blue-500/15 text-blue-400",
-  },
-  {
-    icon: TrendingUp,
-    title: "Career Focused",
-    desc: "Build the right skills, portfolio and mindset to get hired.",
-    color: "bg-amber-500/15 text-amber-400",
-  },
-  {
-    icon: Shield,
-    title: "Trusted by Learners",
-    desc: "Join thousands of learners transforming their careers.",
-    color: "bg-emerald-500/15 text-emerald-400",
+    title: "Professional Mentorship",
+    desc: "Learn from experienced practitioners and receive practical guidance.",
+    color: "bg-purple-500/10 text-purple-600",
   },
 ];
 
@@ -160,10 +168,10 @@ const stats = [
 ];
 
 const trustBadges = [
-  { icon: BarChart3, label: "Business Analysis & Digital Transformation", sub: "Learn to analyse, improve and transform business with practical frameworks.", iconBg: "bg-orange-500/20", iconColor: "text-orange-400" },
-  { icon: UserCheck, label: "Leadership & Professional Development", sub: "Strengthen mindset, communication, influence and leadership for career growth.", iconBg: "bg-emerald-500/20", iconColor: "text-emerald-400" },
-  { icon: Rocket, label: "Agile, Product & Delivery Management", sub: "Build capability in Agile, Scrum, Product Ownership and delivery excellence.", iconBg: "bg-blue-500/20", iconColor: "text-blue-400" },
-  { icon: Building2, label: "Industry & Domain Specialisation", sub: "Apply your skills across real world industries and professional domains.", iconBg: "bg-purple-500/20", iconColor: "text-purple-400" },
+  { icon: BarChart3, label: "Business Analysis & Digital Transformation", sub: "Requirements, stakeholders, BPMN, Agile and practical delivery.", iconBg: "bg-orange-500/20", iconColor: "text-orange-400" },
+  { icon: Target, label: "Business Process Improvement", sub: "Process discovery, mapping, root causes, KPIs and improvement.", iconBg: "bg-emerald-500/20", iconColor: "text-emerald-400" },
+  { icon: Users, label: "Change Management & Transformation", sub: "Engagement, adoption strategies and benefits realisation.", iconBg: "bg-purple-500/20", iconColor: "text-purple-400" },
+  { icon: Layers, label: "Agile, Product & Project Delivery", sub: "Scrum, Kanban, product ownership and delivery governance.", iconBg: "bg-blue-500/20", iconColor: "text-blue-400" },
 ];
 
 /* ═══════════════════════════════════════════════════════════ */
@@ -173,50 +181,58 @@ const HOME_FOLDERS = [
   {
     key: "Business Analysis & Digital Transformation",
     label: "Business Analysis & Digital Transformation",
-    description: "Learn to analyse, improve and transform business with practical frameworks, elicitation techniques and digital tools.",
+    description: "Requirements engineering, stakeholder management, BPMN, Agile, business systems, digital transformation and practical project delivery.",
+    audience: "Aspiring BAs, career changers and working professionals.",
+    aliases: [],
     icon: BarChart3,
     iconBg: "bg-orange-500/15",
-    iconColor: "text-orange-400",
+    iconColor: "text-orange-700",
     accent: "border-orange-500/25 hover:border-orange-500/50",
     glow: "hover:shadow-[0_12px_40px_-10px_rgba(234,119,0,0.18)]",
-    tag: "Analysis",
-    tagCls: "bg-orange-500/15 text-orange-400 border-orange-500/25",
+    tag: "Flagship",
+    tagCls: "bg-orange-500/10 text-orange-700 border-orange-500/25",
   },
   {
-    key: "Leadership & Professional Development",
-    label: "Leadership & Professional Development",
-    description: "Strengthen mindset, communication, influence and leadership for career growth and professional impact.",
-    icon: UserCheck,
+    key: "Business Process Improvement & Operational Excellence",
+    label: "Business Process Improvement & Operational Excellence",
+    description: "Process discovery, AS-IS/TO-BE mapping, BPMN, root cause analysis, customer journeys, bottlenecks, KPIs and continuous improvement.",
+    audience: "Business Analysts, operations professionals, managers and business owners.",
+    aliases: [],
+    icon: Target,
     iconBg: "bg-emerald-500/15",
-    iconColor: "text-emerald-400",
+    iconColor: "text-emerald-600",
     accent: "border-emerald-500/25 hover:border-emerald-500/50",
     glow: "hover:shadow-[0_12px_40px_-10px_rgba(16,185,129,0.15)]",
-    tag: "Leadership",
-    tagCls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
+    tag: "Process Excellence",
+    tagCls: "bg-emerald-500/15 text-emerald-700 border-emerald-500/25",
   },
   {
-    key: "Agile, Product & Delivery Management",
-    label: "Agile, Product & Delivery Management",
-    description: "Build capability in Agile, Scrum, Product Ownership and delivery excellence for high-velocity teams.",
-    icon: Layers,
-    iconBg: "bg-blue-500/15",
-    iconColor: "text-blue-400",
-    accent: "border-blue-500/25 hover:border-blue-500/50",
-    glow: "hover:shadow-[0_12px_40px_-10px_rgba(59,130,246,0.15)]",
-    tag: "Agile",
-    tagCls: "bg-blue-500/15 text-blue-400 border-blue-500/25",
-  },
-  {
-    key: "Industry & Domain Specialisation",
-    label: "Industry & Domain Specialisation",
-    description: "Apply your skills across real world industries — finance, healthcare, technology and more.",
-    icon: Building2,
+    key: "Change Management & Business Transformation",
+    label: "Change Management & Business Transformation",
+    description: "Change impact assessment, stakeholder engagement, communication planning, resistance management, adoption strategies and benefits realisation.",
+    audience: "Project professionals, team leaders, managers and change practitioners.",
+    aliases: [],
+    icon: Users,
     iconBg: "bg-purple-500/15",
-    iconColor: "text-purple-400",
+    iconColor: "text-purple-600",
     accent: "border-purple-500/25 hover:border-purple-500/50",
     glow: "hover:shadow-[0_12px_40px_-10px_rgba(139,92,246,0.15)]",
-    tag: "Specialisation",
-    tagCls: "bg-purple-500/15 text-purple-400 border-purple-500/25",
+    tag: "Transformation",
+    tagCls: "bg-purple-500/15 text-purple-700 border-purple-500/25",
+  },
+  {
+    key: "Agile, Product & Project Delivery Management",
+    label: "Agile, Product & Project Delivery Management",
+    description: "Scrum, Kanban, Product Ownership, backlog management, user stories, sprint planning, delivery governance, Jira and project execution.",
+    audience: "Aspiring Product Owners, Scrum Masters, delivery leads and project professionals.",
+    aliases: ["Agile, Product & Delivery Management"],
+    icon: Layers,
+    iconBg: "bg-blue-500/15",
+    iconColor: "text-blue-700",
+    accent: "border-blue-500/25 hover:border-blue-500/50",
+    glow: "hover:shadow-[0_12px_40px_-10px_rgba(59,130,246,0.15)]",
+    tag: "Agile Delivery",
+    tagCls: "bg-blue-500/10 text-blue-700 border-blue-500/25",
   },
 ];
 
@@ -226,8 +242,8 @@ const Index = () => {
 
   // Count courses per pathway
   const folderCounts = courses
-    ? HOME_FOLDERS.reduce<Record<string, number>>((acc, f) => {
-        acc[f.key] = courses.filter((c) => c.category === f.key).length;
+      ? HOME_FOLDERS.reduce<Record<string, number>>((acc, f) => {
+        acc[f.key] = courses.filter((c) => c.category === f.key || f.aliases?.includes(c.category)).length;
         return acc;
       }, {})
     : {};
@@ -297,10 +313,10 @@ const Index = () => {
                 className="mb-8"
               >
                 <p className="text-base lg:text-lg text-white font-semibold mb-2 leading-snug">
-                  Business Analysis<span className="text-primary">.</span> Digital Transformation<span className="text-primary">.</span> Leadership<span className="text-primary">.</span> Industry Readiness<span className="text-primary">.</span>
+                  Business Analysis<span className="text-primary">.</span> Process Improvement<span className="text-primary">.</span> Change Management<span className="text-primary">.</span> Agile Delivery<span className="text-primary">.</span>
                 </p>
                 <p className="text-sm lg:text-base text-white/55 leading-[1.8] font-light">
-                  Practical learning. Real project simulation. Industry readiness.<br />
+                  Practical learning. Real project simulation. Business-ready delivery skills.<br />
                   Develop the skills, mindset and confidence to excel in today's workplace.
                 </p>
               </motion.div>
@@ -527,6 +543,20 @@ const Index = () => {
               </motion.div>
             ))}
           </div>
+
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true }}
+            variants={fadeUp} custom={4}
+            className="mt-10 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-blue-100 bg-blue-50/70 px-5 py-5 sm:px-7"
+          >
+            <div className="text-center sm:text-left">
+              <p className="font-semibold text-slate-900">Ready to take your next step?</p>
+              <p className="text-sm text-slate-600">Join a pathway and start building practical skills for work.</p>
+            </div>
+            <Button asChild className="bg-gradient-gold hover:opacity-90 font-semibold px-7 h-11 text-sm btn-shimmer shadow-orange shrink-0">
+              <Link to="/auth?tab=signup">Enroll Now <ArrowRight className="ml-2" size={15} /></Link>
+            </Button>
+          </motion.div>
         </div>
       </section>
 
@@ -653,23 +683,22 @@ const Index = () => {
               className="text-xs font-bold uppercase tracking-[0.25em] mb-4"
               style={{ color: "hsl(var(--primary))" }}
             >
-              Choose Your Learning Pathway
+              Our Flagship Programmes
             </motion.p>
             <motion.h2 variants={fadeUp} custom={1}
               className="text-3xl md:text-4xl lg:text-5xl font-serif text-slate-900 leading-tight"
             >
-              Find the right{" "}
-              <em className="not-italic text-gradient-gold">course for you</em>
+              Build Skills. Create Impact. Grow Your Career.
             </motion.h2>
             <motion.p variants={fadeUp} custom={2}
               className="mt-4 text-slate-500 text-sm max-w-xl mx-auto leading-relaxed"
             >
-              Browse across four structured pathways — from BA foundations to domain specialisation.
+              Focused training designed to build practical capability, business impact and career growth.
             </motion.p>
           </motion.div>
 
           {/* Folder cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
             {HOME_FOLDERS.map((folder, i) => {
               const Icon = folder.icon;
               const count = folderCounts[folder.key] ?? 0;
@@ -710,6 +739,11 @@ const Index = () => {
                       {folder.description}
                     </p>
 
+                    <div className="flex items-start gap-2.5 border-t border-slate-100 pt-4 mb-5">
+                      <Users size={16} className="text-primary mt-0.5 shrink-0" />
+                      <p className="text-sm text-slate-600 leading-relaxed">{folder.audience}</p>
+                    </div>
+
                     {/* CTA */}
                     <span
                       className={`inline-flex items-center gap-1.5 text-sm font-semibold group-hover:gap-2.5 transition-all duration-200 ${folder.iconColor}`}
@@ -746,55 +780,38 @@ const Index = () => {
         />
 
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <div className="grid md:grid-cols-2 gap-10 lg:gap-14 xl:gap-20 items-start">
-            {/* Left text */}
-            <motion.div
-              initial="hidden" whileInView="visible" viewport={{ once: true }}
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true }}
+            className="text-center max-w-4xl mx-auto mb-10"
+          >
+            <motion.p variants={fadeUp} custom={0}
+              className="text-xs font-bold uppercase tracking-[0.25em] mb-4"
+              style={{ color: "hsl(var(--primary))" }}
             >
-              <motion.p variants={fadeUp} custom={0}
-                className="text-xs font-bold uppercase tracking-[0.25em] mb-4"
-                style={{ color: "hsl(var(--primary))" }}
-              >
-                Why HTB Academy
-              </motion.p>
-              <motion.h2 variants={fadeUp} custom={1}
-                className="text-5xl md:text-6xl font-serif text-slate-900 mb-4 leading-[1.1]"
-              >
-                We don't just teach.{" "}
-                <em className="not-italic text-gradient-gold">We prepare you for impact.</em>
-              </motion.h2>
-              <motion.p variants={fadeUp} custom={2}
-                className="text-slate-500 leading-[1.9] mb-8 text-sm lg:text-base max-w-md"
-              >
-                Our practical and structured approach ensures you gain the skills, confidence and experience to thrive in real-world BA roles.
-              </motion.p>
-              <motion.div variants={fadeUp} custom={3}>
-                <Button
-                  asChild
-                  className="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 font-semibold px-6 shadow-none"
-                >
-                  <Link to="/about">Learn More About Us <ChevronRight size={15} className="ml-1" /></Link>
-                </Button>
-              </motion.div>
-            </motion.div>
+              Why HTB Academy
+            </motion.p>
+            <motion.h2 variants={fadeUp} custom={1}
+              className="text-3xl md:text-4xl font-serif text-slate-900 leading-tight"
+            >
+              Built for Learning. Designed for Real-World Impact.
+            </motion.h2>
+          </motion.div>
 
-            {/* Right — 2×2 feature cards */}
-            <div className="grid grid-cols-2 gap-4">
-              {whyReasons.map((reason, i) => (
-                <motion.div
-                  key={reason.title}
-                  initial="hidden" whileInView="visible" viewport={{ once: true }}
-                  custom={i} variants={scaleIn}
-                  className="bg-white border border-slate-200 rounded-2xl p-5 hover:border-primary/40 hover:shadow-md hover:shadow-primary/8 transition-all duration-300 card-lift"
-                >
-                  <div className={`w-10 h-10 rounded-xl ${reason.color} flex items-center justify-center mb-3`}>
-                    <reason.icon size={18} />
-                  </div>
-                  <h4 className="text-base font-semibold text-slate-900 mb-2">{reason.title}</h4>
-                  <p className="text-sm text-slate-500 leading-relaxed">{reason.desc}</p>
-                </motion.div>
-              ))}
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 rounded-3xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+            {whyReasons.map((reason, i) => (
+              <motion.div
+                key={reason.title}
+                initial="hidden" whileInView="visible" viewport={{ once: true }}
+                custom={i} variants={scaleIn}
+                className={`p-8 md:p-10 text-center hover:bg-slate-50/70 transition-colors duration-300 ${i < 3 ? "border-b border-slate-200" : ""} ${i < 2 ? "md:border-b" : "md:border-b-0"} ${i % 2 === 1 ? "md:border-l" : ""}`}
+              >
+                <div className={`w-10 h-10 rounded-xl ${reason.color} flex items-center justify-center mx-auto mb-4`}>
+                  <reason.icon size={18} />
+                </div>
+                <h3 className="text-lg md:text-xl font-semibold text-slate-900 mb-2">{reason.title}</h3>
+                <p className="text-sm md:text-base text-slate-600 leading-relaxed max-w-md mx-auto">{reason.desc}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>

@@ -53,12 +53,10 @@ const quickLinks = [
 ];
 
 const popularPathways = [
-  "BA Foundation Bootcamp",
-  "Practical BA Application & Simulation",
-  "Banking BA",
-  "Insurance BA",
-  "Healthcare BA",
-  "Warehouse & Logistics BA",
+  { label: "Business Analysis & Digital Transformation", category: "Business Analysis & Digital Transformation" },
+  { label: "Process Improvement & Operational Excellence", category: "Business Process Improvement & Operational Excellence" },
+  { label: "Change Management & Business Transformation", category: "Change Management & Business Transformation" },
+  { label: "Agile, Product & Project Delivery", category: "Agile, Product & Project Delivery Management" },
 ];
 
 const Footer = () => {
@@ -128,15 +126,15 @@ const Footer = () => {
           <div>
             <h4 className="text-xs font-bold uppercase tracking-widest text-white/50 mb-5">Popular Pathways</h4>
             <ul className="space-y-2.5">
-              {popularPathways.map((name) => (
-                <li key={name}>
+              {popularPathways.map((pathway) => (
+                <li key={pathway.category}>
                   <Link
-                    to="/courses"
+                    to={`/courses?category=${encodeURIComponent(pathway.category)}`}
                     className="text-sm text-white/50 hover:text-primary transition-colors flex items-center gap-2 group"
                   >
                     <span className="w-0 group-hover:w-2 h-px transition-all duration-300 overflow-hidden"
                       style={{ background: "hsl(var(--primary))" }} />
-                    {name}
+                    {pathway.label}
                   </Link>
                 </li>
               ))}

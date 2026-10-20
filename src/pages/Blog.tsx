@@ -60,8 +60,8 @@ const Blog = () => {
             decoding="async"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-[hsl(163,36%,8%)]/92 backdrop-blur-[2px]" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(163,40%,8%)]/85 via-[hsl(163,40%,8%)]/45 to-transparent" />
+          <div className="absolute inset-0 backdrop-blur-[2px]" style={{ background: "hsl(var(--hero-overlay) / 0.92)" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to right, hsl(var(--hero-gradient-from) / 0.85), hsl(var(--hero-gradient-from) / 0.45), transparent)" }} />
           <div className="absolute inset-0 grid-pattern opacity-20" />
         </div>
         <div className="absolute top-0 right-0 w-56 h-56 rounded-full bg-blue-500/7 blur-[70px]" />
@@ -84,7 +84,7 @@ const Blog = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search articles..."
-              className="w-full pl-10 pr-4 py-2.5 bg-[hsl(163,40%,8%)]/70 backdrop-blur-md border border-white/15 rounded-xl text-sm text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500/40 transition-all"
+              className="w-full pl-10 pr-4 py-2.5 bg-card/70 backdrop-blur-md border border-white/15 rounded-xl text-sm text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all"
             />
           </motion.div>
         </div>

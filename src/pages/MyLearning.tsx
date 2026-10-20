@@ -74,7 +74,7 @@ const MyLearning = () => {
             alt=""
             className="w-full h-full object-cover"
           />
-          <div className={`absolute inset-0 ${isDark ? "bg-[hsl(163,36%,8%)]/90" : "bg-slate-900/65"}`} />
+          <div className={`absolute inset-0 ${isDark ? "" : "bg-slate-900/65"}`} style={isDark ? { background: "hsl(var(--hero-overlay) / 0.9)" } : undefined} />
           <div className="absolute inset-0 grid-pattern opacity-20" />
         </div>
         <div className="absolute top-0 right-0 w-56 h-56 rounded-full bg-emerald-500/6 blur-[70px]" />

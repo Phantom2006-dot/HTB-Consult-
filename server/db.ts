@@ -119,9 +119,9 @@ export async function runMigrations() {
     await client.query(`
       INSERT INTO categories (name) VALUES
         ('Business Analysis & Digital Transformation'),
-        ('Leadership & Professional Development'),
-        ('Agile, Product & Delivery Management'),
-        ('Industry & Domain Specialisation')
+        ('Business Process Improvement & Operational Excellence'),
+        ('Change Management & Business Transformation'),
+        ('Agile, Product & Project Delivery Management')
       ON CONFLICT (name) DO NOTHING;
 
       DELETE FROM categories WHERE name IN (
@@ -129,7 +129,9 @@ export async function runMigrations() {
         'Personal and Leadership Development','Mindset Before Skillset®',
         'Agile and Scrum','Product Ownership','Domain Specific Pathways',
         'Digital Transformation','Business Strategy','Project Delivery',
-        'Bid Writing','Consulting & Leadership','General'
+        'Bid Writing','Consulting & Leadership','General',
+        'Leadership & Professional Development','Industry & Domain Specialisation',
+        'Agile, Product & Delivery Management'
       );
     `);
 
@@ -140,15 +142,11 @@ export async function runMigrations() {
           'Business Analysis Foundation Bootcamp','Business Analysis',
           'Digital Transformation','Business Strategy','General'
         );
-      UPDATE courses SET category = 'Leadership & Professional Development'
+      UPDATE courses SET category = 'Agile, Product & Project Delivery Management'
         WHERE category IN (
-          'Personal and Leadership Development','Mindset Before Skillset®',
-          'Consulting & Leadership'
+          'Agile, Product & Delivery Management','Agile and Scrum',
+          'Product Ownership','Project Delivery'
         );
-      UPDATE courses SET category = 'Agile, Product & Delivery Management'
-        WHERE category IN ('Agile and Scrum','Product Ownership','Project Delivery');
-      UPDATE courses SET category = 'Industry & Domain Specialisation'
-        WHERE category IN ('Domain Specific Pathways','Bid Writing');
     `);
 
     // Email verification — mark existing users as already verified so they aren't locked out

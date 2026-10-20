@@ -56,8 +56,8 @@ const Mentors = () => {
             decoding="async"
             className="w-full h-full object-cover"
           />
-          <div className={`absolute inset-0 ${isDark ? "bg-[hsl(163,36%,8%)]/92 backdrop-blur-[2px]" : "bg-slate-900/60 backdrop-blur-[1px]"}`} />
-          <div className={`absolute inset-0 bg-gradient-to-r ${isDark ? "from-[hsl(163,40%,8%)]/85 via-[hsl(163,40%,8%)]/45 to-transparent" : "from-slate-900/70 via-slate-900/35 to-transparent"}`} />
+          <div className={`absolute inset-0 backdrop-blur-[2px] ${isDark ? "" : "bg-slate-900/60"}`} style={isDark ? { background: "hsl(var(--hero-overlay) / 0.92)" } : undefined} />
+          <div className="absolute inset-0" style={{ background: isDark ? "linear-gradient(to right, hsl(var(--hero-gradient-from) / 0.85), hsl(var(--hero-gradient-from) / 0.45), transparent)" : "linear-gradient(to right, rgb(15 23 42 / 0.7), rgb(15 23 42 / 0.35), transparent)" }} />
           <div className="absolute inset-0 grid-pattern opacity-20" />
         </div>
         <div className="absolute top-0 right-0 w-56 h-56 rounded-full bg-purple-500/7 blur-[80px]" />
