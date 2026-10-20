@@ -26,22 +26,25 @@ const FOLDERS = [
   {
     key: "Business Analysis & Digital Transformation",
     label: "Business Analysis & Digital Transformation",
+    aliases: [],
     description:
-      "Learn to analyse, improve and transform business with practical frameworks, elicitation techniques and digital tools.",
+      "Build capability in requirements engineering, stakeholder management, BPMN, Agile, business systems, digital transformation and practical project delivery.",
+    audience: "Aspiring BAs, career changers and working professionals.",
     icon: BarChart3,
     accent: "hsl(30 100% 46%)",
+    surface: "bg-orange-50/50",
     iconBg: "bg-orange-500/15",
-    iconColor: "text-orange-400",
+    iconColor: "text-orange-700",
     borderIdle: "border-orange-500/15",
     borderHover: "hover:border-orange-500/50",
     glow: "hover:shadow-[0_20px_60px_-15px_rgba(234,119,0,0.22)]",
-    tag: "Analysis",
-    tagCls: "bg-orange-500/15 text-orange-400 border-orange-500/25",
+    tag: "Flagship",
+    tagCls: "bg-orange-500/10 text-orange-700 border-orange-500/25",
     programme: {
       type: "foundation" as const,
       badge: "Foundation Programme",
       subtitle:
-        "Master the fundamentals of Business Analysis and Digital Transformation through structured learning, practical exercises, real project simulations and a live Bootcamp. Build the confidence and capability required to operate effectively in real project environments.",
+        "Develop practical capability across requirements engineering, stakeholder management, BPMN, Agile, business systems and digital transformation through structured learning, project simulations and a live bootcamp.",
       phases: [
         {
           title: "Phase 1: Foundation Learning",
@@ -77,34 +80,36 @@ const FOLDERS = [
     },
   },
   {
-    key: "Leadership & Professional Development",
-    label: "Leadership & Professional Development",
+    key: "Business Process Improvement & Operational Excellence",
+    label: "Business Process Improvement & Operational Excellence",
+    aliases: [],
     description:
-      "Strengthen mindset, communication, influence and leadership for career growth and professional impact.",
-    icon: Users,
+      "Learn process discovery, AS-IS/TO-BE mapping, BPMN, root cause analysis, customer journeys, bottlenecks, KPIs and continuous improvement.",
+    audience: "Business Analysts, operations professionals, managers and business owners.",
+    icon: Target,
     accent: "hsl(160 60% 45%)",
+    surface: "bg-emerald-50/45",
     iconBg: "bg-emerald-500/15",
-    iconColor: "text-emerald-400",
+    iconColor: "text-emerald-600",
     borderIdle: "border-emerald-500/15",
     borderHover: "hover:border-emerald-500/50",
     glow: "hover:shadow-[0_20px_60px_-15px_rgba(16,185,129,0.18)]",
-    tag: "Leadership",
-    tagCls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/25",
+    tag: "Process Excellence",
+    tagCls: "bg-emerald-500/15 text-emerald-700 border-emerald-500/25",
     programme: {
       type: "live" as const,
-      badge: "Live Instructor-Led Programme",
+      badge: "Business Process Improvement Programme",
       subtitle:
-        "Develop the mindset, leadership and communication skills needed to influence others, lead with confidence and create lasting professional impact. This live programme combines practical learning, reflection and real world application through interactive Zoom sessions.",
+        "Learn to discover, analyse and improve business processes using practical methods, process models and operational measures, then apply them to realistic business scenarios.",
       learn: [
-        "Leadership Foundations",
-        "Emotional Intelligence",
-        "Effective Communication",
-        "Influencing & Stakeholder Management",
-        "Decision Making",
-        "Personal Effectiveness",
-        "Mindset Before Skillset® Principles",
-        "Leading Teams with Confidence",
-        "Certificate of Completion",
+        "Process Discovery",
+        "AS-IS and TO-BE Mapping",
+        "BPMN Process Modelling",
+        "Root Cause Analysis",
+        "Customer Journey Mapping",
+        "Bottleneck Analysis",
+        "KPI Design",
+        "Continuous Improvement",
       ],
       delivery: [
         "Live Zoom Sessions",
@@ -114,47 +119,97 @@ const FOLDERS = [
         "Certificate of Completion",
       ],
       who: [
-        "Emerging Leaders",
-        "Team Leaders",
-        "Supervisors",
+        "Business Analysts",
+        "Operations Professionals",
         "Managers",
-        "Business Professionals",
-        "Anyone looking to strengthen their leadership capability",
+        "Business Owners",
       ],
       cohortSub:
-        "Secure your place today and join our next instructor-led cohort. Learn through engaging discussions, practical exercises and leadership scenarios that prepare you to lead with confidence.",
-      cta: "Take the next step in your leadership journey.",
+        "Apply process-improvement methods to practical scenarios and build skills you can use to improve operational performance.",
+      cta: "Build the confidence to identify process problems and deliver measurable improvements.",
     },
   },
   {
-    key: "Agile, Product & Delivery Management",
-    label: "Agile, Product & Delivery Management",
+    key: "Change Management & Business Transformation",
+    label: "Change Management & Business Transformation",
+    aliases: [],
     description:
-      "Build capability in Agile, Scrum, Product Ownership and delivery excellence for high-velocity teams.",
+      "Cover change impact assessment, stakeholder engagement, communication planning, resistance management, adoption strategies and benefits realisation.",
+    audience: "Project professionals, team leaders, managers and change practitioners.",
+    icon: Users,
+    accent: "hsl(270 80% 60%)",
+    surface: "bg-purple-50/45",
+    iconBg: "bg-purple-500/15",
+    iconColor: "text-purple-600",
+    borderIdle: "border-purple-500/15",
+    borderHover: "hover:border-purple-500/50",
+    glow: "hover:shadow-[0_20px_60px_-15px_rgba(139,92,246,0.18)]",
+    tag: "Transformation",
+    tagCls: "bg-purple-500/15 text-purple-700 border-purple-500/25",
+    programme: {
+      type: "live" as const,
+      badge: "Change Management Programme",
+      subtitle:
+        "Plan and support business change with practical approaches to impact assessment, stakeholder engagement, communication, resistance, adoption and benefits realisation.",
+      learn: [
+        "Change Impact Assessment",
+        "Stakeholder Engagement",
+        "Communication Planning",
+        "Resistance Management",
+        "Adoption Strategies",
+        "Benefits Realisation",
+        "Transformation Planning",
+        "Practical Change Scenarios",
+      ],
+      delivery: [
+        "Live Zoom Sessions",
+        "Practical Workshops",
+        "Interactive Group Discussions",
+        "Practical Course Resources",
+        "Certificate of Completion",
+      ],
+      who: [
+        "Project Professionals",
+        "Team Leaders",
+        "Managers",
+        "Change Practitioners",
+      ],
+      cohortSub:
+        "Work through practical change scenarios and build the confidence to support people and organisations through transformation.",
+      cta: "Help teams adopt change and realise the benefits of transformation.",
+    },
+  },
+  {
+    key: "Agile, Product & Project Delivery Management",
+    label: "Agile, Product & Project Delivery Management",
+    aliases: ["Agile, Product & Delivery Management"],
+    description:
+      "Cover Scrum, Kanban, Product Ownership, backlog management, user stories, sprint planning, delivery governance, Jira and project execution.",
+    audience: "Aspiring Product Owners, Scrum Masters, delivery leads and project professionals.",
     icon: Layers,
     accent: "hsl(217 91% 56%)",
+    surface: "bg-blue-50/45",
     iconBg: "bg-blue-500/15",
-    iconColor: "text-blue-400",
+    iconColor: "text-blue-600",
     borderIdle: "border-blue-500/15",
     borderHover: "hover:border-blue-500/50",
     glow: "hover:shadow-[0_20px_60px_-15px_rgba(59,130,246,0.18)]",
-    tag: "Agile",
-    tagCls: "bg-blue-500/15 text-blue-400 border-blue-500/25",
+    tag: "Agile Delivery",
+    tagCls: "bg-blue-500/15 text-blue-700 border-blue-500/25",
     programme: {
       type: "live" as const,
-      badge: "Live Instructor-Led Programme",
+      badge: "Agile, Product & Project Delivery Programme",
       subtitle:
-        "Build practical capability in Agile, Scrum, Product Ownership and Delivery Management through live Zoom sessions, interactive workshops and real world case studies. This hands-on programme is designed for professionals who want to lead and deliver successful projects with confidence.",
+        "Develop practical capability in Agile, Product Ownership and project delivery, with a focus on Scrum, Kanban, backlog management, planning, governance and execution.",
       learn: [
-        "Agile & Scrum Foundations",
-        "Product Ownership in Practice",
-        "Sprint Planning & Backlog Management",
-        "Stakeholder Management",
-        "Delivery Planning",
-        "Agile Ceremonies",
-        "User Stories & Backlog Refinement",
-        "Real Project Scenarios",
-        "Certificate of Completion",
+        "Scrum and Kanban",
+        "Product Ownership",
+        "Backlog Management",
+        "User Stories",
+        "Sprint Planning",
+        "Delivery Governance",
+        "Jira",
+        "Project Execution",
       ],
       delivery: [
         "Live Zoom Sessions",
@@ -166,64 +221,12 @@ const FOLDERS = [
       who: [
         "Aspiring Product Owners",
         "Scrum Masters",
-        "Business Analysts",
-        "Project Managers",
-        "Delivery Managers",
-        "Professionals transitioning into Agile roles",
+        "Delivery Leads",
+        "Project Professionals",
       ],
       cohortSub:
-        "Secure your place today and join our next instructor-led cohort. Learn through live teaching, practical workshops and real project discussions that prepare you for Agile delivery in the workplace.",
-      cta: "Take the next step in your Agile journey and build practical skills that you can apply with confidence.",
-    },
-  },
-  {
-    key: "Industry & Domain Specialisation",
-    label: "Industry & Domain Specialisation",
-    description:
-      "Apply your skills across real world industries and professional domains — finance, healthcare, technology and more.",
-    icon: Building2,
-    accent: "hsl(270 80% 60%)",
-    iconBg: "bg-purple-500/15",
-    iconColor: "text-purple-400",
-    borderIdle: "border-purple-500/15",
-    borderHover: "hover:border-purple-500/50",
-    glow: "hover:shadow-[0_20px_60px_-15px_rgba(139,92,246,0.18)]",
-    tag: "Specialisation",
-    tagCls: "bg-purple-500/15 text-purple-400 border-purple-500/25",
-    programme: {
-      type: "live" as const,
-      badge: "Live Instructor-Led Programme",
-      subtitle:
-        "Build practical knowledge across key industries and understand how Business Analysis, Product Management and Agile delivery are applied in different business environments. Learn from real world examples, case studies and practical discussions.",
-      learn: [
-        "Banking & Financial Services",
-        "Healthcare",
-        "Insurance",
-        "Retail & E-Commerce",
-        "Public Sector",
-        "Cyber Security & Identity Management",
-        "Digital Transformation",
-        "Industry Case Studies",
-        "Certificate of Completion",
-      ],
-      delivery: [
-        "Live Zoom Sessions",
-        "Practical Workshops",
-        "Interactive Group Discussions",
-        "Practical Course Resources",
-        "Certificate of Completion",
-      ],
-      who: [
-        "Business Analysts",
-        "Product Owners",
-        "Scrum Masters",
-        "Project Managers",
-        "Consultants",
-        "Professionals looking to specialise in industry domains",
-      ],
-      cohortSub:
-        "Secure your place today and explore how professionals deliver value across different industries through practical learning and real business scenarios.",
-      cta: "Expand your industry knowledge and become more confident across multiple sectors.",
+        "Practise delivery methods through realistic team scenarios and build capability you can apply to active projects.",
+      cta: "Build practical confidence in planning, guiding and delivering products and projects.",
     },
   },
 ];
@@ -424,7 +427,7 @@ const Courses = () => {
     const search = searchParams.get("search");
     if (cat) {
       const match = FOLDERS.find(
-        (f) => f.key.toLowerCase() === cat.toLowerCase() || f.label.toLowerCase() === cat.toLowerCase()
+        (f) => f.key.toLowerCase() === cat.toLowerCase() || f.label.toLowerCase() === cat.toLowerCase() || f.aliases?.some((alias) => alias.toLowerCase() === cat.toLowerCase())
       );
       if (match) setSelectedFolder(match.key);
     }
@@ -440,9 +443,8 @@ const Courses = () => {
   const folderCounts = useMemo(() => {
     if (!courses) return {} as Record<string, number>;
     const counts: Record<string, number> = {};
-    FOLDERS.forEach((f) => { counts[f.key] = 0; });
-    courses.forEach((c) => {
-      if (counts[c.category] !== undefined) counts[c.category]++;
+    FOLDERS.forEach((f) => {
+      counts[f.key] = courses.filter((course) => course.category === f.key || f.aliases?.includes(course.category)).length;
     });
     return counts;
   }, [courses]);
@@ -450,8 +452,9 @@ const Courses = () => {
   // Courses to show in the open folder (or global search)
   const filteredCourses = useMemo(() => {
     if (!courses) return [];
+    const selectedPathway = FOLDERS.find((folder) => folder.key === selectedFolder);
     let base = selectedFolder
-      ? courses.filter((c) => c.category === selectedFolder)
+      ? courses.filter((c) => c.category === selectedFolder || selectedPathway?.aliases?.includes(c.category))
       : courses;
     if (searchQuery.trim()) {
       const q = searchQuery.trim().toLowerCase();
@@ -522,8 +525,8 @@ const Courses = () => {
             decoding="async"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-[hsl(163,36%,8%)]/93 backdrop-blur-[3px]" />
-          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(163,40%,8%)]/90 via-[hsl(163,40%,8%)]/60 to-[hsl(163,40%,8%)]/30" />
+          <div className="absolute inset-0 backdrop-blur-[3px]" style={{ background: "hsl(var(--hero-overlay) / 0.93)" }} />
+          <div className="absolute inset-0" style={{ background: "linear-gradient(to right, hsl(var(--hero-gradient-from) / 0.9), hsl(var(--hero-gradient-from) / 0.6) 60%, hsl(var(--hero-gradient-from) / 0.3))" }} />
           <div className="absolute inset-0 grid-pattern opacity-20" />
         </div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full bg-primary/6 blur-[100px]" />
@@ -581,21 +584,26 @@ const Courses = () => {
                   />
                 </div>
 
-                {/* Section label */}
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-1 h-6 rounded-full bg-gradient-to-b from-primary to-primary/30" />
-                  <h2 className="text-xl font-semibold text-gray-900">Choose Your Learning Pathway</h2>
+                {/* Flagship programmes heading */}
+                <div className="text-center mb-10">
+                  <p className="text-xs font-bold uppercase tracking-[0.24em] text-primary mb-3">Our Flagship Programmes</p>
+                  <h2 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-slate-900 leading-tight">
+                    Build Skills. Create Impact. Grow Your Career.
+                  </h2>
+                  <p className="mt-3 text-sm md:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                    Focused training designed to build practical capability, business impact and career growth.
+                  </p>
                 </div>
 
                 {/* Folder card grid */}
                 {isLoading ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {Array.from({ length: 6 }).map((_, i) => (
-                      <Skeleton key={i} className="h-56 w-full rounded-2xl" />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <Skeleton key={i} className="h-64 w-full rounded-2xl" />
                     ))}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {FOLDERS.map((folder, i) => {
                       const Icon = folder.icon;
                       const count = folderCounts[folder.key] ?? 0;
@@ -610,40 +618,39 @@ const Courses = () => {
                         >
                           <button
                             onClick={() => openFolder(folder.key)}
-                            className={`w-full text-left bg-card rounded-2xl border-2 ${folder.borderIdle} ${folder.borderHover} ${folder.glow} overflow-hidden h-full flex flex-col transition-all duration-300 group card-lift`}
+                            className={`w-full text-left ${folder.surface} rounded-2xl border ${folder.borderIdle} ${folder.borderHover} ${folder.glow} overflow-hidden h-full flex flex-col transition-all duration-300 group card-lift`}
                           >
                             {/* Coloured accent strip */}
                             <div className="h-0.5 w-full" style={{ background: folder.accent }} />
 
-                            <div className="p-6 flex-1 flex flex-col">
-                              {/* Icon row */}
-                              <div className="flex items-start justify-between mb-5">
-                                <div className={`w-12 h-12 rounded-xl ${folder.iconBg} flex items-center justify-center shrink-0`}>
-                                  <Icon size={22} className={folder.iconColor} />
-                                </div>
-                                <Badge variant="outline" className={`text-[10px] border ${folder.tagCls} shrink-0`}>
-                                  {folder.tag}
-                                </Badge>
+                            <div className="p-6 md:p-7 flex-1 grid grid-cols-[3rem_minmax(0,1fr)] gap-x-4 gap-y-5">
+                              <div className={`w-12 h-12 rounded-xl ${folder.iconBg} flex items-center justify-center shrink-0`}>
+                                <Icon size={22} className={folder.iconColor} />
                               </div>
 
-                              {/* Title */}
-                              <h3 className="text-base font-semibold text-foreground leading-snug mb-2 group-hover:text-foreground/90 transition-colors">
-                                {folder.label}
-                              </h3>
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap mb-2">
+                                  <Badge variant="outline" className={`text-[10px] border ${folder.tagCls} shrink-0`}>
+                                    {folder.tag}
+                                  </Badge>
+                                  {count > 0 && <span className="text-xs text-slate-500">{count} {count === 1 ? "course" : "courses"}</span>}
+                                </div>
+                                <h3 className="text-lg md:text-xl font-semibold text-slate-900 leading-snug mb-2 group-hover:text-slate-700 transition-colors">
+                                  {folder.label}
+                                </h3>
+                                <p className="text-sm text-slate-600 leading-relaxed">
+                                  {folder.description}
+                                </p>
+                              </div>
 
-                              {/* Description */}
-                              <p className="text-xs text-foreground/40 leading-relaxed flex-1">
-                                {folder.description}
-                              </p>
-
-                              {/* Footer */}
-                              <div className="flex items-center justify-between mt-5 pt-4 border-t border-border">
-                                <span className="text-xs text-foreground/30 flex items-center gap-1.5">
-                                  <BookOpen size={11} />
-                                  {count === 0 ? "No modules yet" : `${count} module${count !== 1 ? "s" : ""}`}
-                                </span>
-                                <span className={`text-xs ${folder.iconColor} flex items-center gap-1 group-hover:gap-2 transition-all`}>
-                                  Open <ChevronRight size={13} />
+                              <div className="col-span-2 flex items-start gap-3 border-t border-slate-200/80 pt-4">
+                                <Users size={18} className="text-slate-700 mt-0.5 shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs font-semibold text-slate-800 mb-0.5">Ideal for</p>
+                                  <p className="text-sm text-slate-600 leading-relaxed">{folder.audience}</p>
+                                </div>
+                                <span className={`w-9 h-9 rounded-full ${folder.iconBg} ${folder.iconColor} flex items-center justify-center shrink-0 group-hover:translate-x-0.5 transition-transform`}>
+                                  <ChevronRight size={17} />
                                 </span>
                               </div>
                             </div>
@@ -808,7 +815,7 @@ const Courses = () => {
                                     <BookOpen size={36} className="text-primary/30" />
                                   </div>
                                 )}
-                                <div className="absolute inset-0 bg-gradient-to-t from-[hsl(163,36%,10%)]/60 to-transparent" />
+                                <div className="absolute inset-0" style={{ background: "linear-gradient(to top, hsl(var(--hero-overlay) / 0.6), transparent)" }} />
                                 {isLocked && (
                                   <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-2">
                                     <div className="w-12 h-12 rounded-full bg-amber-500/15 border border-amber-500/30 flex items-center justify-center">

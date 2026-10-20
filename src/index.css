@@ -21,8 +21,7 @@ svg, svg * {
 }
 
 @layer base {
-  /* ── GREEN THEME (default) ── */
-  :root,
+  /* ── GREEN THEME (optional) ── */
   [data-theme="green"] {
     --background: 163 36% 16%;
     --foreground: 0 0% 100%;
@@ -143,7 +142,8 @@ svg, svg * {
     --green-light: 0 0% 96%;
   }
 
-  /* ── BLUE THEME ── */
+  /* ── BLUE THEME (default) ── */
+  :root:not([data-theme]),
   [data-theme="blue"] {
     --background: 222 55% 10%;
     --foreground: 0 0% 100%;

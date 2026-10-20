@@ -279,6 +279,20 @@ const Services = () => {
               Each stage builds upon the previous one, ensuring you gain the skills, confidence and experience to create real impact in your career.
             </p>
           </motion.div>
+
+          <motion.div
+            initial="hidden" whileInView="visible" viewport={{ once: true }}
+            variants={fadeUp} custom={3}
+            className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl border border-blue-100 bg-blue-50/70 px-5 py-5 sm:px-7"
+          >
+            <div className="text-center sm:text-left">
+              <p className="font-semibold text-slate-900">Ready to begin your learning pathway?</p>
+              <p className="text-sm text-slate-600">Create your Academy account and take the first step.</p>
+            </div>
+            <Button asChild className="bg-gradient-gold hover:opacity-90 font-semibold px-7 h-11 text-sm btn-shimmer shadow-orange shrink-0">
+              <Link to="/auth?tab=signup">Enroll Now <ArrowRight className="ml-2" size={15} /></Link>
+            </Button>
+          </motion.div>
         </div>
       </section>
 

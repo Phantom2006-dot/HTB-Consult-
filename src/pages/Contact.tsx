@@ -92,7 +92,7 @@ const Contact = () => {
   return (
     <Layout>
       {/* ── Main two-column section ──────────────────────────────────────────── */}
-      <section className="relative min-h-screen bg-[hsl(163,40%,6%)] overflow-hidden">
+      <section className="relative min-h-screen bg-background overflow-hidden">
         {/* Subtle grid */}
         <div className="absolute inset-0 grid-pattern opacity-10 pointer-events-none" />
         {/* Glow orbs */}
@@ -219,7 +219,7 @@ const Contact = () => {
               transition={{ duration: 0.5, delay: 0.15 }}
               className="lg:sticky lg:top-24"
             >
-              <div className="rounded-2xl border border-white/10 bg-[hsl(163,35%,9%)] p-6 shadow-xl">
+              <div className="rounded-2xl border border-white/10 bg-card p-6 shadow-xl">
                 <h2 className="text-xl font-serif font-bold text-white mb-1">Get in Touch</h2>
                 <p className="text-sm text-white/50 mb-6">
                   Fill out the form and we'll get back to you as soon as possible.
@@ -267,7 +267,7 @@ const Contact = () => {
                       <SelectTrigger className="bg-white/5 border-white/10 h-10 text-sm text-white data-[placeholder]:text-white/30 focus:border-primary/50">
                         <SelectValue placeholder="Select a subject" />
                       </SelectTrigger>
-                      <SelectContent className="bg-[hsl(163,35%,9%)] border-white/10">
+                      <SelectContent className="bg-card border-white/10">
                         {subjects.map((s) => (
                           <SelectItem key={s} value={s} className="text-white/80 focus:bg-primary/20 focus:text-white">
                             {s}
@@ -321,7 +321,7 @@ const Contact = () => {
       </section>
 
       {/* ── FAQ ──────────────────────────────────────────────────────────────── */}
-      <section id="faq-section" className="py-16 lg:py-24 bg-[hsl(163,36%,13%)]">
+      <section id="faq-section" className="py-16 lg:py-24 bg-[hsl(var(--section-alt))]">
         <div className="container mx-auto px-4 lg:px-8 max-w-3xl">
           <motion.div
             initial="hidden" whileInView="visible" viewport={{ once: true }}

@@ -3,6 +3,8 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 export type SiteTheme = "green" | "blue";
 export type ColorMode = "light" | "dark";
 
+const THEME_STORAGE_KEY = "htb_theme_v2";
+
 interface ThemeContextType {
   theme: SiteTheme;
   toggleTheme: () => void;
@@ -13,9 +15,9 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: "green",
+  theme: "blue",
   toggleTheme: () => {},
-  isBlue: false,
+  isBlue: true,
   mode: "light",
   toggleMode: () => {},
   isDark: false,
@@ -25,8 +27,10 @@ export const useTheme = () => useContext(ThemeContext);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setTheme] = useState<SiteTheme>(() => {
-    try { return (localStorage.getItem("htb_theme") as SiteTheme) || "green"; }
-    catch { return "green"; }
+    try {
+      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+      return savedTheme === "green" || savedTheme === "blue" ? savedTheme : "blue";
+    } catch { return "blue"; }
   });
 
   const [mode, setMode] = useState<ColorMode>(() => {
@@ -37,7 +41,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const root = document.documentElement;
     root.setAttribute("data-theme", theme);
-    try { localStorage.setItem("htb_theme", theme); } catch {}
+    try { localStorage.setItem(THEME_STORAGE_KEY, theme); } catch { /* Storage can be unavailable in private browsing. */ }
   }, [theme]);
 
   const toggleTheme = () =>
@@ -46,7 +50,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const toggleMode = () => {
     setMode((prev) => {
       const next: ColorMode = prev === "light" ? "dark" : "light";
-      try { localStorage.setItem("htb_mode", next); } catch {}
+      try { localStorage.setItem("htb_mode", next); } catch { /* Storage can be unavailable in private browsing. */ }
       return next;
     });
   };

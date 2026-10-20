@@ -308,9 +308,9 @@ export async function initSchema() {
     await client.query(`
       INSERT INTO categories (name) VALUES
         ('Business Analysis & Digital Transformation'),
-        ('Leadership & Professional Development'),
-        ('Agile, Product & Delivery Management'),
-        ('Industry & Domain Specialisation')
+        ('Business Process Improvement & Operational Excellence'),
+        ('Change Management & Business Transformation'),
+        ('Agile, Product & Project Delivery Management')
       ON CONFLICT (name) DO NOTHING;
     `);
     /* Remove old categories that no longer exist */

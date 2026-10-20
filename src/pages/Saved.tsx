@@ -44,7 +44,7 @@ const Saved = () => {
             alt=""
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-[hsl(163,36%,8%)]/90" />
+          <div className="absolute inset-0" style={{ background: "hsl(var(--hero-overlay) / 0.9)" }} />
           <div className="absolute inset-0 grid-pattern opacity-20" />
         </div>
         <div className="absolute top-0 right-0 w-48 h-48 rounded-full bg-amber-500/7 blur-[60px]" />
