@@ -227,6 +227,20 @@ const HOME_FOLDERS = [
     tag: "Agile Delivery",
     tagCls: "bg-blue-500/10 text-blue-700 border-blue-500/25",
   },
+  {
+    key: "Cybersecurity Bootcamp",
+    label: "Cybersecurity Bootcamp",
+    description: "Protect devices and networks, spot cyber threats, investigate security alerts and respond to incidents through five practical days of guided learning.",
+    audience: "Beginners and career changers exploring their first role in cybersecurity.",
+    aliases: [],
+    icon: Shield,
+    iconBg: "bg-teal-500/15",
+    iconColor: "text-teal-700",
+    accent: "border-teal-500/25 hover:border-teal-500/50",
+    glow: "hover:shadow-[0_12px_40px_-10px_rgba(20,184,166,0.15)]",
+    tag: "Five-Day Bootcamp",
+    tagCls: "bg-teal-500/15 text-teal-700 border-teal-500/25",
+  },
 ];
 
 const Index = () => {

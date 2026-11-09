@@ -5,7 +5,7 @@ import {
   Clock, ArrowRight, BookOpen, ArrowDownAZ, ArrowUpAZ, Hash, Lock, X, Bell,
   GraduationCap, CreditCard, ChevronRight, ArrowLeft, Brain, Users, Target,
   Building2, Search, RefreshCw, Layers, ChevronDown, BarChart3,
-  Video, Award, FileText, CheckCircle2, CalendarDays, UserCheck,
+  Video, Award, FileText, CheckCircle2, CalendarDays, UserCheck, Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +21,7 @@ import { useEnrollments } from "@/hooks/use-enrollments";
 import { useAuth } from "@/contexts/AuthContext";
 import { breadcrumbSchema, courseListSchema, SEO_PAGES, SITE_ORIGIN, setSeoMetadata } from "@/lib/seo";
 
-/* ── Category folder metadata (4 official pathways) ── */
+/* ── Category folder metadata (5 official pathways) ── */
 const FOLDERS = [
   {
     key: "Business Analysis & Digital Transformation",
@@ -227,6 +227,54 @@ const FOLDERS = [
       cohortSub:
         "Practise delivery methods through realistic team scenarios and build capability you can apply to active projects.",
       cta: "Build practical confidence in planning, guiding and delivering products and projects.",
+    },
+  },
+  {
+    key: "Cybersecurity Bootcamp",
+    label: "Cybersecurity Bootcamp",
+    aliases: [],
+    description:
+      "Over five practical days, learn to protect devices and networks, spot cyber threats, investigate security alerts and respond to incidents.",
+    audience: "Beginners and career changers exploring their first role in cybersecurity.",
+    icon: Shield,
+    accent: "hsl(174 72% 40%)",
+    surface: "bg-teal-50/45",
+    iconBg: "bg-teal-500/15",
+    iconColor: "text-teal-700",
+    borderIdle: "border-teal-500/15",
+    borderHover: "hover:border-teal-500/50",
+    glow: "hover:shadow-[0_20px_60px_-15px_rgba(20,184,166,0.18)]",
+    tag: "Five-Day Bootcamp",
+    tagCls: "bg-teal-500/15 text-teal-700 border-teal-500/25",
+    programme: {
+      type: "live" as const,
+      badge: "Cybersecurity Bootcamp",
+      subtitle:
+        "Build practical first-line cybersecurity awareness and incident-response capability through five focused days of guided learning, hands-on exercises and realistic security scenarios.",
+      learn: [
+        "Cybersecurity Foundations",
+        "Protecting Devices and Networks",
+        "Recognising Cyber Threats",
+        "Security Alerts and Triage",
+        "Incident Response Basics",
+        "Practical Security Scenarios",
+      ],
+      delivery: [
+        "Five Practical Days",
+        "Hands-on Exercises",
+        "Interactive Group Discussions",
+        "Practical Course Resources",
+        "Certificate of Completion",
+      ],
+      who: [
+        "Beginners",
+        "Career Changers",
+        "Aspiring Cybersecurity Professionals",
+        "Professionals Building Security Awareness",
+      ],
+      cohortSub:
+        "Learn how to recognise common threats, protect everyday systems and respond methodically when a security incident occurs.",
+      cta: "Build a practical foundation for your first step into cybersecurity.",
     },
   },
 ];
@@ -598,7 +646,7 @@ const Courses = () => {
                 {/* Folder card grid */}
                 {isLoading ? (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {Array.from({ length: 4 }).map((_, i) => (
+                    {Array.from({ length: 5 }).map((_, i) => (
                       <Skeleton key={i} className="h-64 w-full rounded-2xl" />
                     ))}
                   </div>
@@ -610,6 +658,7 @@ const Courses = () => {
                       return (
                         <motion.div
                           key={folder.key}
+                          className={folder.key === "Cybersecurity Bootcamp" ? "lg:col-span-2" : undefined}
                           initial="hidden"
                           whileInView="visible"
                           viewport={{ once: true }}

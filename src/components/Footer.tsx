@@ -57,6 +57,7 @@ const popularPathways = [
   { label: "Process Improvement & Operational Excellence", category: "Business Process Improvement & Operational Excellence" },
   { label: "Change Management & Business Transformation", category: "Change Management & Business Transformation" },
   { label: "Agile, Product & Project Delivery", category: "Agile, Product & Project Delivery Management" },
+  { label: "Cybersecurity Bootcamp", category: "Cybersecurity Bootcamp" },
 ];
 
 const Footer = () => {
