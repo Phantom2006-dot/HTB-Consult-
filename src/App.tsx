@@ -52,6 +52,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
 const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const Cybersecurity = lazy(() => import("./pages/Cybersecurity"));
 
 const queryClient = new QueryClient();
 
@@ -105,6 +106,7 @@ function AppRoutes() {
           <Route path="/blog/:slug" element={<ArticleReader />} />
           <Route path="/sessions" element={<Sessions />} />
           <Route path="/payment/success" element={<PaymentSuccess />} />
+          <Route path="/cybersecurity" element={<Cybersecurity />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

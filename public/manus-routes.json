@@ -1,0 +1,33 @@
+{
+  "routes": [
+    { "path": "/", "title": "HTB Academy" },
+    { "path": "/courses", "title": "Courses" },
+    { "path": "/explore", "title": "Explore" },
+    { "path": "/services", "title": "Services" },
+    { "path": "/about", "title": "About" },
+    { "path": "/about-htb", "title": "About HTB" },
+    { "path": "/contact", "title": "Contact" },
+    { "path": "/auth", "title": "Sign in" },
+    { "path": "/reset-password", "title": "Reset password" },
+    { "path": "/verify-email", "title": "Verify email" },
+    { "path": "/dashboard", "title": "Dashboard" },
+    { "path": "/profile", "title": "Profile" },
+    { "path": "/notifications", "title": "Notifications" },
+    { "path": "/emails", "title": "Emails" },
+    { "path": "/messages", "title": "Messages" },
+    { "path": "/chat", "title": "Chat" },
+    { "path": "/saved", "title": "Saved" },
+    { "path": "/settings", "title": "Settings" },
+    { "path": "/course/:id", "title": "Course" },
+    { "path": "/mentor/:id", "title": "Mentor" },
+    { "path": "/mentor-dashboard", "title": "Mentor dashboard" },
+    { "path": "/my-learning", "title": "My learning" },
+    { "path": "/onboarding", "title": "Onboarding" },
+    { "path": "/mentors", "title": "Mentors" },
+    { "path": "/blog", "title": "Blog" },
+    { "path": "/blog/:slug", "title": "Article" },
+    { "path": "/sessions", "title": "Sessions" },
+    { "path": "/payment/success", "title": "Payment successful" },
+    { "path": "/cybersecurity", "title": "Cybersecurity | Register your interest" }
+  ]
+}
