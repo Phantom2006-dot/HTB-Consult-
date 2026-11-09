@@ -310,7 +310,8 @@ export async function initSchema() {
         ('Business Analysis & Digital Transformation'),
         ('Business Process Improvement & Operational Excellence'),
         ('Change Management & Business Transformation'),
-        ('Agile, Product & Project Delivery Management')
+        ('Agile, Product & Project Delivery Management'),
+        ('Cybersecurity Bootcamp')
       ON CONFLICT (name) DO NOTHING;
     `);
     /* Remove old categories that no longer exist */
