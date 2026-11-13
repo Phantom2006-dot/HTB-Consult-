@@ -164,6 +164,22 @@ export async function runMigrations() {
       );
     `);
 
+    // Public cybersecurity interest form submissions, readable only by admins.
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS cybersecurity_interest_submissions (
+        id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        full_name  TEXT NOT NULL,
+        email      TEXT NOT NULL,
+        country    TEXT NOT NULL,
+        background TEXT NOT NULL,
+        goal       TEXT,
+        consent    BOOLEAN NOT NULL DEFAULT true,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      );
+      CREATE INDEX IF NOT EXISTS idx_cyber_interest_created ON cybersecurity_interest_submissions(created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_cyber_interest_email ON cybersecurity_interest_submissions(email);
+    `);
+
   } finally {
     client.release();
   }

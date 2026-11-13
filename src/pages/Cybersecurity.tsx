@@ -1,8 +1,11 @@
 import { FormEvent, useEffect, useState } from "react";
 import "./Cybersecurity.css";
+import { api } from "@/lib/api";
 
 const Cybersecurity = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   useEffect(() => {
     const previousTitle = document.title;
@@ -10,9 +13,27 @@ const Cybersecurity = () => {
     return () => { document.title = previousTitle; };
   }, []);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitted(true);
+    setSubmitError("");
+    setIsSubmitting(true);
+    const formData = new FormData(event.currentTarget);
+    try {
+      await api.post("/api/cybersecurity/interests", {
+        name: formData.get("name"),
+        email: formData.get("email"),
+        country: formData.get("country"),
+        background: formData.get("background"),
+        goal: formData.get("goal"),
+        consent: formData.get("consent") === "on",
+        website: formData.get("website"),
+      });
+      setSubmitted(true);
+    } catch (error: any) {
+      setSubmitError(error?.message || "We could not save your response. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -47,7 +68,8 @@ const Cybersecurity = () => {
                 <label>What would you like to achieve? <span className="optional">Optional</span><textarea name="goal" maxLength={1000} placeholder="For example, understand the basics before changing careers." rows={2} /></label>
                 <div className="trap" aria-hidden="true"><input tabIndex={-1} autoComplete="off" name="website" /></div>
                 <label className="consent"><input type="checkbox" required name="consent" /><span>I agree to HTB Academy contacting me by email about this cybersecurity programme. <a href="#privacy">How we use your details</a></span></label>
-                <button className="submit" type="submit">Register my interest<span>↗</span></button>
+                {submitError && <p className="error" role="alert">{submitError}</p>}
+                <button className="submit" type="submit" disabled={isSubmitting}>{isSubmitting ? "Saving your interest…" : "Register my interest"}<span>↗</span></button>
                 <p className="no-payment">No payment required. No obligation to enrol.</p>
               </form>
             </>}

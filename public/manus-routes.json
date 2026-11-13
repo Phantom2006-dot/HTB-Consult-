@@ -28,6 +28,7 @@
     { "path": "/blog/:slug", "title": "Article" },
     { "path": "/sessions", "title": "Sessions" },
     { "path": "/payment/success", "title": "Payment successful" },
+    { "path": "/admin/cybersecurity-interests", "title": "Cybersecurity Interests" },
     { "path": "/cybersecurity", "title": "Cybersecurity | Register your interest" }
   ]
 }

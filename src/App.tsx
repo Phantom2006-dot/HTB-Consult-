@@ -43,6 +43,7 @@ const AdminCourseResources = lazy(() => import("./pages/admin/AdminCourseResourc
 const AdminResources = lazy(() => import("./pages/admin/AdminResources"));
 const AdminCertificates = lazy(() => import("./pages/admin/AdminCertificates"));
 const AdminPayments = lazy(() => import("./pages/admin/AdminPayments"));
+const AdminCybersecurityInterests = lazy(() => import("./pages/admin/AdminCybersecurityInterests"));
 const AdminMentorDetail = lazy(() => import("./pages/admin/AdminMentorDetail"));
 const Blog = lazy(() => import("./pages/Blog"));
 const ArticleReader = lazy(() => import("./pages/ArticleReader"));
@@ -92,6 +93,7 @@ function AppRoutes() {
           <Route path="/admin/resources" element={<AdminResources />} />
           <Route path="/admin/certificates" element={<AdminCertificates />} />
           <Route path="/admin/payments" element={<AdminPayments />} />
+          <Route path="/admin/cybersecurity-interests" element={<AdminCybersecurityInterests />} />
           <Route path="/admin/courses/:courseId/resources" element={<AdminCourseResources />} />
           <Route path="/admin/categories" element={<AdminCategories />} />
           <Route path="/admin/mentors" element={<AdminMentors />} />

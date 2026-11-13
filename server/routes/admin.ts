@@ -4,6 +4,19 @@ import { requireAdmin } from "../middleware/auth.js";
 
 const router = Router();
 
+router.get("/cybersecurity-interests", requireAdmin, async (_req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT id, full_name, email, country, background, goal, consent, created_at
+       FROM cybersecurity_interest_submissions
+       ORDER BY created_at DESC`
+    );
+    return res.json(rows);
+  } catch (err) {
+    return res.status(500).json({ error: "Failed to fetch cybersecurity interest submissions" });
+  }
+});
+
 router.get("/stats", requireAdmin, async (_req, res) => {
   try {
     const [courses, mentors, enrollments, users, revenue, completed, bookings, articles] = await Promise.all([
