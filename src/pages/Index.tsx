@@ -716,7 +716,7 @@ const Index = () => {
                   custom={i} variants={scaleIn}
                 >
                   <Link
-                    to={`/courses?category=${encodeURIComponent(folder.key)}`}
+                    to={folder.key === "Cybersecurity Bootcamp" ? "/courses?category=Cybersecurity%20Bootcamp" : `/courses?category=${encodeURIComponent(folder.key)}`}
                     className={`flex flex-col h-full bg-white border rounded-2xl p-6 transition-all duration-300 group ${folder.accent} ${folder.glow} hover:-translate-y-1`}
                   >
                     {/* Icon */}
@@ -755,7 +755,7 @@ const Index = () => {
                     <span
                       className={`inline-flex items-center gap-1.5 text-sm font-semibold group-hover:gap-2.5 transition-all duration-200 ${folder.iconColor}`}
                     >
-                      Browse Courses <ArrowRight size={14} />
+                      {folder.key === "Cybersecurity Bootcamp" ? "View Cybersecurity Course" : "Browse Courses"} <ArrowRight size={14} />
                     </span>
                   </Link>
                 </motion.div>

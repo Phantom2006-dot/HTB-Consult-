@@ -130,7 +130,7 @@ const Footer = () => {
               {popularPathways.map((pathway) => (
                 <li key={pathway.category}>
                   <Link
-                    to={`/courses?category=${encodeURIComponent(pathway.category)}`}
+                    to={pathway.category === "Cybersecurity Bootcamp" ? "/courses?category=Cybersecurity%20Bootcamp" : `/courses?category=${encodeURIComponent(pathway.category)}`}
                     className="text-sm text-white/50 hover:text-primary transition-colors flex items-center gap-2 group"
                   >
                     <span className="w-0 group-hover:w-2 h-px transition-all duration-300 overflow-hidden"
