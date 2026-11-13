@@ -1,6 +1,8 @@
 import { FormEvent, useEffect, useState } from "react";
 import "./Cybersecurity.css";
 import { api } from "@/lib/api";
+import htbLogo from "@/assets/htb-logo-gold.webp";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 const Cybersecurity = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -40,8 +42,7 @@ const Cybersecurity = () => {
     <div className="cyber-page">
       <header>
         <a className="brand" href="/">
-          <span className="brandmark">HTB</span>
-          <span>ACADEMY<small>THINK. ANALYSE. IMPROVE.</small></span>
+          <img className="academy-logo" src={htbLogo} alt="HTB Consult Academy" />
         </a>
         <a className="back" href="/">← Back to academy</a>
       </header>
@@ -80,6 +81,7 @@ const Cybersecurity = () => {
         <section className="privacy" id="privacy"><h3>Your details, handled with care.</h3><p>HTB Academy, operated by HTB Consult Ltd, will store the details you submit and use them to respond to your interest in this cybersecurity programme. This form does not subscribe you to unrelated marketing. To withdraw your interest or request deletion of your details, email <a href="mailto:training@htbconsults.com">training@htbconsults.com</a>.</p></section>
       </main>
       <footer><span>HTB ACADEMY <small>by HTB Consult</small></span><a href="mailto:training@htbconsults.com">Questions? Let’s talk ↗</a><span>Think. Analyse. Improve.</span></footer>
+      <WhatsAppButton />
     </div>
   );
 };

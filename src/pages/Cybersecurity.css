@@ -22,6 +22,8 @@ header { background: var(--navy); color: rgb(255, 255, 255); border-bottom: 1px 
 
 .brand { letter-spacing: 3px; align-items: center; gap: 15px; font-size: 19px; font-weight: 700; text-decoration: none; display: flex; }
 
+.academy-logo { display: block; width: auto; height: 64px; object-fit: contain; }
+
 .brandmark { color: var(--gold); letter-spacing: -2px; border-right: 1px solid rgb(104, 112, 130); padding-right: 19px; font-family: Georgia, serif; font-size: 31px; }
 
 .brand small { letter-spacing: 1.8px; color: rgb(195, 201, 212); margin-top: 7px; font-size: 8px; display: block; }
@@ -168,6 +170,7 @@ footer a { color: rgb(226, 196, 135); text-decoration: none; }
   .learning h2 { font-size: 32px; }
   .nextgrid { gap: 24px; }
   .brand { font-size: 14px; }
+  .academy-logo { height: 52px; }
   .brandmark { font-size: 27px; }
   .back { font-size: 11px; }
   footer { flex-wrap: wrap; }
