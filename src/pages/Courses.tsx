@@ -308,7 +308,7 @@ const DELIVERY_ICONS: Record<string, React.ElementType> = {
   "Certificate of Completion": Award,
 };
 
-function ProgrammePanel({ programme, accentColor }: { programme: Programme; accentColor: string }) {
+function ProgrammePanel({ programme, accentColor, registrationHref }: { programme: Programme; accentColor: string; registrationHref: string }) {
   const accentBorder = accentColor.replace("text-", "border-").replace("-400", "-500/30");
   const accentBg = accentColor.replace("text-", "bg-").replace("-400", "-500/8");
   const accentText = accentColor;
@@ -351,7 +351,7 @@ function ProgrammePanel({ programme, accentColor }: { programme: Programme; acce
           </div>
           <div className="mt-5 flex justify-start">
             <Link
-              to="/auth?tab=signup"
+              to={registrationHref}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors shadow-sm"
             >
               Register Now <ArrowRight size={14} />
@@ -427,7 +427,7 @@ function ProgrammePanel({ programme, accentColor }: { programme: Programme; acce
           <div className="border-t border-gray-100 pt-4 space-y-3">
             <p className="text-[11px] text-gray-500 italic leading-relaxed">{programme.cta}</p>
             <Link
-              to="/auth?tab=signup"
+              to={registrationHref}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold transition-colors shadow-sm"
             >
               Register Now <ArrowRight size={14} />
@@ -795,6 +795,7 @@ const Courses = () => {
                       <ProgrammePanel
                         programme={activeFolderMeta.programme}
                         accentColor={activeFolderMeta.iconColor}
+                        registrationHref={activeFolderMeta.key === "Cybersecurity Bootcamp" ? "/cybersecurity#register" : "/auth?tab=signup"}
                       />
                     )}
                   </>
