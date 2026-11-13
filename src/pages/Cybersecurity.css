@@ -10,6 +10,8 @@
    standalone page is full-bleed, so remove that shell constraint here. */
 .cyber-page { width: 100vw; min-height: 100vh; margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); padding: 0; text-align: left; }
 
+.cyber-page .hero { background-color: var(--navy); }
+
 html { scroll-behavior: smooth; }
 
 body { color: var(--ink); background: rgb(246, 245, 241); margin: 0px; font-family: "DM Sans", Arial, sans-serif; }
